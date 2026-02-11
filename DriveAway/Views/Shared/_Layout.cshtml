@@ -1,50 +1,97 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DriveAway</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DriveAway.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DriveAway</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+<body class="min-h-screen bg-gray-50 text-gray-900">
+    <header class="sticky top-0 z-50">
+        <nav class="shadow" style="background-color: #182F52;">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <a class="text-xl sm:text-2xl font-bold text-white transition-colors" asp-area="" asp-controller="Home" asp-action="Index" onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='white'">
+                        DriveAway
+                    </a>
+
+                    <!-- Desktop nav -->
+                    <div class="hidden md:flex md:items-center md:gap-2">
+                        <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Home</a>
+                        <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Privacy" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Privacy</a>
+
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Super Admin"))
+                        {
+                            <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="RoleManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Role Management</a>
+                        }
+
+                        <partial name="_LoginPartial" />
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <button id="mobileMenuButton" type="button" class="md:hidden inline-flex items-center justify-center rounded p-2 text-white focus:outline-none focus:ring-2 transition-colors" style="--tw-ring-color: #FF6B00;" onmouseover="this.style.backgroundColor='#FF6B00'" onmouseout="this.style.backgroundColor='transparent'" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open main menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile nav panel -->
+                <div id="mobileMenu" class="md:hidden hidden pb-4">
+                    <div class="flex flex-col gap-1 pt-2">
+                        <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Home</a>
+                        <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Privacy" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Privacy</a>
+
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Super Admin"))
+                        {
+                            <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="RoleManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Role Management</a>
+                        }
+
+                        <div class="pt-2">
+                            <partial name="_LoginPartial" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - DriveAway - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-t bg-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-sm text-gray-600 flex items-center justify-between">
+            <div>&copy; 2026 - DriveAway</div>
+            <a class="font-medium transition-colors" style="color: #FF6B00;" onmouseover="this.style.color='#0B1E3D'" onmouseout="this.style.color='#FF6B00'" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('mobileMenuButton');
+            const menu = document.getElementById('mobileMenu');
+            if (!btn || !menu) return;
+
+            btn.addEventListener('click', function () {
+                const isHidden = menu.classList.contains('hidden');
+                menu.classList.toggle('hidden');
+                btn.setAttribute('aria-expanded', String(isHidden));
+            });
+        })();
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

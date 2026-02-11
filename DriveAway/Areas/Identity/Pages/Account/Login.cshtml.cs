@@ -115,6 +115,14 @@ namespace DriveAway.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    
+                    // Check if user is Super Admin and redirect to dashboard
+                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                    if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Super Admin"))
+                    {
+                        return RedirectToAction("Dashboard", "SuperAdmin");
+                    }
+                    
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

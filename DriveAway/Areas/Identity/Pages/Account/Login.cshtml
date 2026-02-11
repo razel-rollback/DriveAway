@@ -5,79 +5,130 @@
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background-color: #182F52;">
+    <div class="max-w-md w-full">
+        <!-- Login Card -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
+            <!-- Header -->
+            <div class="text-center">
+                <div class="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4" style="background-color: #FF6B00;">
+                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                <h1 class="text-3xl font-bold mb-2" style="color: #182F52;">Welcome Back</h1>
+                <p style="color: #636E72;">Sign in to your DriveAway account</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="account" method="post" class="space-y-5">
+                <div asp-validation-summary="ModelOnly" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert"></div>
+                
+                <!-- Email Input -->
+                <div>
+                    <label asp-for="Input.Email" class="block text-sm font-medium mb-2" style="color: #182F52;">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5" style="color: #636E72;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                            </svg>
+                        </div>
+                        <input asp-for="Input.Email" 
+                               class="block w-full pl-10 pr-3 py-3 border rounded-lg transition-all duration-200" 
+                               style="border-color: #636E72; color: #182F52;" 
+                               autocomplete="username" 
+                               aria-required="true" 
+                               placeholder="name@example.com" />
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-red-500 text-sm mt-1 block"></span>
                 </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
+
+                <!-- Password Input -->
+                <div>
+                    <label asp-for="Input.Password" class="block text-sm font-medium mb-2" style="color: #182F52;">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5" style="color: #636E72;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <input asp-for="Input.Password" 
+                               class="block w-full pl-10 pr-3 py-3 border rounded-lg transition-all duration-200" 
+                               style="border-color: #636E72; color: #182F52;" 
+                               autocomplete="current-password" 
+                               aria-required="true" 
+                               placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center">
+                    <input asp-for="Input.RememberMe" 
+                           type="checkbox" 
+                           class="h-4 w-4 border-gray-300 rounded cursor-pointer" 
+                           style="accent-color: #FF6B00;" />
+                    <label asp-for="Input.RememberMe" class="ml-2 block text-sm cursor-pointer" style="color: #636E72;">
                         @Html.DisplayNameFor(m => m.Input.RememberMe)
                     </label>
                 </div>
+
+                <!-- Submit Button -->
                 <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button id="login-submit" 
+                            type="submit" 
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105" 
+                            style="background-color: #FF6B00; --tw-ring-color: #FF6B00;" 
+                            onmouseover="this.style.backgroundColor='#e55f00'" 
+                            onmouseout="this.style.backgroundColor='#FF6B00'">
+                        Sign In
+                    </button>
                 </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+
+                <!-- Links -->
+                <div class="space-y-2 text-center text-sm">
+                    <div>
+                        <a id="forgot-password" 
+                           asp-page="./ForgotPassword" 
+                           class="font-medium transition-colors" 
+                           style="color: #FF6B00;" 
+                           onmouseover="this.style.color='#182F52'" 
+                           onmouseout="this.style.color='#FF6B00'">
+                            Forgot your password?
+                        </a>
+                    </div>
+                    <div>
+                        <a asp-page="./Register" 
+                           asp-route-returnUrl="@Model.ReturnUrl" 
+                           class="font-medium transition-colors" 
+                           style="color: #FF6B00;" 
+                           onmouseover="this.style.color='#182F52'" 
+                           onmouseout="this.style.color='#FF6B00'">
+                            Register as a new user
+                        </a>
+                    </div>
+                    <div>
+                        <a id="resend-confirmation" 
+                           asp-page="./ResendEmailConfirmation" 
+                           class="font-medium transition-colors" 
+                           style="color: #FF6B00;" 
+                           onmouseover="this.style.color='#182F52'" 
+                           onmouseout="this.style.color='#FF6B00'">
+                            Resend email confirmation
+                        </a>
+                    </div>
                 </div>
             </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
+        </div>
+
+        <!-- Footer Text -->
+        <p class="mt-6 text-center text-sm text-white drop-shadow-lg">
+            Secure login powered by DriveAway
+        </p>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+

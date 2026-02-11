@@ -2,25 +2,27 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+    <div class="flex flex-col md:flex-row md:items-center md:space-x-4 mt-2 md:mt-0">
+        <a class="text-white hover:text-blue-100 transition-colors font-medium py-2 px-3" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+            Hello @User.Identity?.Name!
+        </a>
+        <form class="inline-block" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="text-white hover:text-blue-100 transition-colors font-medium py-2 px-4 rounded hover:bg-blue-700 bg-blue-800">
+                Logout
+            </button>
         </form>
-    </li>
+    </div>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
+    <div class="flex flex-col md:flex-row md:items-center md:space-x-4 mt-2 md:mt-0">
+        <a class="text-white hover:text-blue-100 transition-colors font-medium py-2 px-3 rounded hover:bg-blue-700" asp-area="Identity" asp-page="/Account/Register">
+            Register
+        </a>
+        <a class="text-white hover:text-blue-100 transition-colors font-medium py-2 px-3 rounded hover:bg-blue-700" asp-area="Identity" asp-page="/Account/Login">
+            Login
+        </a>
+    </div>
 }
-</ul>
