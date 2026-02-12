@@ -62,15 +62,77 @@ namespace DriveAway.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, string roleName)
+        {
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(roleName))
+            {
+                TempData["Error"] = "Role ID and name are required.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
+            {
+                TempData["Error"] = "Role not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Prevent editing of system roles
+            if (role.Name == "Super Admin" || role.Name == "Admin")
+            {
+                TempData["Error"] = $"Cannot edit the '{role.Name}' system role!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Check if another role already has the new name
+            var existingRole = await _roleManager.FindByNameAsync(roleName);
+            if (existingRole != null && existingRole.Id != id)
+            {
+                TempData["Error"] = $"Role '{roleName}' already exists.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Update the role name
+            role.Name = roleName;
+            role.NormalizedName = roleName.ToUpper();
+
+            var result = await _roleManager.UpdateAsync(role);
+            if (result.Succeeded)
+            {
+                TempData["Success"] = $"Role updated to '{roleName}' successfully!";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to update role.";
+                foreach (var error in result.Errors)
+                {
+                    // Log errors if needed
+                    Console.WriteLine(error.Description);
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
             if (role != null)
             {
-                // Prevent deletion of Super Admin role
-                if (role.Name == "Super Admin")
+                // Prevent deletion of system roles
+                if (role.Name == "Super Admin" || role.Name == "Admin")
                 {
-                    TempData["Error"] = "Cannot delete Super Admin role!";
+                    TempData["Error"] = $"Cannot delete '{role.Name}' system role!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Check if any users are assigned to this role
+                var users = await _userManager.GetUsersInRoleAsync(role.Name);
+                if (users.Any())
+                {
+                    TempData["Error"] = $"Cannot delete role '{role.Name}' because it has {users.Count()} user(s) assigned.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -83,6 +145,10 @@ namespace DriveAway.Controllers
                 {
                     TempData["Error"] = "Failed to delete role.";
                 }
+            }
+            else
+            {
+                TempData["Error"] = "Role not found.";
             }
             return RedirectToAction(nameof(Index));
         }

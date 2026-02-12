@@ -29,9 +29,34 @@
                         <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Home</a>
                         <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Privacy" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Privacy</a>
 
-                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Super Admin"))
+                        @if (SignInManager.IsSignedIn(User))
                         {
-                            <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="RoleManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Role Management</a>
+                            @if (User.IsInRole("Super Admin"))
+                            {
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="SuperAdmin" asp-action="Dashboard" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Dashboard</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="UserManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">User Management</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="RoleManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Role Management</a>
+                            }
+                            else if (User.IsInRole("Admin"))
+                            {
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Admin" asp-action="Dashboard" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Dashboard</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="UserManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">User Management</a>
+                                
+                                <div class="relative group">
+                                    <button class="text-white transition-colors font-medium px-3 py-2 rounded inline-flex items-center" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">
+                                        Asset Lifecycle
+                                        <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden group-hover:block z-50">
+                                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                            <a asp-controller="AssetLifecycle" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">Overview</a>
+                                            <a asp-controller="AssetLifecycle" asp-action="Acquisition" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">Acquisition</a>
+                                            <a asp-controller="AssetLifecycle" asp-action="Registration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">Registration</a>
+                                            <a asp-controller="AssetLifecycle" asp-action="Disposal" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">Disposal</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         }
 
                         <partial name="_LoginPartial" />
@@ -51,12 +76,23 @@
                         <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Home</a>
                         <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Home" asp-action="Privacy" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Privacy</a>
 
-                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Super Admin"))
+                        @if (SignInManager.IsSignedIn(User))
                         {
-                            <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="RoleManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Role Management</a>
+                            @if (User.IsInRole("Super Admin"))
+                            {
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="SuperAdmin" asp-action="Dashboard" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Dashboard</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="UserManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">User Management</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="RoleManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Role Management</a>
+                            }
+                            else if(User.IsInRole("Admin"))
+                            {
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="Admin" asp-action="Dashboard" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Dashboard</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="UserManagement" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">User Management</a>
+                                <a class="text-white transition-colors font-medium px-3 py-2 rounded" asp-area="" asp-controller="AssetLifecycle" asp-action="Index" style="opacity: 0.9;" onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';" onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';">Asset Lifecycle</a>
+                            }
                         }
 
-                        <div class="pt-2">
+                        <div class="pb-4">
                             <partial name="_LoginPartial" />
                         </div>
                     </div>

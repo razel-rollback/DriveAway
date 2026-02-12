@@ -1,0 +1,101 @@
+@model DriveAway.Models.CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="mx-auto h-14 w-14 rounded-lg flex items-center justify-center mb-4" style="background-color: #1E3A5F;">
+                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-semibold" style="color: #1E3A5F;">Create New User</h2>
+            <p class="text-sm mt-1" style="color: #64748B;">Add a new user to the DriveAway system</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-lg border border-gray-100 p-8">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded mb-6" role="alert"></div>
+
+                <!-- Email Input -->
+                <div class="mb-5">
+                    <label asp-for="Email" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Email Address</label>
+                    <input asp-for="Email"
+                           class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
+                           style="border-color: #E2E8F0;"
+                           placeholder="user@example.com" />
+                    <span asp-validation-for="Email" class="text-xs text-red-600 mt-1 block"></span>
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-5">
+                    <label asp-for="Password" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Password</label>
+                    <input asp-for="Password"
+                           type="password"
+                           class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
+                           style="border-color: #E2E8F0;"
+                           placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-xs text-red-600 mt-1 block"></span>
+                </div>
+
+                <!-- Confirm Password Input -->
+                <div class="mb-5">
+                    <label asp-for="ConfirmPassword" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Confirm Password</label>
+                    <input asp-for="ConfirmPassword"
+                           type="password"
+                           class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
+                           style="border-color: #E2E8F0;"
+                           placeholder="••••••••" />
+                    <span asp-validation-for="ConfirmPassword" class="text-xs text-red-600 mt-1 block"></span>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="mb-6">
+                    <label asp-for="SelectedRole" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Assign Role</label>
+                    <div class="relative">
+                        <select asp-for="SelectedRole"
+                                asp-items="ViewBag.Roles"
+                                class="block w-full px-4 py-2.5 border rounded-lg appearance-none focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors bg-white"
+                                style="border-color: #E2E8F0; color: #1E3A5F;">
+                            <option value="">-- Select Role --</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <button type="submit"
+                            class="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+                            style="background-color: #1E3A5F;"
+                            onmouseover="this.style.backgroundColor='#FF6B00'"
+                            onmouseout="this.style.backgroundColor='#1E3A5F'">
+                        Create User
+                    </button>
+                    <a asp-action="Index"
+                       class="text-sm font-medium transition-colors"
+                       style="color: #64748B;"
+                       onmouseover="this.style.color='#FF6B00'"
+                       onmouseout="this.style.color='#64748B'">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

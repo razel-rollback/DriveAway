@@ -122,8 +122,12 @@ namespace DriveAway.Areas.Identity.Pages.Account
                     {
                         return RedirectToAction("Dashboard", "SuperAdmin");
                     }
-                    
-                    return LocalRedirect(returnUrl);
+                    if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return RedirectToAction("Dashboard", "Admin");
+                    }
+
+                        return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {

@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "Asset Lifecycle Management";
+}
+
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Asset Lifecycle Management</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a asp-action="Acquisition" class="block p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 transition duration-300">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Acquisition</h5>
+            <p class="font-normal text-gray-700">Manage the purchase and acquisition of new assets.</p>
+        </a>
+        
+        <a asp-action="Registration" class="block p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 transition duration-300">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Registration</h5>
+            <p class="font-normal text-gray-700">Handle vehicle registration and documentation.</p>
+        </a>
+        
+        <a asp-action="Disposal" class="block p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 transition duration-300">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Disposal</h5>
+            <p class="font-normal text-gray-700">Manage the sale or disposal of assets.</p>
+        </a>
+    </div>
+</div>
