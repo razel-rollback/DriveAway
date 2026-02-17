@@ -5,11 +5,11 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
-        <a class="text-white hover:text-blue-100 transition-colors font-medium py-2 px-3" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+        <a class="text-gray-100 hover:text-[#FF6B00] transition-colors font-medium py-2 px-3 text-sm" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
             Hello @User.Identity?.Name!
         </a>
         <form class="inline-block" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button type="submit" class="text-white hover:text-blue-100 transition-colors font-medium py-2 px-4 rounded hover:bg-blue-700 bg-blue-800">
+            <button type="submit" class="text-white hover:text-white transition-colors font-medium py-2 px-4 rounded-md bg-[#FF6B00] hover:bg-[#E65100] text-sm shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-200">
                 Logout
             </button>
         </form>
@@ -19,10 +19,7 @@ else
 {
     <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
         @* Registration is restricted to Admin/Super Admin workflows. *@
-        <a class="text-white transition-colors font-medium px-3 py-2 rounded"
-           style="opacity: 0.9;"
-           onmouseover="this.style.backgroundColor='#FF6B00'; this.style.opacity='1';"
-           onmouseout="this.style.backgroundColor='transparent'; this.style.opacity='0.9';"
+        <a class="text-gray-100 hover:text-white hover:bg-[#FF6B00] transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm"
            asp-area="Identity" asp-page="/Account/Login">
             Login
         </a>
