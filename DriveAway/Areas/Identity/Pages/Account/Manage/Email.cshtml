@@ -1,0 +1,68 @@
+@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Manage Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6" style="color: #1E3A5F;">Manage Account</h2>
+
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Main Content -->
+        <div class="flex-1 w-full">
+            <div class="bg-white rounded-lg border border-gray-100 p-6">
+                <h3 class="text-lg font-semibold mb-4" style="color: #1E3A5F;">Manage Email</h3>
+
+                <partial name="_StatusMessage" for="StatusMessage" />
+
+                <form id="email-form" method="post" asp-page-handler="ChangeEmail" class="space-y-5">
+                    <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded" role="alert"></div>
+
+                    <!-- Current Email (read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1" style="color: #1E3A5F;">Current Email</label>
+                        <div class="flex items-center gap-2">
+                            <input class="block w-full px-4 py-2.5 border rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                                   style="border-color: #E2E8F0;"
+                                   value="@Model.Email" disabled />
+                            @if (Model.IsEmailConfirmed)
+                            {
+                                <span class="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2.5 py-1 whitespace-nowrap">
+                                    <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                    Verified
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- New Email -->
+                    <div>
+                        <label asp-for="Input.NewEmail" class="block text-sm font-medium mb-1" style="color: #1E3A5F;">New email</label>
+                        <input asp-for="Input.NewEmail"
+                               class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
+                               style="border-color: #E2E8F0;"
+                               placeholder="Enter new email"
+                               autocomplete="email" />
+                        <span asp-validation-for="Input.NewEmail" class="text-xs text-red-600 mt-1 block"></span>
+                    </div>
+
+                    <!-- Submit -->
+                    <div>
+                        <button id="change-email-button" type="submit"
+                                class="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+                                style="background-color: #1E3A5F;"
+                                onmouseover="this.style.backgroundColor='#FF6B00'"
+                                onmouseout="this.style.backgroundColor='#1E3A5F'">
+                            Change email
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

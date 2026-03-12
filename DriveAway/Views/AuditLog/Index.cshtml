@@ -1,0 +1,279 @@
+@model IEnumerable<DriveAway.Models.AuditLog>
+@using DriveAway.Models
+@{
+    ViewData["Title"] = "Audit Log";
+
+    string ActionBadge(string action) => action switch
+    {
+        AuditAction.Create        => "bg-green-100 text-green-700",
+        AuditAction.Update        => "bg-blue-100 text-blue-700",
+        AuditAction.StatusChanged => "bg-amber-100 text-amber-700",
+        AuditAction.Delete        => "bg-red-100 text-red-700",
+        AuditAction.Archive       => "bg-gray-100 text-gray-600",
+        AuditAction.Login         => "bg-emerald-100 text-emerald-700",
+        AuditAction.LoginFailed   => "bg-red-100 text-red-700",
+        AuditAction.Logout        => "bg-slate-100 text-slate-600",
+        _                         => "bg-gray-100 text-gray-600"
+    };
+
+    string ActionDot(string action) => action switch
+    {
+        AuditAction.Create        => "bg-green-500",
+        AuditAction.Update        => "bg-blue-500",
+        AuditAction.StatusChanged => "bg-amber-500",
+        AuditAction.Delete        => "bg-red-500",
+        AuditAction.Archive       => "bg-gray-400",
+        AuditAction.Login         => "bg-emerald-500",
+        AuditAction.LoginFailed   => "bg-red-500",
+        AuditAction.Logout        => "bg-slate-400",
+        _                         => "bg-gray-400"
+    };
+
+    string ModuleBadge(string module) => module switch
+    {
+        AuditModule.Asset          => "bg-blue-50 text-blue-600",
+        AuditModule.UserManagement => "bg-purple-50 text-purple-600",
+        AuditModule.Authentication => "bg-teal-50 text-teal-600",
+        AuditModule.RoleManagement => "bg-orange-50 text-orange-600",
+        _                          => "bg-gray-50 text-gray-500"
+    };
+
+    int page       = (int)ViewBag.Page;
+    int totalPages = (int)ViewBag.TotalPages;
+    int totalCount = (int)ViewBag.TotalCount;
+}
+
+<div class="space-y-6">
+
+    <!-- Header -->
+    <div>
+        <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Audit Log</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Complete record of all system actions — read-only</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        @foreach (var (label, value, colorClass, subtext) in new (string, object, string, string)[]
+        {
+            ("Total Entries",    (int)ViewBag.TotalAll,    "text-gray-800",   "all time"),
+            ("Today",            (int)ViewBag.TotalToday,  "text-blue-600",   "UTC date"),
+            ("Last 7 Days",      (int)ViewBag.TotalWeek,   "text-indigo-600", "rolling"),
+            ("Unique Users",     (int)ViewBag.UniqueUsers, "text-purple-600", "in log"),
+        })
+        {
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm px-5 py-4">
+                <p class="text-xs text-gray-500 font-medium">@label</p>
+                <p class="text-3xl font-bold mt-1 @colorClass">@value</p>
+                <p class="text-xs text-gray-400 mt-0.5">@subtext</p>
+            </div>
+        }
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Filter Entries</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">User Email</label>
+                <input type="text" name="userEmail" value="@ViewBag.FilterUserEmail"
+                       placeholder="e.g. admin@@..."
+                       class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Module</label>
+                <select name="module" class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D] bg-white">
+                    <option value="">All Modules</option>
+                    @foreach (var m in (List<string>)ViewBag.Modules)
+                    {
+                        <option value="@m" selected="@(ViewBag.FilterModule == m ? "selected" : null)">@m</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Action</label>
+                <select name="auditAction" class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D] bg-white">
+                    <option value="">All Actions</option>
+                    @foreach (var a in (List<string>)ViewBag.Actions)
+                    {
+                        <option value="@a" selected="@(ViewBag.FilterAction == a ? "selected" : null)">@a</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">From Date</label>
+                <input type="date" name="from" value="@ViewBag.FilterFrom"
+                       class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">To Date</label>
+                <input type="date" name="to" value="@ViewBag.FilterTo"
+                       class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" />
+            </div>
+        </div>
+        <div class="flex items-center gap-3 mt-4">
+            <button type="submit"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
+                    style="background-color: #0B1E3D;"
+                    onmouseover="this.style.backgroundColor='#FF6B00'"
+                    onmouseout="this.style.backgroundColor='#0B1E3D'">
+                Apply Filters
+            </button>
+            <a asp-action="Index"
+               class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:text-gray-800 transition-colors">
+                Clear
+            </a>
+            <span class="text-xs text-gray-400 ml-auto">
+                Showing @Model.Count() of @totalCount matching entr@(totalCount == 1 ? "y" : "ies")
+            </span>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+        @if (!Model.Any())
+        {
+            <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+                <svg class="h-12 w-12 mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p class="text-sm font-medium text-gray-500">No audit entries match your filters.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 text-sm">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left w-40">Timestamp (UTC)</th>
+                            <th class="px-5 py-3 text-left">User</th>
+                            <th class="px-5 py-3 text-left">Action</th>
+                            <th class="px-5 py-3 text-left">Module</th>
+                            <th class="px-5 py-3 text-left">Entity</th>
+                            <th class="px-5 py-3 text-left">Details</th>
+                          
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach (var log in Model)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-5 py-3.5 text-xs text-gray-500 whitespace-nowrap">
+                                    <span class="font-medium text-gray-700">@log.Timestamp.ToString("MMM d, yyyy")</span>
+                                    <br />
+                                    <span class="text-gray-400">@log.Timestamp.ToString("HH:mm:ss") UTC</span>
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    @if (!string.IsNullOrEmpty(log.UserEmail))
+                                    {
+                                        <span class="text-gray-700 font-medium">@log.UserEmail</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-300 text-xs">—</span>
+                                    }
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium @ActionBadge(log.Action)">
+                                        <span class="h-1.5 w-1.5 rounded-full @ActionDot(log.Action)"></span>
+                                        @log.Action
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium @ModuleBadge(log.Module)">
+                                        @log.Module
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    @if (!string.IsNullOrEmpty(log.EntityName))
+                                    {
+                                        <span class="font-medium text-gray-700 text-xs">@log.EntityName</span>
+                                        @if (!string.IsNullOrEmpty(log.EntityType))
+                                        {
+                                            <br /><span class="text-gray-400 text-xs">@log.EntityType</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-300 text-xs">—</span>
+                                    }
+                                </td>
+                                <td class="px-5 py-3.5 text-xs text-gray-500 max-w-xs">
+                                    @if (!string.IsNullOrEmpty(log.Details))
+                                    {
+                                        <span title="@log.Details">
+                                            @(log.Details.Length > 80 ? log.Details[..80] + "…" : log.Details)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-300">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (totalPages > 1)
+            {
+                <div class="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+                    <p class="text-xs text-gray-500">
+                        Page @(page) of @(totalPages)
+                    </p>
+                    <div class="flex items-center gap-2">
+                        @if (page > 1)
+                        {
+                            <a asp-action="Index"
+                               asp-route-page="@(page - 1)"
+                               asp-route-userEmail="@ViewBag.FilterUserEmail"
+                               asp-route-module="@ViewBag.FilterModule"
+                               asp-route-auditAction="@ViewBag.FilterAction"
+                               asp-route-from="@ViewBag.FilterFrom"
+                               asp-route-to="@ViewBag.FilterTo"
+                               class="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg text-gray-600 hover:border-[#0B1E3D] hover:text-[#0B1E3D] transition-colors">
+                                ← Previous
+                            </a>
+                        }
+                        @for (int p = Math.Max(1, page - 2); p <= Math.Min(totalPages, page + 2); p++)
+                        {
+                            if (p == page)
+                            {
+                                <span class="px-3 py-1.5 text-xs font-semibold rounded-lg text-white"
+                                      style="background-color: #0B1E3D;">@p</span>
+                            }
+                            else
+                            {
+                                <a asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-userEmail="@ViewBag.FilterUserEmail"
+                                   asp-route-module="@ViewBag.FilterModule"
+                                   asp-route-auditAction="@ViewBag.FilterAction"
+                                   asp-route-from="@ViewBag.FilterFrom"
+                                   asp-route-to="@ViewBag.FilterTo"
+                                   class="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg text-gray-600 hover:border-[#0B1E3D] hover:text-[#0B1E3D] transition-colors">
+                                    @p
+                                </a>
+                            }
+                        }
+                        @if (page < totalPages)
+                        {
+                            <a asp-action="Index"
+                               asp-route-page="@(page + 1)"
+                               asp-route-userEmail="@ViewBag.FilterUserEmail"
+                               asp-route-module="@ViewBag.FilterModule"
+                               asp-route-auditAction="@ViewBag.FilterAction"
+                               asp-route-from="@ViewBag.FilterFrom"
+                               asp-route-to="@ViewBag.FilterTo"
+                               class="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg text-gray-600 hover:border-[#0B1E3D] hover:text-[#0B1E3D] transition-colors">
+                                Next →
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

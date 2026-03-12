@@ -1,0 +1,327 @@
+@model DriveAway.Models.RentalContract
+@using DriveAway.Models
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Rent Vehicle";
+    var vehicleData = ViewBag.VehicleData as IEnumerable<dynamic>;
+    var categoryRates = ViewBag.CategoryRates as List<DriveAway.Models.CategoryRate>;
+    var categories = ViewBag.Categories as List<string>;
+}
+
+<div class="max-w-3xl mx-auto space-y-6">
+
+    @* ── Header ── *@
+    <div>
+        <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Rent Vehicle</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Fill in the rental details and process check-out</p>
+    </div>
+
+    @* ── Validation Summary ── *@
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div asp-validation-summary="All" class="space-y-1"></div>
+        </div>
+    }
+
+    <form asp-action="CheckOut" method="post" class="bg-white rounded-lg border border-gray-100 shadow-sm divide-y divide-gray-100">
+
+        @* ── Category & Vehicle Selection ── *@
+        <div class="px-6 py-5 space-y-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Vehicle Selection</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Category</label>
+                    <select id="categorySelect"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]">
+                        <option value="">All Categories</option>
+                        @if (categories != null)
+                        {
+                            @foreach (var cat in categories)
+                            {
+                                <option value="@cat">@cat</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search Vehicle</label>
+                    <input type="text" id="vehicleSearch" placeholder="Type plate, make, or model…"
+                           class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" />
+                </div>
+            </div>
+
+            <div>
+                <label asp-for="VehicleId" class="block text-sm font-medium text-gray-700 mb-1">Select Vehicle</label>
+                <select asp-for="VehicleId" id="vehicleSelect"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]">
+                    <option value="">— Choose a vehicle —</option>
+                </select>
+                <span asp-validation-for="VehicleId" class="text-xs text-red-600"></span>
+                <p id="vehicleCount" class="text-xs text-gray-400 mt-1"></p>
+            </div>
+
+            @* Vehicle Image Preview *@
+            <div id="vehicleImageContainer" class="hidden">
+                <div class="rounded-lg border border-gray-200 overflow-hidden bg-gray-50 max-w-sm">
+                    <img id="vehicleImage" src="" alt="Vehicle" class="w-full h-48 object-cover" />
+                </div>
+            </div>
+        </div>
+
+        @* ── Customer Information ── *@
+        <div class="px-6 py-5 space-y-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Customer Information</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="CustomerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input asp-for="CustomerName" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" placeholder="Juan Dela Cruz" />
+                    <span asp-validation-for="CustomerName" class="text-xs text-red-600"></span>
+                </div>
+                <div>
+                    <label asp-for="CustomerContact" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                    <input asp-for="CustomerContact" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" placeholder="09XX-XXX-XXXX" />
+                    <span asp-validation-for="CustomerContact" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="CustomerLicense" class="block text-sm font-medium text-gray-700 mb-1">Driver's License No.</label>
+                    <input asp-for="CustomerLicense" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" placeholder="License number" />
+                    <span asp-validation-for="CustomerLicense" class="text-xs text-red-600"></span>
+                </div>
+                <div>
+                    <label asp-for="CustomerEmail" class="block text-sm font-medium text-gray-700 mb-1">Customer Email (Gmail)</label>
+                    <input asp-for="CustomerEmail" type="email" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" placeholder="customer@gmail.com" />
+                    <span asp-validation-for="CustomerEmail" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+        </div>
+
+        @* ── Rental Period & Pricing ── *@
+        <div class="px-6 py-5 space-y-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Rental Period & Pricing</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="RentalStart" class="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                    <input asp-for="RentalStart" type="datetime-local" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" id="rentalStart" />
+                    <span asp-validation-for="RentalStart" class="text-xs text-red-600"></span>
+                </div>
+                <div>
+                    <label asp-for="RentalEnd" class="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
+                    <input asp-for="RentalEnd" type="datetime-local" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" id="rentalEnd" />
+                    <span asp-validation-for="RentalEnd" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                    <label asp-for="DailyRate" class="block text-sm font-medium text-gray-700 mb-1">Daily Rate (₱)</label>
+                    <input asp-for="DailyRate" type="number" step="0.01" min="0.01" id="dailyRate" readonly
+                           class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-700" placeholder="0.00" />
+                    <p class="text-xs text-gray-400 mt-1">Auto-filled from category (read-only)</p>
+                    <span asp-validation-for="DailyRate" class="text-xs text-red-600"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Days</label>
+                    <input type="text" id="rentalDays" readonly class="w-full border border-gray-100 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-600" value="0" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Rental Total (₱)</label>
+                    <input type="text" id="totalFeeDisplay" readonly class="w-full border border-gray-100 rounded-lg px-3 py-2.5 text-sm bg-gray-50 font-semibold text-gray-800" value="0.00" />
+                </div>
+                <div>
+                    <label asp-for="SecurityDeposit" class="block text-sm font-medium text-gray-700 mb-1">Security Deposit (₱)</label>
+                    <input asp-for="SecurityDeposit" type="number" step="0.01" min="5000" id="securityDeposit"
+                           class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" value="5000" />
+                    <p class="text-xs text-gray-400 mt-1">Minimum ₱5,000</p>
+                    <span asp-validation-for="SecurityDeposit" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            @* Grand Total *@
+            <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-600">Grand Total (Rental + Deposit)</span>
+                <span class="text-lg font-bold" style="color: #0B1E3D;" id="grandTotal">₱0.00</span>
+            </div>
+        </div>
+
+        @* ── Payment ── *@
+        <div class="px-6 py-5 space-y-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Payment</h2>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                <select name="paymentMethod" id="paymentMethod"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]">
+                    <option value="Cash">Cash</option>
+                    <option value="Online">Online</option>
+                </select>
+            </div>
+
+            @* Payment status info *@
+            <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 flex items-center gap-2">
+                <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Payment status will be set to <strong>Pending</strong> until payment is confirmed.</span>
+            </div>
+
+            @* Online PayMongo note *@
+            <div id="ewalletNote" class="hidden rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 flex items-center gap-2">
+                <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                A PayMongo payment link and QR code will be generated after check-out for the customer to pay online.
+            </div>
+        </div>
+
+        @* ── Actions ── *@
+        <div class="px-6 py-4 flex items-center justify-between bg-gray-50/50">
+            <a asp-action="Index" class="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">← Back to Dashboard</a>
+            <button type="submit"
+                    class="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md"
+                    style="background-color: #FF6B00;">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Process Check-Out
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+    // Vehicle data from server
+    var allVehicles = @Html.Raw(JsonSerializer.Serialize(vehicleData, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+    var categoryRates = {};
+    @if (categoryRates != null)
+    {
+        foreach (var r in categoryRates)
+        {
+            @Html.Raw($"categoryRates[\"{r.Category}\"] = {r.DailyRate.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)};")
+        }
+    }
+
+    var vehicleSelect = document.getElementById('vehicleSelect');
+    var categorySelect = document.getElementById('categorySelect');
+    var searchInput = document.getElementById('vehicleSearch');
+    var vehicleCount = document.getElementById('vehicleCount');
+
+    // Populate vehicle dropdown based on filters
+    function populateVehicles() {
+        var cat = categorySelect.value;
+        var query = (searchInput.value || '').toLowerCase().trim();
+        var currentVal = vehicleSelect.value;
+
+        vehicleSelect.innerHTML = '<option value="">— Choose a vehicle —</option>';
+
+        var filtered = allVehicles;
+        if (cat) {
+            filtered = filtered.filter(function(v) { return v.category === cat; });
+        }
+        if (query) {
+            filtered = filtered.filter(function(v) {
+                return v.display.toLowerCase().indexOf(query) !== -1;
+            });
+        }
+
+        filtered.forEach(function(v) {
+            var opt = document.createElement('option');
+            opt.value = v.id;
+            opt.textContent = v.display + (v.branch ? ' [' + v.branch + ']' : '');
+            opt.dataset.image = v.imagePath || '';
+            opt.dataset.category = v.category || '';
+            if (v.id == currentVal) opt.selected = true;
+            vehicleSelect.appendChild(opt);
+        });
+
+        vehicleCount.textContent = filtered.length + ' vehicle(s) available';
+    }
+
+    // Initial load
+    populateVehicles();
+
+    // Category filter
+    categorySelect.addEventListener('change', function() {
+        var cat = this.value;
+
+        // Reset image
+        document.getElementById('vehicleImageContainer').classList.add('hidden');
+
+        // Auto-fill daily rate from category
+        if (cat && categoryRates[cat]) {
+            document.getElementById('dailyRate').value = categoryRates[cat].toFixed(2);
+            calcFee();
+        } else {
+            document.getElementById('dailyRate').value = '';
+            calcFee();
+        }
+
+        populateVehicles();
+    });
+
+    // Search filter (debounced)
+    var searchTimer = null;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            populateVehicles();
+        }, 200);
+    });
+
+    // Show vehicle image on selection and auto-fill rate from its category
+    vehicleSelect.addEventListener('change', function() {
+        var selected = this.options[this.selectedIndex];
+        var imgContainer = document.getElementById('vehicleImageContainer');
+        var img = document.getElementById('vehicleImage');
+
+        if (selected && selected.dataset.image) {
+            img.src = selected.dataset.image;
+            imgContainer.classList.remove('hidden');
+        } else {
+            imgContainer.classList.add('hidden');
+        }
+
+        // If no category selected yet, auto-fill rate from vehicle's category
+        if (!categorySelect.value && selected && selected.dataset.category && categoryRates[selected.dataset.category]) {
+            document.getElementById('dailyRate').value = categoryRates[selected.dataset.category].toFixed(2);
+            calcFee();
+        }
+    });
+
+    // Fee calculation
+    function calcFee() {
+        var start = document.getElementById('rentalStart').value;
+        var end   = document.getElementById('rentalEnd').value;
+        var rate  = parseFloat(document.getElementById('dailyRate').value) || 0;
+        var deposit = parseFloat(document.getElementById('securityDeposit').value) || 0;
+
+        if (start && end) {
+            var ms   = new Date(end) - new Date(start);
+            var days = Math.max(1, Math.ceil(ms / 86400000));
+            var rental = rate * days;
+            document.getElementById('rentalDays').value = days;
+            document.getElementById('totalFeeDisplay').value = rental.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('grandTotal').textContent = '₱' + (rental + deposit).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        } else {
+            document.getElementById('rentalDays').value = '0';
+            document.getElementById('totalFeeDisplay').value = '0.00';
+            document.getElementById('grandTotal').textContent = '₱0.00';
+        }
+    }
+
+    document.getElementById('rentalStart').addEventListener('change', calcFee);
+    document.getElementById('rentalEnd').addEventListener('change', calcFee);
+    document.getElementById('securityDeposit').addEventListener('input', calcFee);
+
+    // Online note toggle
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+        var note = document.getElementById('ewalletNote');
+        if (this.value === 'Online') {
+            note.classList.remove('hidden');
+        } else {
+            note.classList.add('hidden');
+        }
+    });
+</script>
+}

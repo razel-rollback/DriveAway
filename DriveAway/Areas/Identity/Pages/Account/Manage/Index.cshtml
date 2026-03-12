@@ -1,0 +1,58 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6" style="color: #1E3A5F;">Manage Account</h2>
+
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Main Content -->
+        <div class="flex-1 w-full">
+            <div class="bg-white rounded-lg border border-gray-100 p-6">
+                <h3 class="text-lg font-semibold mb-4" style="color: #1E3A5F;">Profile</h3>
+
+                <partial name="_StatusMessage" for="StatusMessage" />
+
+                <form id="profile-form" method="post" class="space-y-5">
+                    <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded" role="alert"></div>
+
+                    <!-- Username (read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1" style="color: #1E3A5F;">Username</label>
+                        <input class="block w-full px-4 py-2.5 border rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                               style="border-color: #E2E8F0;"
+                               value="@Model.Username" disabled />
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label asp-for="Input.PhoneNumber" class="block text-sm font-medium mb-1" style="color: #1E3A5F;">Phone number</label>
+                        <input asp-for="Input.PhoneNumber"
+                               class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
+                               style="border-color: #E2E8F0;"
+                               placeholder="Enter phone number" />
+                        <span asp-validation-for="Input.PhoneNumber" class="text-xs text-red-600 mt-1 block"></span>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div>
+                        <button id="update-profile-button" type="submit"
+                                class="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+                                style="background-color: #1E3A5F;"
+                                onmouseover="this.style.backgroundColor='#FF6B00'"
+                                onmouseout="this.style.backgroundColor='#1E3A5F'">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

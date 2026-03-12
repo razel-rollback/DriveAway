@@ -1,0 +1,103 @@
+@using DriveAway.Models
+@{
+    ViewData["Title"] = "Repair History";
+    var jobs = (List<MaintenanceJob>)Model;
+}
+
+@model List<MaintenanceJob>
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Repair History</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Your completed maintenance records</p>
+        </div>
+        <a asp-action="Dashboard" class="inline-flex items-center gap-1 text-sm font-medium text-[#FF6B00] hover:text-[#0B1E3D] transition-colors">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    @if (!jobs.Any())
+    {
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-12 text-center">
+            <svg class="h-12 w-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-sm text-gray-400">No completed repairs yet</p>
+        </div>
+    }
+    else
+    {
+        <div class="space-y-4">
+            @foreach (var job in jobs)
+            {
+                <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="font-bold text-gray-800">@job.Vehicle.PlateNumber</span>
+                            <span class="text-xs text-gray-500">@job.Vehicle.Year @job.Vehicle.Make @job.Vehicle.Model</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium @(job.DamageSeverity == DamageSeverity.Major ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700")">@job.DamageSeverity</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Completed</span>
+                            @if (job.Vehicle.Branch != null)
+                            {
+                                <span class="text-xs text-gray-400">• @job.Vehicle.Branch.Name</span>
+                            }
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mt-3">
+                            <div>
+                                <p class="text-xs text-gray-400">Damage</p>
+                                <p class="text-gray-700 text-xs">@(job.DamageDescription ?? "—")</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Completed</p>
+                                <p class="font-medium text-gray-700 text-xs">@(job.CompletedAt?.ToString("MMM dd, yyyy") ?? "—")</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Total Cost</p>
+                                <p class="font-bold text-gray-800">₱@((job.RepairCost ?? 0).ToString("N2"))</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Repair Notes</p>
+                                <p class="text-gray-700 text-xs">@(job.RepairNotes ?? "—")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (job.RepairParts.Any())
+                    {
+                        <div class="border-t border-gray-100">
+                            <table class="w-full text-xs">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-gray-500 font-semibold">Part Name</th>
+                                        <th class="px-4 py-2 text-left text-gray-500 font-semibold">Quantity</th>
+                                        <th class="px-4 py-2 text-right text-gray-500 font-semibold">Unit Cost</th>
+                                        <th class="px-4 py-2 text-right text-gray-500 font-semibold">Total Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @foreach (var part in job.RepairParts)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-2 text-gray-700">@part.PartName</td>
+                                            <td class="px-4 py-2 text-gray-600">@part.Quantity</td>
+                                            <td class="px-4 py-2 text-right text-gray-600">₱@part.UnitCost.ToString("N2")</td>
+                                            <td class="px-4 py-2 text-right font-medium text-gray-800">₱@part.TotalCost.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="bg-gray-50">
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-2 text-right font-semibold text-gray-600 text-xs uppercase">Total</td>
+                                        <td class="px-4 py-2 text-right font-bold text-gray-800">₱@job.RepairParts.Sum(p => p.TotalCost).ToString("N2")</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

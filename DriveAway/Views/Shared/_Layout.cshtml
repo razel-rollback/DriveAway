@@ -1,17 +1,16 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8" />    
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DriveAway</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DriveAway.styles.css" asp-append-version="true" />
 </head>
@@ -29,20 +28,66 @@
 
                     <!-- Desktop nav -->
                     <div class="hidden md:flex md:items-center md:gap-1">
-                        <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
 
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            @if (User.IsInRole("Super Admin"))
+                            var isAdmin = User.IsInRole("Admin");
+                            var isSuperAdmin = User.IsInRole("Super Admin");
+                            var isBusinessOwner = User.IsInRole("Business Owner");
+                            var isStaff = User.IsInRole("Staff");
+
+                            if (isAdmin || isSuperAdmin || isBusinessOwner)
                             {
-                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm" asp-controller="SuperAdmin" asp-action="Dashboard">Dashboard</a>
-                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm" asp-controller="UserManagement" asp-action="Index">Users</a>
-                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm" asp-controller="RoleManagement" asp-action="Index">Roles</a>
-                            }
-                            else if (User.IsInRole("Admin"))
-                            {
-                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm" asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
+                                <!-- Dashboard Link -->
+                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm"
+                                   asp-controller="@(isSuperAdmin ? "SuperAdmin" : isBusinessOwner ? "BusinessOwner" : "Admin")"
+                                   asp-action="Dashboard">Dashboard</a>
+
+                                @if (isSuperAdmin)
+                                {
+                                    <div class="relative">
+
+                                        <button id="adminButton" type="button" aria-haspopup="true" aria-expanded="false" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 focus:text-[#FF6B00] focus:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
+                                            Administration
+                                            <svg class="ml-1.5 h-4 w-4 opacity-70 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </button>
+                                        <div id="adminMenu" class="absolute left-0 mt-2 w-56 hidden transform origin-top-left z-[1000]">
+                                            <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
+                                                <div class="py-1">
+                                                    <a asp-controller="UserManagement" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">User Management</a>
+                                                    <a asp-controller="RoleManagement" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Role Management</a>
+                                                    <a asp-controller="CategoryRates" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Category Management</a>
+                                                    <a asp-controller="BranchManagement" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Branch Management</a>
+                                                    <a asp-controller="AuditLog" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Audit Log</a>
+                                                    <a asp-controller="Admin" asp-action="Archive" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Archive</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else if (isAdmin || isBusinessOwner)
+                                {
+                                    <!-- Administration Dropdown for Admin / Business Owner -->
+                                    <div class="relative">
+                                        <button id="administrationButton" type="button" aria-haspopup="true" aria-expanded="false" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 focus:text-[#FF6B00] focus:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
+                                            Administration
+                                            <svg class="ml-1.5 h-4 w-4 opacity-70 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </button>
+                                        <div id="administrationMenu" class="absolute left-0 mt-2 w-56 hidden transform origin-top-left z-[1000]">
+                                            <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
+                                                <div class="py-1">
+                                                    <a asp-controller="UserManagement" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">User Management</a>
+                                                    <a asp-controller="CategoryRates" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Category Management</a>
+                                                    @if (isBusinessOwner)
+                                                    {
+                                                        <a asp-controller="BranchManagement" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Branch Management</a>
+                                                    }
+                                                    <a asp-controller="Admin" asp-action="Archive" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Archive</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
 
                                 <!-- Asset Inventory Dropdown -->
                                 <div class="relative">
@@ -55,53 +100,113 @@
                                             <div class="py-1">
                                                 <a asp-controller="AssetLifecycle" asp-action="Registration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Registration</a>
                                                 <a asp-controller="AssetLifecycle" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Lifecycle Tracking</a>
-                                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Status Monitoring</a>
+                                                <a asp-controller="AssetLifecycle" asp-action="StatusMonitoring" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Status Monitoring</a>
+                                                <a asp-controller="AssetLifecycle" asp-action="Disposal" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Disposal</a>
+                                                @if (isBusinessOwner)
+                                                {
+                                                    <a asp-controller="BusinessOwner" asp-action="FleetManagement" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Fleet Management</a>
+                                                }
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Rental Operations (Link) -->
-                                <a href="#" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm">Rental Operations</a>
+                                <a asp-controller="RentalOperations" asp-action="Index" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm">Rental Operations</a>
 
                                 <!-- Maintenance Tracker Dropdown -->
-                                <div class="relative group">
-                                    <button class="text-gray-100 group-hover:text-[#FF6B00] group-hover:bg-white/10 group-focus-within:text-[#FF6B00] group-focus-within:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
+                                <div class="relative">
+                                    <button id="maintenanceButton" type="button" aria-haspopup="true" aria-expanded="false" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 focus:text-[#FF6B00] focus:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
                                         Maintenance
-                                        <svg class="ml-1.5 h-4 w-4 opacity-70 group-hover:rotate-180 group-focus-within:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        <svg class="ml-1.5 h-4 w-4 opacity-70 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
-                                    <div class="absolute left-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 transform origin-top-left z-[1000]">
-                                         <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
+                                    <div id="maintenanceMenu" class="absolute left-0 mt-2 w-56 hidden transform origin-top-left z-[1000]">
+                                        <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
                                             <div class="py-1">
-                                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Maintenance Mgmt</a>
-                                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Work Orders</a>
+                                                <a asp-controller="Maintenance" asp-action="Jobs" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Maintenance Jobs</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Finance & Accounting Dropdown -->
-                                <div class="relative group">
-                                    <button class="text-gray-100 group-hover:text-[#FF6B00] group-hover:bg-white/10 group-focus-within:text-[#FF6B00] group-focus-within:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
-                                        Finance
-                                        <svg class="ml-1.5 h-4 w-4 opacity-70 group-hover:rotate-180 group-focus-within:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <div class="relative">
+                                    <button id="financeButton" type="button" aria-haspopup="true" aria-expanded="false" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 focus:text-[#FF6B00] focus:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
+                                        Finance & Reports
+                                        <svg class="ml-1.5 h-4 w-4 opacity-70 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
-                                    <div class="absolute right-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 transform origin-top-right z-[1000]">
+                                    <div id="financeMenu" class="absolute right-0 mt-2 w-56 hidden transform origin-top-right z-[1000]">
                                          <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
                                             <div class="py-1">
-                                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Depreciation</a>
-                                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Cost Analysis</a>
-                                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Financial Reporting</a>
+                                                <a asp-controller="Reports" asp-action="AssetInventory" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Inventory Report</a>
+                                                <a asp-controller="Reports" asp-action="RentalTransactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Rental Transaction Report</a>
+                                                <a asp-controller="Reports" asp-action="VehicleStatus" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Vehicle Status Report</a>
+                                                <a asp-controller="Reports" asp-action="MaintenanceRecords" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Maintenance Records</a>
+                                                <a asp-controller="Reports" asp-action="PaymentTransactions" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Payment Transactions</a>
+                                                <a asp-controller="Reports" asp-action="DamageRepair" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Damage &amp; Repair Report</a>
+                                                <div class="border-t border-gray-100 my-1"></div>
+                                                <div class="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Analytical</div>
+                                                <a asp-controller="Reports" asp-action="AssetDepreciation" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Asset Depreciation</a>
+                                                <a asp-controller="Reports" asp-action="VehicleUtilization" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Vehicle Utilization</a>
+                                                <a asp-controller="Reports" asp-action="MaintenanceCostAnalysis" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Maintenance Cost Analysis</a>
+                                                <a asp-controller="Reports" asp-action="RevenueAnalysis" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Revenue Analysis</a>
+                                                <a asp-controller="Reports" asp-action="ProfitAndLoss" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Profit & Loss</a>
+                                                <a asp-controller="Reports" asp-action="PaymentMethodAnalysis" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Payment Method Analysis</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            }
+                            else if (isStaff)
+                            {
+                                <!-- Staff Dashboard Link -->
+                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm"
+                                   asp-controller="StaffDashboard"
+                                   asp-action="Dashboard">Dashboard</a>
 
-                                <a href="#" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm">Reports</a>
+                                <!-- Staff Rental Operations Dropdown -->
+                                <div class="relative">
+                                    <button id="staffRentalButton" type="button" aria-haspopup="true" aria-expanded="false" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 focus:text-[#FF6B00] focus:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
+                                        Rental Operations
+                                        <svg class="ml-1.5 h-4 w-4 opacity-70 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="staffRentalMenu" class="absolute left-0 mt-2 w-56 hidden transform origin-top-left z-[1000]">
+                                        <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
+                                            <div class="py-1">
+                                                <a asp-controller="RentalOperations" asp-action="CheckOut" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Rent Vehicle</a>
+                                                <a asp-controller="RentalOperations" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">All Contracts</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (User.IsInRole("Mechanic"))
+                            {
+                                <!-- Mechanic Dashboard -->
+                                <a class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm"
+                                   asp-controller="Mechanic"
+                                   asp-action="Dashboard">Dashboard</a>
+
+                                <!-- Mechanic Jobs Dropdown -->
+                                <div class="relative">
+                                    <button id="mechanicJobsButton" type="button" aria-haspopup="true" aria-expanded="false" class="text-gray-100 hover:text-[#FF6B00] hover:bg-white/10 focus:text-[#FF6B00] focus:bg-white/10 transition-all duration-200 font-medium px-3 py-2 rounded-md text-sm inline-flex items-center">
+                                        My Jobs
+                                        <svg class="ml-1.5 h-4 w-4 opacity-70 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div id="mechanicJobsMenu" class="absolute left-0 mt-2 w-56 hidden transform origin-top-left z-[1000]">
+                                        <div class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden bg-white">
+                                            <div class="py-1">
+                                                <a asp-controller="Mechanic" asp-action="Dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Active Jobs</a>
+                                                <a asp-controller="Mechanic" asp-action="History" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Repair History</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             }
                         }
 
-                        <partial name="_LoginPartial" />
+                        <partial name="_LoginPartial" view-data='new ViewDataDictionary(ViewData) { ["Mode"] = "Desktop" }' />
                     </div>
 
                     <!-- Mobile menu button -->
@@ -120,32 +225,84 @@
 
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            @if (User.IsInRole("Super Admin"))
+                            var isAdmin = User.IsInRole("Admin");
+                            var isSuperAdmin = User.IsInRole("Super Admin");
+                            var isBusinessOwner = User.IsInRole("Business Owner");
+                            var isStaff = User.IsInRole("Staff");
+
+                            if (isAdmin || isSuperAdmin || isBusinessOwner)
                             {
-                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="SuperAdmin" asp-action="Dashboard">Dashboard</a>
-                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="UserManagement" asp-action="Index">User Management</a>
-                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="RoleManagement" asp-action="Index">Role Management</a>
-                            }
-                            else if(User.IsInRole("Admin"))
-                            {
-                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
+                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="@(isSuperAdmin ? "SuperAdmin" : isBusinessOwner ? "BusinessOwner" : "Admin")" asp-action="Dashboard">Dashboard</a>
                                 <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Asset Inventory</div>
                                 <a asp-controller="AssetLifecycle" asp-action="Registration" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Registration</a>
                                 <a asp-controller="AssetLifecycle" asp-action="Index" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Lifecycle</a>
+                                <a asp-controller="AssetLifecycle" asp-action="StatusMonitoring" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Status Monitoring</a>
+                                <a asp-controller="AssetLifecycle" asp-action="Disposal" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Asset Disposal</a>
+                                @if (isBusinessOwner)
+                                {
+                                    <a asp-controller="BusinessOwner" asp-action="FleetManagement" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Fleet Management</a>
+                                }
+                                <a asp-controller="CategoryRates" asp-action="Index" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Category Rates</a>
 
-                                <a href="#" class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium">Rental Operations</a>
-                                
+                                <a asp-controller="RentalOperations" asp-action="Index" class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium">Rental Operations</a>
+
                                 <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Maintenance</div>
-                                <a href="#" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Maintenance Mgmt</a>
+                                <a asp-controller="Maintenance" asp-action="Jobs" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Maintenance Jobs</a>
 
-                                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Finance</div>
-                                <a href="#" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Depreciation</a>
+                                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Reports</div>
+                                <a asp-controller="Reports" asp-action="AssetInventory" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Asset Inventory</a>
+                                <a asp-controller="Reports" asp-action="RentalTransactions" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Rental Transactions</a>
+                                <a asp-controller="Reports" asp-action="VehicleStatus" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Vehicle Status</a>
+                                <a asp-controller="Reports" asp-action="MaintenanceRecords" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Maintenance Records</a>
+                                <a asp-controller="Reports" asp-action="PaymentTransactions" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Payment Transactions</a>
+                                <a asp-controller="Reports" asp-action="DamageRepair" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Damage & Repair</a>
+                                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Analytical</div>
+                                <a asp-controller="Reports" asp-action="AssetDepreciation" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Asset Depreciation</a>
+                                <a asp-controller="Reports" asp-action="VehicleUtilization" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Vehicle Utilization</a>
+                                <a asp-controller="Reports" asp-action="MaintenanceCostAnalysis" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Maintenance Cost Analysis</a>
+                                <a asp-controller="Reports" asp-action="RevenueAnalysis" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Revenue Analysis</a>
+                                <a asp-controller="Reports" asp-action="ProfitAndLoss" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Profit & Loss</a>
+                                <a asp-controller="Reports" asp-action="PaymentMethodAnalysis" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Payment Method Analysis</a>
+
+                                @if (isSuperAdmin)
+                                {
+                                    <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Administration</div>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="UserManagement" asp-action="Index">User Management</a>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="RoleManagement" asp-action="Index">Role Management</a>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="AuditLog" asp-action="Index">Audit Log</a>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="CategoryRates" asp-action="Index">Category Management</a>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="Admin" asp-action="Archive">Archive</a>
+                                }
+                                else if (isAdmin || isBusinessOwner)
+                                {
+                                    <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Administration</div>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="UserManagement" asp-action="Index">User Management</a>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="CategoryRates" asp-action="Index">Category Management</a>
+                                    @if (isBusinessOwner)
+                                    {
+                                        <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="BranchManagement" asp-action="Index">Branch Management</a>
+                                    }
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="Admin" asp-action="Archive">Archive</a>
+                                }
+                            }
+                            else if (isStaff)
+                            {
+                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="StaffDashboard" asp-action="Dashboard">Dashboard</a>
+                                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Rental Operations</div>
+                                <a asp-controller="RentalOperations" asp-action="CheckOut" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Rent Vehicle</a>
+                                <a asp-controller="RentalOperations" asp-action="Index" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">All Contracts</a>
+                            }
+
+                            @if (User.IsInRole("Mechanic"))
+                            {
+                                <a class="text-gray-200 hover:bg-[#FF6B00] hover:text-white block px-3 py-2 rounded-md text-base font-medium" asp-controller="Mechanic" asp-action="Dashboard">Dashboard</a>
+                                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">My Jobs</div>
+                                <a asp-controller="Mechanic" asp-action="Dashboard" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Active Jobs</a>
+                                <a asp-controller="Mechanic" asp-action="History" class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10">Repair History</a>
                             }
                         }
 
-                        <div class="pt-2 border-t border-gray-700/50">
-                             <partial name="_LoginPartial" />
-                        </div>
+                        <partial name="_LoginPartial" view-data='new ViewDataDictionary(ViewData) { ["Mode"] = "Mobile" }' />
                     </div>
                 </div>
             </div>
@@ -179,32 +336,53 @@
         })();
 
         (function () {
-            const button = document.getElementById('assetInventoryButton');
-            const menu = document.getElementById('assetInventoryMenu');
-            if (!button || !menu) return;
+            const pairs = [
+                ['adminButton', 'adminMenu'],
+                ['administrationButton', 'administrationMenu'],
+                ['accountButton', 'accountMenu'],
+                ['assetInventoryButton', 'assetInventoryMenu'],
+                ['maintenanceButton', 'maintenanceMenu'],
+                ['financeButton', 'financeMenu'],
+                ['staffRentalButton', 'staffRentalMenu'],
+                ['mechanicJobsButton', 'mechanicJobsMenu']
+            ];
 
-            const setOpen = (open) => {
-                menu.classList.toggle('hidden', !open);
-                button.setAttribute('aria-expanded', String(open));
+            const dropdowns = pairs
+                .map(([bId, mId]) => ({ btn: document.getElementById(bId), menu: document.getElementById(mId) }))
+                .filter(d => d.btn && d.menu);
 
-                const icon = button.querySelector('svg');
-                if (icon) icon.classList.toggle('rotate-180', open);
-            };
+            function closeAll(except) {
+                dropdowns.forEach(d => {
+                    if (d !== except) {
+                        d.menu.classList.add('hidden');
+                        d.btn.setAttribute('aria-expanded', 'false');
+                        const icon = d.btn.querySelector('svg');
+                        if (icon) icon.classList.remove('rotate-180');
+                    }
+                });
+            }
 
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                setOpen(menu.classList.contains('hidden'));
+            dropdowns.forEach(d => {
+                d.btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const opening = d.menu.classList.contains('hidden');
+                    closeAll(d);
+                    d.menu.classList.toggle('hidden', !opening);
+                    d.btn.setAttribute('aria-expanded', String(opening));
+                    const icon = d.btn.querySelector('svg');
+                    if (icon) icon.classList.toggle('rotate-180', opening);
+                });
             });
 
-            // Close when clicking outside
             document.addEventListener('click', (e) => {
-                if (button.contains(e.target) || menu.contains(e.target)) return;
-                setOpen(false);
+                if (!dropdowns.some(d => d.btn.contains(e.target) || d.menu.contains(e.target))) {
+                    closeAll();
+                }
             });
 
-            // Close on Escape
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') setOpen(false);
+                if (e.key === 'Escape') closeAll();
             });
         })();
     </script>

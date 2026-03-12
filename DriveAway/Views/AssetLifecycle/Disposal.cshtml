@@ -1,27 +1,171 @@
+@using DriveAway.Models
 @{
     ViewData["Title"] = "Asset Disposal";
+    var vehicles = (List<Vehicle>)ViewBag.Vehicles;
+    var disposalRequests = (List<DisposalRequest>)ViewBag.DisposalRequests;
+
+    string StatusBadge(DisposalRequestStatus s) => s switch
+    {
+        DisposalRequestStatus.Pending => "bg-amber-100 text-amber-700",
+        DisposalRequestStatus.Approved => "bg-green-100 text-green-700",
+        DisposalRequestStatus.Rejected => "bg-red-100 text-red-700",
+        _ => "bg-gray-100 text-gray-500"
+    };
 }
 
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-4 text-gray-800">Asset Disposal</h1>
-    <p class="text-gray-600 mb-6">Manage the end-of-life process for assets, including sales and scrapping.</p>
-    
-    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm text-yellow-700">
-                    This module is currently under development.
-                </p>
-            </div>
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Asset Disposal Management</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Submit disposal recommendations for owner approval</p>
         </div>
+        <a asp-action="Index" class="text-sm font-medium text-gray-500 hover:text-[#0B1E3D] transition-colors">&larr; Back to Lifecycle</a>
     </div>
 
-    <div class="mt-8">
-        <a asp-action="Index" class="text-blue-600 hover:text-blue-800 font-medium">&larr; Back to Lifecycle Management</a>
+    @if (TempData["Success"] != null)
+    {
+        <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-lg">
+            <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded-lg">
+            <svg class="h-5 w-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Submit Disposal Form -->
+    @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
+    {
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-6">
+            <h2 class="text-sm font-semibold text-gray-800 mb-4">Submit Disposal Recommendation</h2>
+            <form asp-action="SubmitDisposal" method="post" class="space-y-4">
+                @Html.AntiForgeryToken()
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Vehicle</label>
+                        <select name="vehicleId" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0B1E3D] bg-white">
+                            <option value="">— Select Vehicle —</option>
+                            @foreach (var v in vehicles)
+                            {
+                                <option value="@v.Id">@v.PlateNumber — @v.Year @v.Make @v.Model (₱@v.CurrentBookValue.ToString("N0"))</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Estimated Repair Cost</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">₱</span>
+                            <input type="number" name="estimatedRepairCost" step="0.01" min="0" required class="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" placeholder="0.00" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Recommended Disposal Value</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">₱</span>
+                            <input type="number" name="recommendedDisposalValue" step="0.01" min="0" required class="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" placeholder="0.00" />
+                        </div>
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-4">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Reason for Disposal</label>
+                        <textarea name="reason" required rows="2" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" placeholder="e.g. High repair cost, old unit, frequent breakdowns..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors" style="background-color: #0B1E3D;" onmouseover="this.style.backgroundColor='#FF6B00'" onmouseout="this.style.backgroundColor='#0B1E3D'">
+                    Submit Disposal Recommendation
+                </button>
+            </form>
+        </div>
+    }
+
+    <!-- Disposal Requests Table -->
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-sm font-semibold" style="color: #0B1E3D;">Disposal Requests History</h2>
+        </div>
+        @if (!disposalRequests.Any())
+        {
+            <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                <svg class="h-12 w-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                <p class="text-sm font-medium text-gray-500">No disposal requests submitted yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 text-sm">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left">Vehicle</th>
+                            <th class="px-5 py-3 text-left">Reason</th>
+                            <th class="px-5 py-3 text-right">Repair Cost</th>
+                            <th class="px-5 py-3 text-right">Disposal Value</th>
+                            <th class="px-5 py-3 text-left">Requested By</th>
+                            <th class="px-5 py-3 text-left">Date</th>
+                            <th class="px-5 py-3 text-left">Status</th>
+                            <th class="px-5 py-3 text-left">Review</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach (var d in disposalRequests)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-5 py-3.5">
+                                    <span class="font-semibold text-gray-800">@d.Vehicle.PlateNumber</span>
+                                    <br /><span class="text-xs text-gray-500">@d.Vehicle.Year @d.Vehicle.Make @d.Vehicle.Model</span>
+                                </td>
+                                <td class="px-5 py-3.5 text-gray-600 max-w-xs truncate">@d.Reason</td>
+                                <td class="px-5 py-3.5 text-right text-red-600 font-medium">₱@d.EstimatedRepairCost.ToString("N0")</td>
+                                <td class="px-5 py-3.5 text-right font-medium">₱@d.RecommendedDisposalValue.ToString("N0")</td>
+                                <td class="px-5 py-3.5 text-xs text-gray-500">@(d.RequestedByEmail ?? "—")</td>
+                                <td class="px-5 py-3.5 text-xs text-gray-500">@d.RequestedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @StatusBadge(d.Status)">@d.Status</span>
+                                </td>
+                                <td class="px-5 py-3.5 text-xs text-gray-500">
+                                    @if (d.ReviewedAt.HasValue)
+                                    {
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-medium text-gray-700">@(d.ReviewedByEmail ?? "System")</span>
+                                                <span class="text-[10px] text-gray-400">@d.ReviewedAt.Value.ToString("MMM dd, yyyy")</span>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(d.ReviewNotes))
+                                            {
+                                                <p class="text-gray-500 italic leading-relaxed">"@d.ReviewNotes"</p>
+                                            }
+                                        </div>
+                                    }
+                                    else if (User.IsInRole("Business Owner"))
+                                    {
+                                        <div class="flex flex-col gap-2">
+                                            <form id="reviewForm_@d.Id" method="post" class="flex items-center gap-2">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="requestId" value="@d.Id" />
+                                                <button type="submit" formaction="@Url.Action("ApproveDisposal")" class="px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded hover:bg-green-100 transition-colors font-medium">Approve</button>
+                                                <button type="submit" formaction="@Url.Action("RejectDisposal")" class="px-2 py-1 bg-red-50 text-red-700 border border-red-200 rounded hover:bg-red-100 transition-colors font-medium">Reject</button>
+                                            </form>
+                                            <input type="text" name="reviewNotes" form="reviewForm_@d.Id" placeholder="Add review notes..." class="w-full px-2 py-1.5 border border-gray-200 rounded text-[10px] focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="flex items-center gap-1.5 text-amber-600 font-medium">
+                                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <span>Awaiting Review</span>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 </div>

@@ -40,6 +40,7 @@
                     <div class="relative">
                         <select asp-for="SelectedRole"
                                 asp-items="ViewBag.Roles"
+                                id="roleSelect"
                                 class="block w-full px-4 py-2.5 border rounded-lg appearance-none focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors bg-white"
                                 style="border-color: #E2E8F0; color: #1E3A5F;">
                             <option value="">-- No Role --</option>
@@ -51,6 +52,52 @@
                         </div>
                     </div>
                     <span asp-validation-for="SelectedRole" class="text-xs text-red-600 mt-1 block"></span>
+                </div>
+
+                <!-- Branch Assignment -->
+                @if (ViewBag.IsAdminUser == true)
+                {
+                    <div class="mb-6" id="branch-section">
+                        <label class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Assigned Branch</label>
+                        <input type="hidden" asp-for="BranchId" value="@ViewBag.AdminBranchId" />
+                        <input type="text" class="block w-full px-4 py-2.5 border rounded-lg bg-gray-50 cursor-not-allowed"
+                               style="border-color: #E2E8F0; color: #64748B;"
+                               value="@ViewBag.AdminBranchName" disabled />
+                        <p class="text-xs mt-1" style="color: #64748B;">Users in your branch only</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-6" id="branch-section">
+                        <label asp-for="BranchId" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Assign Branch</label>
+                        <div class="relative">
+                            <select asp-for="BranchId"
+                                    asp-items="ViewBag.Branches"
+                                    class="block w-full px-4 py-2.5 border rounded-lg appearance-none focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors bg-white"
+                                    style="border-color: #E2E8F0; color: #1E3A5F;">
+                                <option value="">-- No Branch --</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-xs mt-1" style="color: #64748B;">Not required for Super Admin or Business Owner</p>
+                    </div>
+                }
+
+                <!-- Active Status -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Account Status</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" asp-for="IsActive" class="sr-only peer" />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1E3A5F]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1E3A5F]"></div>
+                        <span class="ml-3 text-sm font-medium" id="statusLabel" style="color: #1E3A5F;">
+                            @(Model.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </label>
+                    <p class="text-xs mt-1" style="color: #64748B;">Inactive users cannot log in to the system</p>
                 </div>
 
                 <!-- Actions -->
@@ -79,4 +126,37 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Hide branch selection for top-level roles
+        (function() {
+            var roleSelect = document.getElementById('roleSelect');
+            function toggleBranch() {
+                var branchSection = document.getElementById('branch-section');
+                if (branchSection && roleSelect) {
+                    var role = roleSelect.value;
+                    if (role === 'Super Admin' || role === 'Business Owner') {
+                        branchSection.style.display = 'none';
+                    } else {
+                        branchSection.style.display = 'block';
+                    }
+                }
+            }
+            if (roleSelect) {
+                roleSelect.addEventListener('change', toggleBranch);
+                toggleBranch(); // Run on page load
+            }
+
+            // Active status label toggle
+            var activeCheckbox = document.getElementById('IsActive');
+            var statusLabel = document.getElementById('statusLabel');
+            if (activeCheckbox && statusLabel) {
+                activeCheckbox.addEventListener('change', function() {
+                    statusLabel.textContent = activeCheckbox.checked ? 'Active' : 'Inactive';
+                    statusLabel.style.color = activeCheckbox.checked ? '#1E3A5F' : '#DC2626';
+                });
+                // Set initial color
+                if (!activeCheckbox.checked) statusLabel.style.color = '#DC2626';
+            }
+        })();
+    </script>
 }

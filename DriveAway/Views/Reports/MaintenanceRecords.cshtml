@@ -1,0 +1,192 @@
+@model IEnumerable<DriveAway.Models.MaintenanceJob>
+@using DriveAway.Models
+@{
+    ViewData["Title"] = "Maintenance Records Report";
+}
+
+
+<div class="space-y-6">
+
+   
+
+    @* ── Header ── *@
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 no-print">
+        <div>
+            <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Maintenance Records Report</h1>
+            <p class="text-sm text-gray-500 mt-0.5">All completed and ongoing vehicle maintenance activities</p>
+        </div>
+      
+    </div>
+
+    @* ── Date Filter ── *@
+    <partial name="_DateFilter" />
+
+    @* ── Summary Cards ── *@
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 no-print">
+        @{
+            var total = Model.Count();
+            var pending = Model.Count(j => j.JobStatus == MaintenanceJobStatus.Pending);
+            var assigned = Model.Count(j => j.JobStatus == MaintenanceJobStatus.Assigned);
+            var inProgress = Model.Count(j => j.JobStatus == MaintenanceJobStatus.InProgress);
+            var completed = Model.Count(j => j.JobStatus == MaintenanceJobStatus.Completed);
+            var totalCost = Model.Where(j => j.RepairCost.HasValue).Sum(j => j.RepairCost!.Value);
+        }
+        @foreach (var (label, value, colorClass) in new (string, string, string)[] {
+            ("Total Jobs", total.ToString(), "text-gray-800"),
+            ("Pending", pending.ToString(), "text-amber-600"),
+            ("In Progress", (assigned + inProgress).ToString(), "text-blue-600"),
+            ("Completed", completed.ToString(), "text-green-600"),
+            ("Total Repair Cost", $"₱{totalCost:N2}", "text-red-600"),
+        })
+        {
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm px-4 py-3">
+                <p class="text-xs text-gray-500 font-medium leading-snug">@label</p>
+                <p class="text-2xl font-bold mt-1 @colorClass">@value</p>
+            </div>
+        }
+    </div>
+
+    @* ── Table ── *@
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center gap-3 no-print">
+            <h2 class="text-sm font-semibold flex-1" style="color: #0B1E3D;">Maintenance Jobs</h2>
+            <select id="statusFilter"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D] bg-white">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="assigned">Assigned</option>
+                <option value="inprogress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+            <input id="tableSearch" type="text" placeholder="Search vehicle, mechanic, description…"
+                   class="text-sm border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-56 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" />
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                <p class="text-sm">No maintenance records found.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 text-sm report-table">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left">#</th>
+                            <th class="px-5 py-3 text-left">Vehicle</th>
+                            <th class="px-5 py-3 text-left">Severity</th>
+                            <th class="px-5 py-3 text-left">Description</th>
+                            <th class="px-5 py-3 text-left">Mechanic</th>
+                            <th class="px-5 py-3 text-left">Service Date</th>
+                            <th class="px-5 py-3 text-left">Completed</th>
+                            <th class="px-5 py-3 text-left">Repair Cost</th>
+                            <th class="px-5 py-3 text-left">Parts Used</th>
+                            <th class="px-5 py-3 text-left">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @{ var rowNum = 0; }
+                        @foreach (var j in Model)
+                        {
+                            rowNum++;
+                            var statusBadge = j.JobStatus switch
+                            {
+                                MaintenanceJobStatus.Pending => "bg-amber-100 text-amber-700",
+                                MaintenanceJobStatus.Assigned => "bg-purple-100 text-purple-700",
+                                MaintenanceJobStatus.InProgress => "bg-blue-100 text-blue-700",
+                                MaintenanceJobStatus.Completed => "bg-green-100 text-green-700",
+                                _ => "bg-gray-100 text-gray-500"
+                            };
+
+                            var statusText = j.JobStatus switch
+                            {
+                                MaintenanceJobStatus.InProgress => "In Progress",
+                                _ => j.JobStatus.ToString()
+                            };
+
+                            var severityBadge = j.DamageSeverity switch
+                            {
+                                DamageSeverity.Minor => "bg-yellow-100 text-yellow-700",
+                                DamageSeverity.Major => "bg-red-100 text-red-700",
+                                _ => "bg-gray-100 text-gray-500"
+                            };
+
+                            var partsCount = j.RepairParts?.Count ?? 0;
+
+                            <tr class="hover:bg-gray-50 transition-colors report-row"
+                                data-search="@($"{j.Vehicle?.PlateNumber} {j.Vehicle?.Make} {j.Vehicle?.Model} {j.AssignedMechanicEmail} {j.DamageDescription} {j.RepairNotes}".ToLower())"
+                                data-status="@j.JobStatus.ToString().ToLower()">
+                                <td class="px-5 py-3.5 text-gray-400">@rowNum</td>
+                                <td class="px-5 py-3.5">
+                                    @if (j.Vehicle != null)
+                                    {
+                                        <span class="font-semibold text-gray-800">@j.Vehicle.PlateNumber</span>
+                                        <span class="text-gray-500 text-xs block">@j.Vehicle.Make @j.Vehicle.Model</span>
+                                    }
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @severityBadge">
+                                        @j.DamageSeverity
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5 text-gray-600 max-w-xs truncate" title="@j.DamageDescription">
+                                    @(j.DamageDescription ?? "—")
+                                </td>
+                                <td class="px-5 py-3.5 text-gray-600">@(j.AssignedMechanicEmail ?? "Unassigned")</td>
+                                <td class="px-5 py-3.5 text-gray-600">@j.CreatedAt.ToString("MMM d, yyyy")</td>
+                                <td class="px-5 py-3.5 text-gray-600">
+                                    @(j.CompletedAt.HasValue ? j.CompletedAt.Value.ToString("MMM d, yyyy") : "—")
+                                </td>
+                                <td class="px-5 py-3.5 font-medium text-gray-800">
+                                    @(j.RepairCost.HasValue ? $"₱{j.RepairCost.Value:N2}" : "—")
+                                </td>
+                                <td class="px-5 py-3.5 text-gray-600">
+                                    @if (partsCount > 0)
+                                    {
+                                        <span class="text-xs">@partsCount part(s)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-400">—</span>
+                                    }
+                                </td>
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @statusBadge">
+                                        @statusText
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div id="noResults" class="hidden py-10 text-center text-sm text-gray-400">No records match your filter.</div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function applyFilters() {
+        const q = document.getElementById('tableSearch').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value.toLowerCase();
+        let visible = 0;
+
+        document.querySelectorAll('.report-row').forEach(row => {
+            const matchSearch = row.dataset.search.includes(q);
+            const matchStatus = !status || row.dataset.status === status;
+            const show = matchSearch && matchStatus;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        const noResults = document.getElementById('noResults');
+        if (noResults) noResults.classList.toggle('hidden', visible > 0);
+    }
+
+    document.getElementById('tableSearch')?.addEventListener('input', applyFilters);
+    document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+</script>
+}

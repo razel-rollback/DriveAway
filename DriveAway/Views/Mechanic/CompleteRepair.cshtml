@@ -1,0 +1,164 @@
+@using DriveAway.Models
+@model MaintenanceJob
+@{
+    ViewData["Title"] = "Complete Repair";
+}
+
+<div class="max-w-3xl mx-auto space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Complete Repair</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Log repair details and parts used for <strong>@Model.Vehicle.PlateNumber</strong></p>
+    </div>
+
+    <!-- Vehicle Info -->
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                 style="background-color: @(Model.DamageSeverity == DamageSeverity.Major ? "#ef4444" : "#f59e0b");">
+                @Model.Vehicle.Make?.Substring(0, Math.Min(2, Model.Vehicle.Make.Length)).ToUpper()
+            </div>
+            <div>
+                <p class="font-semibold text-gray-800">@Model.Vehicle.PlateNumber — @Model.Vehicle.Year @Model.Vehicle.Make @Model.Vehicle.Model</p>
+                <p class="text-sm text-gray-500">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium @(Model.DamageSeverity == DamageSeverity.Major ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700")">@Model.DamageSeverity Damage</span>
+                </p>
+                <p class="text-xs text-gray-400 mt-1">@(Model.DamageDescription ?? "No description")</p>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="CompleteRepair" method="post" class="bg-white rounded-lg border border-gray-100 shadow-sm divide-y divide-gray-100">
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <!-- Repair Notes -->
+        <div class="px-6 py-5 space-y-3">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Repair Notes</h2>
+            <textarea name="repairNotes" rows="4"
+                      placeholder="Describe the repair work performed — what was fixed, how, any observations…"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]"></textarea>
+        </div>
+
+        <!-- Parts Used -->
+        <div class="px-6 py-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Parts Used</h2>
+                <button type="button" id="addPartBtn"
+                        class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                        style="color: #FF6B00; background: rgba(255,107,0,0.08);"
+                        onmouseover="this.style.background='rgba(255,107,0,0.15)'" onmouseout="this.style.background='rgba(255,107,0,0.08)'">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Part
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm" id="partsTable">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-3 py-2 text-left">Part Name</th>
+                            <th class="px-3 py-2 text-left w-28">Quantity</th>
+                            <th class="px-3 py-2 text-right w-32">Unit Cost (₱)</th>
+                            <th class="px-3 py-2 text-right w-32">Total Cost (₱)</th>
+                            <th class="px-3 py-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="partsBody" class="divide-y divide-gray-100">
+                        <!-- Dynamic rows added here -->
+                    </tbody>
+                    <tfoot class="bg-gray-50">
+                        <tr>
+                            <td colspan="3" class="px-3 py-2 text-right text-xs font-semibold text-gray-600 uppercase">Grand Total</td>
+                            <td class="px-3 py-2 text-right font-bold text-gray-800" id="grandTotal">₱0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <p class="text-xs text-gray-400">Add each part used during the repair. Total cost is calculated automatically.</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="px-6 py-4 flex items-center justify-between bg-gray-50/50">
+            <a asp-action="Dashboard" class="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">← Back to Dashboard</a>
+            @Html.AntiForgeryToken()
+            <button type="submit"
+                    class="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md"
+                    style="background-color: #0B1E3D;"
+                    onclick="return confirm('Mark this repair as completed? The vehicle will be set back to Available.')">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Complete Repair
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+    let partIndex = 0;
+
+    function addPartRow() {
+        const tbody = document.getElementById('partsBody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="px-3 py-2">
+                <input type="text" name="partName" placeholder="e.g. Brake Pad"
+                       class="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" required />
+            </td>
+            <td class="px-3 py-2">
+                <input type="text" name="partQuantity" placeholder="e.g. 1 set"
+                       class="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]" required />
+            </td>
+            <td class="px-3 py-2">
+                <input type="number" name="partUnitCost" step="0.01" min="0" value="0"
+                       class="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00] unit-cost-input" />
+            </td>
+            <td class="px-3 py-2">
+                <input type="number" name="partTotalCost" step="0.01" min="0" value="0"
+                       class="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm text-right bg-gray-50 focus:outline-none total-cost-input" readonly />
+            </td>
+            <td class="px-3 py-2 text-center">
+                <button type="button" onclick="removePartRow(this)" class="text-red-400 hover:text-red-600 transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        partIndex++;
+
+        // Add event listeners for auto-calculation
+        const unitCostInput = row.querySelector('.unit-cost-input');
+        const quantityInput = row.querySelector('input[name="partQuantity"]');
+        unitCostInput.addEventListener('input', () => calcRowTotal(row));
+        quantityInput.addEventListener('input', () => calcRowTotal(row));
+    }
+
+    function removePartRow(btn) {
+        btn.closest('tr').remove();
+        calcGrandTotal();
+    }
+
+    function calcRowTotal(row) {
+        const unitCost = parseFloat(row.querySelector('.unit-cost-input').value) || 0;
+        const qtyText = row.querySelector('input[name="partQuantity"]').value;
+        // Try to extract a number from quantity for auto-calc
+        const qtyNum = parseFloat(qtyText) || 1;
+        const total = unitCost * qtyNum;
+        row.querySelector('.total-cost-input').value = total.toFixed(2);
+        calcGrandTotal();
+    }
+
+    function calcGrandTotal() {
+        let total = 0;
+        document.querySelectorAll('.total-cost-input').forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        document.getElementById('grandTotal').textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    document.getElementById('addPartBtn').addEventListener('click', addPartRow);
+
+    // Add one empty row by default
+    addPartRow();
+</script>
+}

@@ -1,3 +1,5 @@
+using DriveAway.Models;
+using DriveAway.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +11,13 @@ namespace DriveAway.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IAuditService _audit;
 
-        public RoleManagementController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        public RoleManagementController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IAuditService audit)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _audit = audit;
         }
 
         public IActionResult Index()
@@ -40,6 +44,8 @@ namespace DriveAway.Controllers
                     var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
                     if (result.Succeeded)
                     {
+                        await _audit.LogAsync(AuditAction.Create, AuditModule.RoleManagement,
+                            "Role", null, roleName, $"Role '{roleName}' created.");
                         TempData["Success"] = $"Role '{roleName}' created successfully!";
                         return RedirectToAction(nameof(Index));
                     }
@@ -99,6 +105,8 @@ namespace DriveAway.Controllers
             var result = await _roleManager.UpdateAsync(role);
             if (result.Succeeded)
             {
+                await _audit.LogAsync(AuditAction.Update, AuditModule.RoleManagement,
+                    "Role", role.Id, roleName, $"Role renamed to '{roleName}'.");
                 TempData["Success"] = $"Role updated to '{roleName}' successfully!";
             }
             else
@@ -139,6 +147,8 @@ namespace DriveAway.Controllers
                 var result = await _roleManager.DeleteAsync(role);
                 if (result.Succeeded)
                 {
+                    await _audit.LogAsync(AuditAction.Delete, AuditModule.RoleManagement,
+                        "Role", role.Id, role.Name, $"Role '{role.Name}' deleted.");
                     TempData["Success"] = $"Role '{role.Name}' deleted successfully!";
                 }
                 else

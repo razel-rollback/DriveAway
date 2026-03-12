@@ -1,0 +1,70 @@
+@model DriveAway.Models.CategoryRate
+
+@{
+    ViewData["Title"] = "Delete Category";
+}
+
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="mx-auto h-14 w-14 rounded-lg flex items-center justify-center mb-4" style="background-color: #DC2626;">
+                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-semibold text-red-600">Delete Category</h2>
+            <p class="text-sm mt-1" style="color: #64748B;">This action cannot be undone</p>
+        </div>
+
+        <!-- Confirmation Card -->
+        <div class="bg-white rounded-lg border border-red-100 p-8">
+            <div class="text-center mb-6">
+                <p class="text-sm" style="color: #64748B;">
+                    You are about to delete the category <span class="font-semibold" style="color: #1E3A5F;">@Model.Category</span>
+                </p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5" style="color: #64748B;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h4 class="text-sm font-medium" style="color: #1E3A5F;">Category Details</h4>
+                        <div class="mt-2 text-sm" style="color: #64748B;">
+                            <p><strong>Name:</strong> @Model.Category</p>
+                            <p><strong>Daily Rate:</strong> ₱@Model.DailyRate.ToString("N2")</p>
+                        </div>
+                        <p class="text-xs mt-3" style="color: #64748B;">
+                            This will permanently remove the category and its daily rate.
+                            Vehicles currently assigned to this category may be affected.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <div class="flex items-center justify-between">
+                    <button type="submit"
+                            class="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+                            style="background-color: #DC2626;"
+                            onmouseover="this.style.backgroundColor='#B91C1C'"
+                            onmouseout="this.style.backgroundColor='#DC2626'">
+                        Delete Category
+                    </button>
+                    <a asp-action="Index"
+                       class="text-sm font-medium transition-colors"
+                       style="color: #64748B;"
+                       onmouseover="this.style.color='#1E3A5F'"
+                       onmouseout="this.style.color='#64748B'">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

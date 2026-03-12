@@ -1,0 +1,153 @@
+@using DriveAway.Models
+@{
+    ViewData["Title"] = "Profit and Loss Report";
+    var monthlyPnL = (IEnumerable<dynamic>)ViewBag.MonthlyPnL;
+}
+
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Profit and Loss Report</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Compares rental income against operational expenses to determine net profit</p>
+        </div>
+    </div>
+
+    <partial name="_DateFilter" />
+
+    @* ── P&L Summary Cards ── *@
+    @{
+        var netProfit = (decimal)ViewBag.NetProfit;
+        var profitColor = netProfit >= 0 ? "text-green-600" : "text-red-600";
+        var profitBg = netProfit >= 0 ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50";
+    }
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm px-4 py-3">
+            <p class="text-xs text-gray-500 font-medium">Total Income</p>
+            <p class="text-2xl font-bold mt-1 text-green-600">₱@(((decimal)ViewBag.TotalIncome).ToString("N2"))</p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm px-4 py-3">
+            <p class="text-xs text-gray-500 font-medium">Total Expenses</p>
+            <p class="text-2xl font-bold mt-1 text-red-600">₱@(((decimal)ViewBag.TotalExpenses).ToString("N2"))</p>
+        </div>
+        <div class="rounded-lg border shadow-sm px-4 py-3 @profitBg">
+            <p class="text-xs text-gray-500 font-medium">Net Profit</p>
+            <p class="text-2xl font-bold mt-1 @profitColor">₱@netProfit.ToString("N2")</p>
+        </div>
+    </div>
+
+    @* ── Income Breakdown ── *@
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 bg-green-50/50">
+                <h2 class="text-sm font-semibold text-green-800">Income Breakdown</h2>
+            </div>
+            <div class="p-5 space-y-3 text-sm">
+                @foreach (var (label, amount, color) in new (string, decimal, string)[]
+                {
+                    ("Rental Fees", (decimal)ViewBag.RentalIncome, "bg-blue-500"),
+                    ("Late Fees", (decimal)ViewBag.LateFeeIncome, "bg-red-400"),
+                    ("Damage Fees", (decimal)ViewBag.DamageFeeIncome, "bg-orange-400"),
+                    ("Fuel Fees", (decimal)ViewBag.FuelFeeIncome, "bg-amber-400"),
+                })
+                {
+                    var totalIncome = (decimal)ViewBag.TotalIncome;
+                    var pct = totalIncome > 0 ? (amount / totalIncome) * 100 : 0;
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2 flex-1">
+                            <div class="w-3 h-3 rounded-full @color"></div>
+                            <span class="text-gray-700">@label</span>
+                        </div>
+                        <span class="font-semibold text-gray-800 tabular-nums">₱@amount.ToString("N2")</span>
+                    </div>
+                }
+                <div class="pt-3 border-t border-gray-100 flex justify-between items-center font-bold">
+                    <span class="text-green-700">Total Income</span>
+                    <span class="text-green-700">₱@(((decimal)ViewBag.TotalIncome).ToString("N2"))</span>
+                </div>
+            </div>
+        </div>
+
+        @* ── Expense Breakdown ── *@
+        <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 bg-red-50/50">
+                <h2 class="text-sm font-semibold text-red-800">Expense Breakdown</h2>
+            </div>
+            <div class="p-5 space-y-3 text-sm">
+                @foreach (var (label, amount, color) in new (string, decimal, string)[]
+                {
+                    ("Repair Labor", (decimal)ViewBag.RepairLabor, "bg-red-500"),
+                    ("Parts & Materials", (decimal)ViewBag.PartsCost, "bg-orange-500"),
+                    ("Deposit Refunds", (decimal)ViewBag.TotalRefunds, "bg-purple-500"),
+                })
+                {
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2 flex-1">
+                            <div class="w-3 h-3 rounded-full @color"></div>
+                            <span class="text-gray-700">@label</span>
+                        </div>
+                        <span class="font-semibold text-gray-800 tabular-nums">₱@amount.ToString("N2")</span>
+                    </div>
+                }
+                <div class="pt-3 border-t border-gray-100 flex justify-between items-center font-bold">
+                    <span class="text-red-700">Total Expenses</span>
+                    <span class="text-red-700">₱@(((decimal)ViewBag.TotalExpenses).ToString("N2"))</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Monthly P&L ── *@
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-sm font-semibold" style="color: #0B1E3D;">Monthly Profit & Loss</h2>
+        </div>
+        @if (monthlyPnL.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 text-sm">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left">Month</th>
+                            <th class="px-5 py-3 text-right">Income</th>
+                            <th class="px-5 py-3 text-right">Expenses</th>
+                            <th class="px-5 py-3 text-right">Net Profit</th>
+                            <th class="px-5 py-3 text-left">Margin</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach (var m in monthlyPnL)
+                        {
+                            var income = (decimal)m.Income;
+                            var expense = (decimal)m.Expense;
+                            var net = income - expense;
+                            var margin = income > 0 ? ((net / income) * 100) : 0;
+                            var netColor = net >= 0 ? "text-green-600" : "text-red-600";
+                            var barColor = net >= 0 ? "bg-green-500" : "bg-red-500";
+
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-5 py-3.5 font-semibold text-gray-800">
+                                    @(new DateTime((int)m.Year, (int)m.Month, 1).ToString("MMM yyyy"))
+                                </td>
+                                <td class="px-5 py-3.5 text-right text-green-700 font-medium">₱@income.ToString("N2")</td>
+                                <td class="px-5 py-3.5 text-right text-red-600 font-medium">₱@expense.ToString("N2")</td>
+                                <td class="px-5 py-3.5 text-right font-bold @netColor">₱@net.ToString("N2")</td>
+                                <td class="px-5 py-3.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-16 bg-gray-200 rounded-full h-2">
+                                            <div class="@barColor h-2 rounded-full" style="width: @Math.Min(100, Math.Abs(margin))%"></div>
+                                        </div>
+                                        <span class="text-xs @netColor font-medium">@margin.ToString("F1")%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-sm text-gray-400 text-center py-10">No monthly data available.</p>
+        }
+    </div>
+</div>

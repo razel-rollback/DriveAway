@@ -1,0 +1,212 @@
+@using DriveAway.Models
+@{
+    ViewData["Title"] = "Fleet Management";
+    var vehicles = (List<Vehicle>)ViewBag.Vehicles;
+    var unassigned = (List<Vehicle>)ViewBag.UnassignedVehicles;
+    var branches = (List<Branch>)ViewBag.Branches;
+    var assignedVehicles = vehicles.Where(v => v.BranchId != null && v.Status != VehicleStatus.Retired).ToList();
+}
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-[#0B1E3D]">Fleet distribution & Management</h1>
+            <p class="text-sm text-gray-500 mt-1">Assign new assets or rebalance fleet across branches</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a asp-action="Dashboard" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-lg animate-fade-in-down">
+            <svg class="h-5 w-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- Tabbed Interface -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="flex border-b border-gray-100">
+            <button onclick="switchTab('unassigned')" id="tab-unassigned" class="flex-1 py-4 text-sm font-semibold border-b-2 transition-all duration-200 focus:outline-none border-[#FF6B00] text-[#0B1E3D]">
+                Unassigned Assets (@unassigned.Count)
+            </button>
+            <button onclick="switchTab('assigned')" id="tab-assigned" class="flex-1 py-4 text-sm font-semibold border-b-2 transition-all duration-200 focus:outline-none border-transparent text-gray-400 hover:text-gray-600">
+                Assigned Fleet (@assignedVehicles.Count)
+            </button>
+        </div>
+
+        <!-- Unassigned Section -->
+        <div id="section-unassigned" class="p-0">
+            @if (!unassigned.Any())
+            {
+                <div class="py-16 text-center">
+                    <div class="bg-gray-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    </div>
+                    <p class="text-gray-500 font-medium">All vehicles are currently assigned to branches.</p>
+                </div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead class="bg-gray-50/50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Vehicle Details</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Book Value</th>
+                                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to Branch</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach (var v in unassigned)
+                            {
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-[#0B1E3D]">@v.PlateNumber</span>
+                                            <span class="text-xs text-gray-500">@v.Year @v.Make @v.Model</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                            @(v.Category ?? "General")
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-semibold text-[#0B1E3D]">₱@v.CurrentBookValue.ToString("N2")</td>
+                                    <td class="px-6 py-4">
+                                        <form asp-action="AssignVehicleToBranch" method="post" class="flex items-center justify-center gap-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="vehicleId" value="@v.Id" />
+                                            <select name="branchId" class="text-xs border border-gray-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-[#0B1E3D] focus:border-[#0B1E3D] transition-all" required>
+                                                <option value="">Select Branch</option>
+                                                @foreach (var b in branches)
+                                                {
+                                                    <option value="@b.Id">@b.Name</option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="text-xs font-bold px-4 py-2 rounded-lg text-white bg-[#0B1E3D] hover:bg-[#FF6B00] transition-all shadow-sm">
+                                                Assign
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Assigned Section -->
+        <div id="section-assigned" class="p-0 hidden">
+            @if (!assignedVehicles.Any())
+            {
+                <div class="py-16 text-center text-gray-500">No assigned vehicles found.</div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead class="bg-gray-50/50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Vehicle</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Current Branch</th>
+                                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Transfer Fleet</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach (var v in assignedVehicles.OrderBy(v => v.Branch?.Name))
+                            {
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-[#0B1E3D]">@v.PlateNumber</span>
+                                            <span class="text-xs text-gray-500">@v.Year @v.Make @v.Model</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                            <span class="text-sm text-gray-700 font-medium">@(v.Branch?.Name ?? "N/A")</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                         @{
+                                            var badgeClass = v.Status switch
+                                            {
+                                                VehicleStatus.Available => "bg-green-100 text-green-700",
+                                                VehicleStatus.Rented => "bg-blue-100 text-blue-700",
+                                                VehicleStatus.UnderMaintenance => "bg-amber-100 text-amber-700",
+                                                _ => "bg-gray-100 text-gray-600"
+                                            };
+                                        }
+                                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider @badgeClass">@v.Status</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <form asp-action="TransferVehicle" method="post" class="flex items-center justify-center gap-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="vehicleId" value="@v.Id" />
+                                            <select name="toBranchId" class="text-xs border border-gray-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-[#0B1E3D] focus:border-[#0B1E3D] transition-all" required>
+                                                <option value="">Move To...</option>
+                                                @foreach (var b in branches.Where(b => b.Id != v.BranchId))
+                                                {
+                                                    <option value="@b.Id">@b.Name</option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="text-xs font-bold px-4 py-2 rounded-lg border border-[#0B1E3D] text-[#0B1E3D] hover:bg-[#0B1E3D] hover:text-white transition-all">
+                                                Transfer
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        const unassignedTab = document.getElementById('tab-unassigned');
+        const assignedTab = document.getElementById('tab-assigned');
+        const unassignedSection = document.getElementById('section-unassigned');
+        const assignedSection = document.getElementById('section-assigned');
+
+        if (tab === 'unassigned') {
+            unassignedTab.classList.add('border-[#FF6B00]', 'text-[#0B1E3D]');
+            unassignedTab.classList.remove('border-transparent', 'text-gray-400');
+            assignedTab.classList.remove('border-[#FF6B00]', 'text-[#0B1E3D]');
+            assignedTab.classList.add('border-transparent', 'text-gray-400');
+            unassignedSection.classList.remove('hidden');
+            assignedSection.classList.add('hidden');
+        } else {
+            assignedTab.classList.add('border-[#FF6B00]', 'text-[#0B1E3D]');
+            assignedTab.classList.remove('border-transparent', 'text-gray-400');
+            unassignedTab.classList.remove('border-[#FF6B00]', 'text-[#0B1E3D]');
+            unassignedTab.classList.add('border-transparent', 'text-gray-400');
+            assignedSection.classList.remove('hidden');
+            unassignedSection.classList.add('hidden');
+        }
+    }
+</script>
+
+<style>
+    @@keyframes fade-in-down {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-down {
+        animation: fade-in-down 0.3s ease-out;
+    }
+</style>

@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using DriveAway.Models;
+using DriveAway.Services;
 
 namespace DriveAway.Areas.Identity.Pages.Account
 {
@@ -21,11 +23,13 @@ namespace DriveAway.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IAuditService _audit;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, IAuditService audit)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _audit = audit;
         }
 
         /// <summary>
@@ -112,10 +116,19 @@ namespace DriveAway.Areas.Identity.Pages.Account
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("User account is deactivated.");
+                    ModelState.AddModelError(string.Empty, "Your account has been deactivated. Please contact an administrator.");
+                    return Page();
+                }
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    
+                    await _audit.LogAsync(AuditAction.Login, AuditModule.Authentication,
+                        details: "User logged in successfully.",
+                        userEmailOverride: Input.Email);
+
                     // Check if user is Super Admin and redirect to dashboard
                     var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
                     if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Super Admin"))
@@ -126,8 +139,20 @@ namespace DriveAway.Areas.Identity.Pages.Account
                     {
                         return RedirectToAction("Dashboard", "Admin");
                     }
+                    if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Business Owner"))
+                    {
+                        return RedirectToAction("Dashboard", "BusinessOwner");
+                    }
+                    if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Staff"))
+                    {
+                        return RedirectToAction("Dashboard", "StaffDashboard");
+                    }
+                    if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Mechanic"))
+                    {
+                        return RedirectToAction("Dashboard", "Mechanic");
+                    }
 
-                        return LocalRedirect(returnUrl);
+                    return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {
@@ -140,6 +165,9 @@ namespace DriveAway.Areas.Identity.Pages.Account
                 }
                 else
                 {
+                    await _audit.LogAsync(AuditAction.LoginFailed, AuditModule.Authentication,
+                        details: "Invalid login attempt.",
+                        userEmailOverride: Input.Email);
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();
                 }

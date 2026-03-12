@@ -8,6 +8,15 @@ namespace DriveAway.Models
         public string Email { get; set; }
         public string UserName { get; set; }
         public IList<string> Roles { get; set; }
+        public bool IsBusinessOwner { get; set; } // Flag for disabling actions
+        public string BranchName { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+    public class ArchiveViewModel
+    {
+        public List<UserViewModel> ArchivedUsers { get; set; } = new();
+        public List<CategoryRate> ArchivedCategories { get; set; } = new();
     }
 
     public class CreateUserViewModel
@@ -30,6 +39,9 @@ namespace DriveAway.Models
 
         [Display(Name = "Role")]
         public string SelectedRole { get; set; }
+
+        [Display(Name = "Branch")]
+        public int? BranchId { get; set; }
     }
 
     public class EditUserViewModel
@@ -42,5 +54,11 @@ namespace DriveAway.Models
 
         [Display(Name = "Role")]
         public string SelectedRole { get; set; }
+
+        [Display(Name = "Branch")]
+        public int? BranchId { get; set; }
+
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; } = true;
     }
 }

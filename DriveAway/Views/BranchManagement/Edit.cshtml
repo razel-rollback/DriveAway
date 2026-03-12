@@ -1,0 +1,103 @@
+@model DriveAway.Models.Branch
+
+@{
+    ViewData["Title"] = "Edit Branch";
+}
+
+<div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+    
+    <!-- Page header -->
+    <div class="sm:flex sm:justify-between sm:items-center mb-8">
+        <div class="mb-4 sm:mb-0">
+            <h1 class="text-2xl md:text-3xl text-gray-800 font-bold">Edit Branch Details</h1>
+            <p class="text-gray-500 mt-1">Update information for @Model.Name</p>
+        </div>
+        <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+            <a asp-action="Index" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="w-4 h-4 fill-current text-gray-400 shrink-0 mr-2" viewBox="0 0 16 16">
+                    <path d="M7 14c-.3 0-.5-.1-.7-.3l-6-6c-.4-.4-.4-1 0-1.4l6-6c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4L2.8 7H15c.6 0 1 .4 1 1s-.4 1-1 1H2.8l4.9 4.9c.4.4.4 1 0 1.4-.2.2-.4.3-.7.3z" />
+                </svg>
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-sm border border-gray-200">
+        <form asp-action="Edit" class="p-5 sm:p-10 divide-y divide-gray-200">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 p-4 bg-red-50 rounded-md"></div>
+
+            <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-2 mb-8 items-start">
+                <div>
+                    <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1">Branch Name <span class="text-red-500">*</span></label>
+                    <input asp-for="Name" class="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                    <span asp-validation-for="Name" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="City" class="block text-sm font-medium text-gray-700 mb-1">City / Region <span class="text-red-500">*</span></label>
+                    <input asp-for="City" class="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                    <span asp-validation-for="City" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label asp-for="Address" class="block text-sm font-medium text-gray-700 mb-1">Full Address <span class="text-red-500">*</span></label>
+                    <textarea asp-for="Address" rows="3" class="form-textarea w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+                    <span asp-validation-for="Address" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ContactNumber" class="block text-sm font-medium text-gray-700 mb-1">Contact Number <span class="text-red-500">*</span></label>
+                    <input asp-for="ContactNumber" class="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                    <span asp-validation-for="ContactNumber" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div class="flex items-center mt-7">
+                    <div class="w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer" id="toggleButton">
+                        <div class="bg-white md:w-4 md:h-4 h-5 w-5 rounded-full shadow-md transform transition" id="toggleCircle"></div>
+                    </div>
+                    <label asp-for="IsActive" class="ml-3 text-sm font-medium text-gray-700">Active Branch</label>
+                    <input asp-for="IsActive" type="checkbox" class="hidden" id="internalToggle" />
+                </div>
+            </div>
+
+            <div class="pt-5 mt-8 flex justify-end">
+                <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2" style="background-color: #0B1E3D; hover:background-color: #1a365d;">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.getElementById('toggleButton');
+            const toggleCircle = document.getElementById('toggleCircle');
+            const internalToggle = document.getElementById('internalToggle');
+
+            function updateToggle() {
+                if (internalToggle.checked) {
+                    toggleButton.classList.remove('bg-gray-300');
+                    toggleButton.classList.add('bg-[#1E3A5F]');
+                    toggleCircle.classList.add('translate-x-6');
+                } else {
+                    toggleButton.classList.add('bg-gray-300');
+                    toggleButton.classList.remove('bg-[#1E3A5F]');
+                    toggleCircle.classList.remove('translate-x-6');
+                }
+            }
+
+            // Initialization
+            updateToggle();
+
+            toggleButton.addEventListener('click', () => {
+                internalToggle.checked = !internalToggle.checked;
+                updateToggle();
+            });
+        });
+    </script>
+}

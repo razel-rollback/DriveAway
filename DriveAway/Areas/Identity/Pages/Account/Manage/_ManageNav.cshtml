@@ -1,15 +1,20 @@
 ﻿@inject SignInManager<IdentityUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+
+    string ActiveCss(string navClass) =>
+        navClass == "active"
+            ? "bg-[#1E3A5F] text-white"
+            : "text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00]";
 }
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
+<nav class="flex flex-col space-y-1">
+    <a id="profile"   asp-page="./Index"            class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors @ActiveCss(ManageNavPages.IndexNavClass(ViewContext))">Profile</a>
+    <a id="email"      asp-page="./Email"            class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors @ActiveCss(ManageNavPages.EmailNavClass(ViewContext))">Email</a>
+    <a id="change-password" asp-page="./ChangePassword" class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors @ActiveCss(ManageNavPages.ChangePasswordNavClass(ViewContext))">Password</a>
     @if (hasExternalLogins)
     {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+        <a id="external-login" asp-page="./ExternalLogins" class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors @ActiveCss(ManageNavPages.ExternalLoginsNavClass(ViewContext))">External logins</a>
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
-</ul>
+    <a id="two-factor" asp-page="./TwoFactorAuthentication" class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors @ActiveCss(ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext))">Two-factor authentication</a>
+    <a id="personal-data" asp-page="./PersonalData" class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors @ActiveCss(ManageNavPages.PersonalDataNavClass(ViewContext))">Personal data</a>
+</nav>

@@ -1,8 +1,337 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Break out of the layout's max-w-7xl container for full-width sections -->
+<div class="-mx-4 sm:-mx-6 lg:-mx-8 -mt-8">
+
+    <!-- ═══ Hero Section ══════════════════════════════════════════════════ -->
+    <section class="relative overflow-hidden bg-[#0B1E3D]">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 50%, #FF6B00 1px, transparent 1px), radial-gradient(circle at 75% 50%, #FF6B00 1px, transparent 1px); background-size: 60px 60px;"></div>
+        </div>
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#FF6B00]/10 to-transparent"></div>
+
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-[#FF6B00]/15 text-[#FF6B00] text-sm font-medium mb-6">
+                        <span class="inline-block w-1.5 h-1.5 bg-[#FF6B00] rounded-full mr-2 animate-pulse"></span>
+                        Premier Car Rental Service
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
+                        Drive Your Way,
+                        <span class="text-[#FF6B00]">Every Day.</span>
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-300 max-w-lg leading-relaxed">
+                        Experience hassle-free car rentals with DriveAway. Whether it's a quick city commute or a long road trip, we have the perfect vehicle waiting for you.
+                    </p>
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                        <a href="#fleet"
+                           class="inline-flex items-center justify-center px-8 py-3.5 bg-[#FF6B00] text-white font-semibold rounded-lg hover:bg-[#e55f00] transition-all duration-300 shadow-lg shadow-[#FF6B00]/25 hover:shadow-xl hover:shadow-[#FF6B00]/30 hover:-translate-y-0.5">
+                            Explore Our Fleet
+                            <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                        <a href="#how-it-works"
+                           class="inline-flex items-center justify-center px-8 py-3.5 border-2 border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 hover:border-white/40 transition-all duration-300">
+                            How It Works
+                        </a>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="mt-10 flex items-center gap-6 text-gray-400 text-sm">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-5 w-5 text-[#FF6B00]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            Fully Insured
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="h-5 w-5 text-[#FF6B00]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            24/7 Support
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <svg class="h-5 w-5 text-[#FF6B00]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            No Hidden Fees
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="hidden lg:block relative">
+                    <div class="relative">
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-8 -right-8 w-72 h-72 bg-[#FF6B00]/10 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-8 -left-8 w-48 h-48 bg-[#1E3A5F]/40 rounded-full blur-2xl"></div>
+
+                        <!-- Card Stack -->
+                        <div class="relative space-y-4">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="h-12 w-12 rounded-xl bg-[#FF6B00]/20 flex items-center justify-center">
+                                        <svg class="h-6 w-6 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-semibold">Quick Booking</p>
+                                        <p class="text-gray-400 text-sm">Reserve in under 2 minutes</p>
+                                    </div>
+                                </div>
+                                <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#FF6B00] rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <div class="flex-1 bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                                    <p class="text-3xl font-bold text-white">500<span class="text-[#FF6B00]">+</span></p>
+                                    <p class="text-gray-400 text-sm mt-1">Happy Customers</p>
+                                </div>
+                                <div class="flex-1 bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                                    <p class="text-3xl font-bold text-white">4.9<span class="text-[#FF6B00]">★</span></p>
+                                    <p class="text-gray-400 text-sm mt-1">Customer Rating</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wave divider -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
+                <path d="M0 60L48 55C96 50 192 40 288 35C384 30 480 30 576 33.3C672 36.7 768 43.3 864 45C960 46.7 1056 43.3 1152 38.3C1248 33.3 1344 26.7 1392 23.3L1440 20V60H1392C1344 60 1248 60 1152 60C1056 60 960 60 864 60C768 60 672 60 576 60C480 60 384 60 288 60C192 60 96 60 48 60H0Z" fill="#F9FAFB"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ═══ Features Section ══════════════════════════════════════════════ -->
+    <section class="bg-gray-50 py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider">Why Choose Us</span>
+                <h2 class="mt-3 text-3xl md:text-4xl font-bold text-[#0B1E3D]">Everything You Need for a Great Ride</h2>
+                <p class="mt-4 text-gray-500 max-w-2xl mx-auto">From booking to returning, we make every step of your rental experience smooth and worry-free.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="h-14 w-14 rounded-xl bg-[#FF6B00]/10 flex items-center justify-center mb-6 group-hover:bg-[#FF6B00] transition-colors duration-300">
+                        <svg class="h-7 w-7 text-[#FF6B00] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Fast &amp; Easy Booking</h3>
+                    <p class="text-gray-500 leading-relaxed">Reserve your vehicle in just a few clicks. Our streamlined process gets you on the road faster.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="h-14 w-14 rounded-xl bg-[#0B1E3D]/10 flex items-center justify-center mb-6 group-hover:bg-[#0B1E3D] transition-colors duration-300">
+                        <svg class="h-7 w-7 text-[#0B1E3D] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Fully Insured Fleet</h3>
+                    <p class="text-gray-500 leading-relaxed">Every vehicle in our fleet comes with comprehensive insurance coverage for your peace of mind.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="h-14 w-14 rounded-xl bg-[#FF6B00]/10 flex items-center justify-center mb-6 group-hover:bg-[#FF6B00] transition-colors duration-300">
+                        <svg class="h-7 w-7 text-[#FF6B00] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Transparent Pricing</h3>
+                    <p class="text-gray-500 leading-relaxed">No hidden charges or surprise fees. What you see is what you pay — clear and honest pricing.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="h-14 w-14 rounded-xl bg-[#0B1E3D]/10 flex items-center justify-center mb-6 group-hover:bg-[#0B1E3D] transition-colors duration-300">
+                        <svg class="h-7 w-7 text-[#0B1E3D] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Multiple Branches</h3>
+                    <p class="text-gray-500 leading-relaxed">Pick up and drop off at any of our conveniently located branches across the city.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="h-14 w-14 rounded-xl bg-[#FF6B00]/10 flex items-center justify-center mb-6 group-hover:bg-[#FF6B00] transition-colors duration-300">
+                        <svg class="h-7 w-7 text-[#FF6B00] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Well-Maintained Cars</h3>
+                    <p class="text-gray-500 leading-relaxed">All vehicles undergo regular maintenance and inspections to ensure safety and reliability.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="h-14 w-14 rounded-xl bg-[#0B1E3D]/10 flex items-center justify-center mb-6 group-hover:bg-[#0B1E3D] transition-colors duration-300">
+                        <svg class="h-7 w-7 text-[#0B1E3D] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">24/7 Roadside Assist</h3>
+                    <p class="text-gray-500 leading-relaxed">Round-the-clock roadside assistance so you're never stranded. Help is a call away.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ How It Works ══════════════════════════════════════════════════ -->
+    <section id="how-it-works" class="bg-white py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider">Simple Process</span>
+                <h2 class="mt-3 text-3xl md:text-4xl font-bold text-[#0B1E3D]">How It Works</h2>
+                <p class="mt-4 text-gray-500 max-w-2xl mx-auto">Three easy steps to get behind the wheel of your next ride.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <!-- Connector line (desktop) -->
+                <div class="hidden md:block absolute top-16 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-[#FF6B00]/20 via-[#FF6B00] to-[#FF6B00]/20"></div>
+
+                <!-- Step 1 -->
+                <div class="relative text-center">
+                    <div class="relative z-10 mx-auto h-20 w-20 rounded-2xl bg-[#FF6B00] flex items-center justify-center shadow-lg shadow-[#FF6B00]/25 mb-6">
+                        <span class="text-2xl font-extrabold text-white">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Choose Your Vehicle</h3>
+                    <p class="text-gray-500 leading-relaxed">Browse our diverse fleet of economy, SUV, luxury, and commercial vehicles to find your perfect match.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative text-center">
+                    <div class="relative z-10 mx-auto h-20 w-20 rounded-2xl bg-[#0B1E3D] flex items-center justify-center shadow-lg shadow-[#0B1E3D]/25 mb-6">
+                        <span class="text-2xl font-extrabold text-white">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Book &amp; Pay</h3>
+                    <p class="text-gray-500 leading-relaxed">Complete your reservation with our secure payment system. Choose from multiple payment options.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative text-center">
+                    <div class="relative z-10 mx-auto h-20 w-20 rounded-2xl bg-[#FF6B00] flex items-center justify-center shadow-lg shadow-[#FF6B00]/25 mb-6">
+                        <span class="text-2xl font-extrabold text-white">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0B1E3D] mb-3">Hit the Road</h3>
+                    <p class="text-gray-500 leading-relaxed">Pick up your vehicle at your chosen branch and enjoy the ride. Return when you're done — it's that simple.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Vehicle Categories ════════════════════════════════════════════ -->
+    <section id="fleet" class="bg-gray-50 py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider">Our Fleet</span>
+                <h2 class="mt-3 text-3xl md:text-4xl font-bold text-[#0B1E3D]">A Vehicle for Every Journey</h2>
+                <p class="mt-4 text-gray-500 max-w-2xl mx-auto">From budget-friendly economy cars to premium luxury vehicles, we have it all.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Economy -->
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div class="h-40 bg-gradient-to-br from-[#0B1E3D] to-[#1E3A5F] flex items-center justify-center">
+                        <svg class="h-16 w-16 text-white/80 group-hover:text-[#FF6B00] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 17h.01M16 17h.01M5 11l1.5-4.5A2 2 0 018.4 5h7.2a2 2 0 011.9 1.5L19 11M5 11h14M5 11a2 2 0 00-2 2v3a1 1 0 001 1h1m14-6a2 2 0 012 2v3a1 1 0 01-1 1h-1"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-[#0B1E3D]">Economy</h3>
+                        <p class="text-sm text-gray-500 mt-2">Fuel-efficient and budget-friendly. Perfect for daily commutes.</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Starting from</span>
+                            <span class="text-lg font-bold text-[#FF6B00]">₱1,500<span class="text-xs text-gray-400 font-normal">/day</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUV -->
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div class="h-40 bg-gradient-to-br from-[#1E3A5F] to-[#2c5282] flex items-center justify-center">
+                        <svg class="h-16 w-16 text-white/80 group-hover:text-[#FF6B00] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 17h.01M16 17h.01M4 11l2-5a2 2 0 012-2h8a2 2 0 012 2l2 5M4 11h16M4 11a2 2 0 00-2 2v4a1 1 0 001 1h1m16-7a2 2 0 012 2v4a1 1 0 01-1 1h-1M7 17a1 1 0 11-2 0 1 1 0 012 0zm10 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-[#0B1E3D]">SUV</h3>
+                        <p class="text-sm text-gray-500 mt-2">Spacious and powerful. Great for family trips and adventures.</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Starting from</span>
+                            <span class="text-lg font-bold text-[#FF6B00]">₱3,000<span class="text-xs text-gray-400 font-normal">/day</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Luxury -->
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div class="h-40 bg-gradient-to-br from-[#FF6B00] to-[#e55f00] flex items-center justify-center">
+                        <svg class="h-16 w-16 text-white/80 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-[#0B1E3D]">Luxury</h3>
+                        <p class="text-sm text-gray-500 mt-2">Premium vehicles for special occasions and VIP experiences.</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Starting from</span>
+                            <span class="text-lg font-bold text-[#FF6B00]">₱5,000<span class="text-xs text-gray-400 font-normal">/day</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commercial -->
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div class="h-40 bg-gradient-to-br from-[#0B1E3D] to-[#1a3654] flex items-center justify-center">
+                        <svg class="h-16 w-16 text-white/80 group-hover:text-[#FF6B00] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 17h.01M16 17h.01M13 5H5a2 2 0 00-2 2v8h16V9l-3-4h-3zm0 0V3M3 15h18v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-[#0B1E3D]">Commercial</h3>
+                        <p class="text-sm text-gray-500 mt-2">Vans and trucks for business logistics and moving needs.</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Starting from</span>
+                            <span class="text-lg font-bold text-[#FF6B00]">₱4,000<span class="text-xs text-gray-400 font-normal">/day</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Stats Section ════════════════════════════════════════════════ -->
+    <section class="bg-[#0B1E3D] py-16 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle, #FF6B00 1px, transparent 1px); background-size: 40px 40px;"></div>
+        </div>
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white">500<span class="text-[#FF6B00]">+</span></p>
+                    <p class="mt-2 text-gray-400 text-sm font-medium">Happy Customers</p>
+                </div>
+                <div>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white">50<span class="text-[#FF6B00]">+</span></p>
+                    <p class="mt-2 text-gray-400 text-sm font-medium">Vehicles Available</p>
+                </div>
+                <div>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white">5<span class="text-[#FF6B00]">+</span></p>
+                    <p class="mt-2 text-gray-400 text-sm font-medium">Branch Locations</p>
+                </div>
+                <div>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white">99<span class="text-[#FF6B00]">%</span></p>
+                    <p class="mt-2 text-gray-400 text-sm font-medium">Customer Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>

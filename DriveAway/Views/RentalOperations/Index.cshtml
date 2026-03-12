@@ -1,0 +1,306 @@
+@model IEnumerable<DriveAway.Models.RentalContract>
+@using DriveAway.Models
+@{
+    ViewData["Title"] = "Rental Operations";
+}
+
+<div class="space-y-6">
+
+    @* ── Success Toast ── *@
+    @if (TempData["Success"] != null)
+    {
+        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 flex items-center gap-2">
+            <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["PaymentUrl"] != null)
+    {
+        var payUrl = TempData["PaymentUrl"]!.ToString();
+        <div class="rounded-lg border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-700 space-y-3">
+            <div class="flex items-center gap-2">
+                <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                <span class="font-semibold">Payment Options</span>
+            </div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                @* Option 1: Proceed to Payment link *@
+                <a href="@payUrl" target="_blank"
+                   class="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md"
+                   style="background-color: #FF6B00;">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    Proceed to Payment
+                </a>
+
+                @* Option 2: QR Code *@
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
+                        <div id="paymentQrCode"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs text-blue-600 font-medium">Scan QR Code</p>
+                        <p class="text-xs text-blue-500">Customer can scan to pay</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* ── Header ── *@
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Rental Operations</h1>
+            <p class="text-sm text-gray-500 mt-0.5">Manage vehicle check-outs, returns, and active contracts</p>
+        </div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+        {
+            <a asp-action="CheckOut"
+               class="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md"
+               style="background-color: #FF6B00;">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Rent Vehicle
+            </a>
+        }
+    </div>
+
+    @* ── Summary Cards ── *@
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        @foreach (var (label, count, colorClass, icon) in new (string, int, string, string)[]
+        {
+            ("Available Vehicles", (int)ViewBag.AvailableVehicles, "text-green-600",
+                "<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/>"),
+            ("Active Rentals",     (int)ViewBag.ActiveRentals,     "text-blue-600",
+                "<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7h12M8 12h12M8 17h8'/>"),
+            ("Completed Today",    (int)ViewBag.CompletedToday,    "text-emerald-600",
+                "<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'/>"),
+            ("Overdue",            (int)ViewBag.Overdue,           "text-red-600",
+                "<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'/>"),
+        })
+        {
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm px-4 py-3">
+                <div class="flex items-center gap-2 mb-1">
+                    <svg class="h-4 w-4 @colorClass opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">@Html.Raw(icon)</svg>
+                    <p class="text-xs text-gray-500 font-medium leading-snug">@label</p>
+                </div>
+                <p class="text-2xl font-bold mt-1 @colorClass">@count</p>
+            </div>
+        }
+    </div>
+
+    @* ── Contracts Table ── *@
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center gap-3">
+            <h2 class="text-sm font-semibold flex-1" style="color: #0B1E3D;">Rental Contracts</h2>
+            <select id="statusFilter"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D] bg-white">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <input id="tableSearch" type="text" placeholder="Search contract, customer, plate…"
+                   class="text-sm border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-56 focus:outline-none focus:ring-1 focus:ring-[#0B1E3D]" />
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                <p class="text-sm">No rental contracts yet.</p>
+                @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                {
+                    <a asp-action="CheckOut" class="mt-2 text-sm font-semibold" style="color: #FF6B00;">Rent a vehicle →</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 text-sm">
+                    <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left">Contract #</th>
+                            <th class="px-5 py-3 text-left">Vehicle</th>
+                            <th class="px-5 py-3 text-left">Customer</th>
+                            <th class="px-5 py-3 text-left">Rental Period</th>
+                            <th class="px-5 py-3 text-left">Fee</th>
+                            <th class="px-5 py-3 text-left">Payment</th>
+                            <th class="px-5 py-3 text-left">Deposit</th>
+                            <th class="px-5 py-3 text-left">Status</th>
+                            <th class="px-5 py-3 text-left">Processed By</th>
+                            <th class="px-5 py-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach (var c in Model)
+                        {
+                            var statusBadge = c.RentalStatus switch
+                            {
+                                RentalStatus.Active    => "bg-blue-100 text-blue-700",
+                                RentalStatus.Completed => "bg-green-100 text-green-700",
+                                RentalStatus.Cancelled => "bg-gray-100 text-gray-500",
+                                _                      => "bg-gray-100 text-gray-500"
+                            };
+
+                            // Derive payment status from Payments collection
+                            var payments = c.Payments?.ToList() ?? new List<Payment>();
+                            var allPaid = payments.Any() && payments.Where(p => p.PaymentType != PaymentType.DepositRefund).All(p => p.PaymentStatus == PaymentStatus.Paid);
+                            var anyPaid = payments.Any(p => p.PaymentStatus == PaymentStatus.Paid && p.PaymentType != PaymentType.DepositRefund);
+                            var payStatusText = !payments.Any() ? "—" : allPaid ? "Paid" : anyPaid ? "Partial" : "Pending";
+                            var payBadge = payStatusText switch
+                            {
+                                "Paid"    => "bg-green-100 text-green-700",
+                                "Pending" => "bg-amber-100 text-amber-700",
+                                "Partial" => "bg-yellow-100 text-yellow-700",
+                                _         => "bg-gray-100 text-gray-500"
+                            };
+
+                            var depositBadge = c.DepositStatus switch
+                            {
+                                DepositStatus.Held              => "bg-blue-100 text-blue-700",
+                                DepositStatus.FullyRefunded     => "bg-green-100 text-green-700",
+                                DepositStatus.PartiallyRefunded => "bg-yellow-100 text-yellow-700",
+                                DepositStatus.Forfeited         => "bg-red-100 text-red-700",
+                                _                               => "bg-gray-100 text-gray-500"
+                            };
+
+                            var isOverdue = c.RentalStatus == RentalStatus.Active && c.RentalEnd.Date < DateTime.UtcNow.Date;
+
+                            <tr class="hover:bg-gray-50 transition-colors rental-row"
+                                data-search="@($"{c.ContractNumber} {c.CustomerName} {c.Vehicle?.PlateNumber}".ToLower())"
+                                data-status="@c.RentalStatus.ToString().ToLower()">
+
+                                <td class="px-5 py-3.5 font-semibold text-gray-800">@c.ContractNumber</td>
+
+                                <td class="px-5 py-3.5">
+                                    @if (c.Vehicle != null)
+                                    {
+                                        <span class="font-medium text-gray-800">@c.Vehicle.PlateNumber</span>
+                                        <span class="text-gray-500 text-xs block">@c.Vehicle.Make @c.Vehicle.Model</span>
+                                    }
+                                </td>
+
+                                <td class="px-5 py-3.5">
+                                    <span class="font-medium text-gray-800">@c.CustomerName</span>
+                                    <span class="text-gray-500 text-xs block">@c.CustomerContact</span>
+                                </td>
+
+                                <td class="px-5 py-3.5 text-gray-600">
+                                    <span class="block">@c.RentalStart.ToString("MMM d, yyyy")</span>
+                                    <span class="text-gray-400">→</span>
+                                    <span class="block @(isOverdue ? "text-red-600 font-semibold" : "")">
+                                        @c.RentalEnd.ToString("MMM d, yyyy")
+                                        @if (isOverdue)
+                                        {
+                                            <span class="text-xs ml-1">(overdue)</span>
+                                        }
+                                    </span>
+                                </td>
+
+                                <td class="px-5 py-3.5">
+                                    @{
+                                        var extraFeesTotal = c.LateFee + c.DamageFee + c.FuelFee;
+                                        var baseFee = c.TotalFee > 0
+                                            ? c.TotalFee
+                                            : c.DailyRate * Math.Max(1, (int)Math.Ceiling((c.RentalEnd - c.RentalStart).TotalDays));
+                                        var rentalTotal = (c.FinalFee.HasValue && c.FinalFee.Value > 0)
+                                            ? c.FinalFee.Value
+                                            : baseFee + extraFeesTotal;
+                                    }
+                                    <span class="font-semibold text-gray-800">₱@rentalTotal.ToString("N2")</span>
+                                    @if (extraFeesTotal > 0)
+                                    {
+                                        <span class="block text-xs text-red-500 mt-0.5">incl. ₱@extraFeesTotal.ToString("N2") fees</span>
+                                    }
+                                    <span class="block text-xs text-gray-400 mt-0.5">Rental: ₱@baseFee.ToString("N2")</span>
+                                </td>
+
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @payBadge">
+                                        @payStatusText
+                                    </span>
+                                </td>
+
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @depositBadge">
+                                        @c.DepositStatus
+                                    </span>
+                                </td>
+
+                                <td class="px-5 py-3.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @statusBadge">
+                                        @c.RentalStatus
+                                    </span>
+                                </td>
+
+                                <td class="px-5 py-3.5 text-gray-500 text-xs">
+                                    @(c.ProcessedByEmail ?? "—")
+                                </td>
+
+                                <td class="px-5 py-3.5 text-center flex items-center justify-center gap-2">
+                                    <a asp-action="Details" asp-route-id="@c.Id"
+                                       class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                                       title="View Details">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        View
+                                    </a>
+                                    @if (c.RentalStatus == RentalStatus.Active && (User.IsInRole("Admin") || User.IsInRole("Staff")))
+                                    {
+                                        <a asp-action="CheckIn" asp-route-id="@c.Id"
+                                           class="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors"
+                                           style="background-color: #0B1E3D;">
+                                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            Return
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div id="noResults" class="hidden py-10 text-center text-sm text-gray-400">No contracts match your filter.</div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    // Table filter
+    function applyFilters() {
+        const q      = document.getElementById('tableSearch').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value.toLowerCase();
+        let visible  = 0;
+
+        document.querySelectorAll('.rental-row').forEach(row => {
+            const matchSearch = row.dataset.search.includes(q);
+            const matchStatus = !status || row.dataset.status === status;
+            const show = matchSearch && matchStatus;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        const noResults = document.getElementById('noResults');
+        if (noResults) noResults.classList.toggle('hidden', visible > 0);
+    }
+
+    document.getElementById('tableSearch')?.addEventListener('input', applyFilters);
+    document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+
+    // Generate QR code if payment URL exists
+    var qrContainer = document.getElementById('paymentQrCode');
+    if (qrContainer) {
+        var payUrl = '@(TempData.Peek("PaymentUrl") ?? "")';
+        if (payUrl) {
+            new QRCode(qrContainer, {
+                text: payUrl,
+                width: 120,
+                height: 120,
+                colorDark: "#0B1E3D",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+    }
+</script>
+}
