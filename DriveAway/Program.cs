@@ -25,8 +25,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<INhtsaService, NhtsaService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IReportExportService, ReportExportService>();
 
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, SmtpEmailService>();
 
 builder.Services.AddHttpClient<IPayMongoService, PayMongoService>();
 

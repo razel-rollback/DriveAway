@@ -1,9 +1,10 @@
 using System.Net;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace DriveAway.Services
 {
-    public class SmtpEmailService : IEmailService
+    public class SmtpEmailService : IEmailService, IEmailSender
     {
         private readonly SmtpSettings _settings;
         private readonly ILogger<SmtpEmailService> _logger;
@@ -42,6 +43,7 @@ namespace DriveAway.Services
 
             using var client = new SmtpClient(_settings.Host, _settings.Port)
             {
+                UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(_settings.Username, _settings.Password),
                 EnableSsl = _settings.EnableSsl
             };

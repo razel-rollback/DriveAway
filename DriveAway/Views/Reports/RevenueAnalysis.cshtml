@@ -13,6 +13,7 @@
             <h1 class="text-2xl font-bold" style="color: #0B1E3D;">Revenue Analysis Report</h1>
             <p class="text-sm text-gray-500 mt-0.5">Total revenue generated over time — daily, monthly, and by type</p>
         </div>
+        <partial name="_ExportButtons" model='new { ReportName = "Revenue Analysis" }' />
     </div>
 
     <partial name="_DateFilter" />

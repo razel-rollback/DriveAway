@@ -3,6 +3,7 @@ using DriveAway.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using DriveAway.Services;
 
 namespace DriveAway.Controllers
 {
@@ -10,10 +11,12 @@ namespace DriveAway.Controllers
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IReportExportService _exportService;
 
-        public ReportsController(ApplicationDbContext context)
+        public ReportsController(ApplicationDbContext context, IReportExportService exportService)
         {
             _context = context;
+            _exportService = exportService;
         }
 
         // ───────── Helper: resolve date range from filter params ─────────
@@ -44,7 +47,7 @@ namespace DriveAway.Controllers
         }
 
         // ───────── Asset Inventory Report ─────────
-        public async Task<IActionResult> AssetInventory(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> AssetInventory(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -55,11 +58,35 @@ namespace DriveAway.Controllers
                 query = query.Where(v => v.CreatedAt >= start.Value && v.CreatedAt <= end.Value);
 
             var vehicles = await query.OrderBy(v => v.PlateNumber).ToListAsync();
+
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("VIN");
+                dt.Columns.Add("Plate Number");
+                dt.Columns.Add("Make / Model");
+                dt.Columns.Add("Year");
+                dt.Columns.Add("Category");
+                dt.Columns.Add("Branch");
+                dt.Columns.Add("Status");
+
+                foreach (var v in vehicles)
+                {
+                    dt.Rows.Add(v.VIN, v.PlateNumber, $"{v.Make} {v.Model}", v.Year.ToString(), v.Category, v.Branch?.Name, v.Status.ToString());
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Asset Inventory"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AssetInventory.xlsx");
+                
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Asset Inventory"), "application/pdf", "AssetInventory.pdf");
+            }
+
             return View(vehicles);
         }
 
         // ───────── Rental Transaction Report ─────────
-        public async Task<IActionResult> RentalTransactions(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> RentalTransactions(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -73,11 +100,42 @@ namespace DriveAway.Controllers
                 query = query.Where(c => c.CreatedAt >= start.Value && c.CreatedAt <= end.Value);
 
             var contracts = await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
+
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Contract No.");
+                dt.Columns.Add("Date Created");
+                dt.Columns.Add("Customer Name");
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Period");
+                dt.Columns.Add("Total Fee");
+                dt.Columns.Add("Status");
+
+                foreach (var c in contracts)
+                {
+                    dt.Rows.Add(
+                        c.ContractNumber, 
+                        c.CreatedAt.ToString("MMM dd, yyyy"), 
+                        c.CustomerName, 
+                        c.Vehicle != null ? $"{c.Vehicle.PlateNumber} - {c.Vehicle.Make} {c.Vehicle.Model}" : "—",
+                        $"{c.RentalStart:MMM dd} - {c.RentalEnd:MMM dd, yyyy}", 
+                        c.FinalFee?.ToString("N2") ?? c.TotalFee.ToString("N2"), 
+                        c.RentalStatus.ToString()
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Rental Transactions"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RentalTransactions.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Rental Transactions"), "application/pdf", "RentalTransactions.pdf");
+            }
+
             return View(contracts);
         }
 
         // ───────── Vehicle Status Report ─────────
-        public async Task<IActionResult> VehicleStatus()
+        public async Task<IActionResult> VehicleStatus(string? export)
         {
             var vehicles = await _context.Vehicles
                 .Include(v => v.Branch)
@@ -89,11 +147,33 @@ namespace DriveAway.Controllers
             ViewBag.DateRange = "";
             ViewBag.DateLabel = "Current Snapshot";
 
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Plate Number");
+                dt.Columns.Add("Make / Model");
+                dt.Columns.Add("Year");
+                dt.Columns.Add("Category");
+                dt.Columns.Add("Branch");
+                dt.Columns.Add("Mileage (km)");
+                dt.Columns.Add("Status");
+
+                foreach (var v in vehicles)
+                {
+                    dt.Rows.Add(v.PlateNumber, $"{v.Make} {v.Model}", v.Year.ToString(), v.Category, v.Branch?.Name, v.CurrentMileage.ToString("N0"), v.Status.ToString());
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Vehicle Status"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "VehicleStatus.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Vehicle Status"), "application/pdf", "VehicleStatus.pdf");
+            }
+
             return View(vehicles);
         }
 
         // ───────── Maintenance Records Report ─────────
-        public async Task<IActionResult> MaintenanceRecords(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> MaintenanceRecords(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -108,11 +188,46 @@ namespace DriveAway.Controllers
                 query = query.Where(j => j.CreatedAt >= start.Value && j.CreatedAt <= end.Value);
 
             var jobs = await query.OrderByDescending(j => j.CreatedAt).ToListAsync();
+
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Severity");
+                dt.Columns.Add("Description");
+                dt.Columns.Add("Mechanic");
+                dt.Columns.Add("Service Date");
+                dt.Columns.Add("Completed");
+                dt.Columns.Add("Repair Cost");
+                dt.Columns.Add("Parts Used");
+                dt.Columns.Add("Status");
+
+                foreach (var j in jobs)
+                {
+                    dt.Rows.Add(
+                        j.Vehicle != null ? $"{j.Vehicle.PlateNumber} - {j.Vehicle.Make} {j.Vehicle.Model}" : "—",
+                        j.DamageSeverity.ToString(),
+                        j.DamageDescription,
+                        j.AssignedMechanicEmail ?? "Unassigned",
+                        j.CreatedAt.ToString("MMM d, yyyy"),
+                        j.CompletedAt?.ToString("MMM d, yyyy") ?? "—",
+                        j.RepairCost?.ToString("N2") ?? "—",
+                        j.RepairParts?.Count > 0 ? $"{j.RepairParts.Count} part(s)" : "—",
+                        j.JobStatus.ToString()
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Maintenance Records"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MaintenanceRecords.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Maintenance Records"), "application/pdf", "MaintenanceRecords.pdf");
+            }
+
             return View(jobs);
         }
 
         // ───────── Payment Transactions Report ─────────
-        public async Task<IActionResult> PaymentTransactions(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> PaymentTransactions(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -126,11 +241,46 @@ namespace DriveAway.Controllers
                 query = query.Where(p => p.CreatedAt >= start.Value && p.CreatedAt <= end.Value);
 
             var payments = await query.OrderByDescending(p => p.CreatedAt).ToListAsync();
+
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Date");
+                dt.Columns.Add("Contract");
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Customer");
+                dt.Columns.Add("Type");
+                dt.Columns.Add("Method");
+                dt.Columns.Add("Amount");
+                dt.Columns.Add("Status");
+                dt.Columns.Add("Notes");
+
+                foreach (var p in payments)
+                {
+                    dt.Rows.Add(
+                        p.CreatedAt.ToString("MMM d, yyyy"),
+                        p.RentalContract?.ContractNumber ?? "—",
+                        p.RentalContract?.Vehicle != null ? $"{p.RentalContract.Vehicle.PlateNumber} - {p.RentalContract.Vehicle.Make} {p.RentalContract.Vehicle.Model}" : "—",
+                        p.RentalContract?.CustomerName ?? "—",
+                        p.PaymentType.ToString(),
+                        p.PaymentMethod.ToString(),
+                        p.Amount.ToString("N2"),
+                        p.PaymentStatus.ToString(),
+                        p.Notes ?? "—"
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Payment Transactions"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PaymentTransactions.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Payment Transactions"), "application/pdf", "PaymentTransactions.pdf");
+            }
+
             return View(payments);
         }
 
         // ───────── Damage and Repair Report ─────────
-        public async Task<IActionResult> DamageRepair(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> DamageRepair(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -146,6 +296,45 @@ namespace DriveAway.Controllers
                 query = query.Where(j => j.CreatedAt >= start.Value && j.CreatedAt <= end.Value);
 
             var jobs = await query.OrderByDescending(j => j.CreatedAt).ToListAsync();
+
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Contract");
+                dt.Columns.Add("Customer");
+                dt.Columns.Add("Severity");
+                dt.Columns.Add("Damage Description");
+                dt.Columns.Add("Reported");
+                dt.Columns.Add("Repair Cost");
+                dt.Columns.Add("Parts");
+                dt.Columns.Add("Repair Status");
+
+                foreach (var j in jobs)
+                {
+                    var partsSummary = j.RepairParts?.Any() == true
+                        ? string.Join(", ", j.RepairParts.Select(rp => $"{rp.PartName} (₱{rp.TotalCost:N2})"))
+                        : "—";
+
+                    dt.Rows.Add(
+                        j.Vehicle != null ? $"{j.Vehicle.PlateNumber} - {j.Vehicle.Make} {j.Vehicle.Model}" : "—",
+                        j.RentalContract?.ContractNumber ?? "—",
+                        j.RentalContract?.CustomerName ?? "—",
+                        j.DamageSeverity.ToString(),
+                        j.DamageDescription ?? "—",
+                        j.CreatedAt.ToString("MMM d, yyyy"),
+                        j.RepairCost?.ToString("N2") ?? "—",
+                        partsSummary,
+                        j.JobStatus.ToString()
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Damage and Repair"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DamageAndRepair.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Damage and Repair"), "application/pdf", "DamageAndRepair.pdf");
+            }
+
             return View(jobs);
         }
 
@@ -154,7 +343,7 @@ namespace DriveAway.Controllers
         // ═══════════════════════════════════════════════════════════════════
 
         // ───────── Asset Depreciation Report ─────────
-        public async Task<IActionResult> AssetDepreciation()
+        public async Task<IActionResult> AssetDepreciation(string? export)
         {
             var vehicles = await _context.Vehicles
                 .Include(v => v.Branch)
@@ -195,11 +384,45 @@ namespace DriveAway.Controllers
             ViewBag.TotalDepreciation = depreciationData.Sum(d => d.TotalDepreciation);
             ViewBag.AvgAge = depreciationData.Any() ? depreciationData.Average(d => d.AgeYears) : 0;
 
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Year");
+                dt.Columns.Add("Acquisition Date");
+                dt.Columns.Add("Cost (₱)");
+                dt.Columns.Add("Salvage (₱)");
+                dt.Columns.Add("Age (Yrs)");
+                dt.Columns.Add("Useful Life Remaining");
+                dt.Columns.Add("Total Dep. (₱)");
+                dt.Columns.Add("Book Value (₱)");
+
+                foreach (var d in depreciationData)
+                {
+                    dt.Rows.Add(
+                        $"{d.Vehicle.PlateNumber} - {d.Vehicle.Make} {d.Vehicle.Model}",
+                        d.Vehicle.Year.ToString(),
+                        d.Vehicle.AcquisitionDate.ToString("MMM d, yyyy"),
+                        d.Vehicle.PurchaseCost.ToString("N2"),
+                        d.Vehicle.SalvageValue.ToString("N2"),
+                        d.AgeYears.ToString("N1"),
+                        d.RemainingLife.ToString("N1"),
+                        d.TotalDepreciation.ToString("N2"),
+                        d.BookValue.ToString("N2")
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Asset Depreciation"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AssetDepreciation.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Asset Depreciation"), "application/pdf", "AssetDepreciation.pdf");
+            }
+
             return View(vehicles);
         }
 
         // ───────── Vehicle Utilization Report ─────────
-        public async Task<IActionResult> VehicleUtilization(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> VehicleUtilization(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -241,7 +464,7 @@ namespace DriveAway.Controllers
                 if (v.AcquisitionDate > periodStart) periodStart = v.AcquisitionDate;
                 var availableDays = Math.Max(1, (periodEnd - periodStart).TotalDays);
 
-                var utilizationRate = (totalRentalDays / availableDays) * 100;
+                var utilizationRate = availableDays > 0 ? (totalRentalDays / availableDays) * 100 : 0;
 
                 // Revenue
                 var totalRevenue = contractList.Sum(c => c.FinalFee ?? c.TotalFee);
@@ -265,11 +488,48 @@ namespace DriveAway.Controllers
             ViewBag.TotalRentals = utilizationData.Sum(u => u.TotalRentals);
             ViewBag.MostUtilized = utilizationData.OrderByDescending(u => u.UtilizationRate).FirstOrDefault()?.Vehicle?.PlateNumber ?? "—";
 
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Branch");
+                dt.Columns.Add("Category");
+                dt.Columns.Add("Total Rentals");
+                dt.Columns.Add("Active");
+                dt.Columns.Add("Completed");
+                dt.Columns.Add("Rental Days");
+                dt.Columns.Add("Available Days");
+                dt.Columns.Add("Utilization (%)");
+                dt.Columns.Add("Revenue (₱)");
+
+                foreach (var u in utilizationData.OrderByDescending((Func<dynamic, object>)(x => (double)x.UtilizationRate)))
+                {
+                    var v = (Vehicle)u.Vehicle;
+                    dt.Rows.Add(
+                        $"{v.PlateNumber} - {v.Make} {v.Model}",
+                        v.Branch?.Name ?? "—",
+                        v.Category ?? "—",
+                        u.TotalRentals.ToString(),
+                        u.ActiveRentals.ToString(),
+                        u.CompletedRentals.ToString(),
+                        u.TotalRentalDays.ToString(),
+                        u.AvailableDays.ToString(),
+                        ((double)u.UtilizationRate).ToString("N1"),
+                        ((decimal)u.TotalRevenue).ToString("N2")
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Vehicle Utilization"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "VehicleUtilization.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Vehicle Utilization"), "application/pdf", "VehicleUtilization.pdf");
+            }
+
             return View(vehicles);
         }
 
         // ───────── Maintenance Cost Analysis Report ─────────
-        public async Task<IActionResult> MaintenanceCostAnalysis(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> MaintenanceCostAnalysis(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -317,11 +577,46 @@ namespace DriveAway.Controllers
             ViewBag.FleetPartsCost = costData.Sum(c => c.PartsCost);
             ViewBag.HighCostCount = costData.Count(c => c.CostPercentOfValue > 10);
 
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Vehicle");
+                dt.Columns.Add("Branch");
+                dt.Columns.Add("Purchase Cost (₱)");
+                dt.Columns.Add("Total Jobs");
+                dt.Columns.Add("Completed");
+                dt.Columns.Add("Repair Cost (₱)");
+                dt.Columns.Add("Parts Cost (₱)");
+                dt.Columns.Add("Total Cost (₱)");
+                dt.Columns.Add("Cost % of Value");
+
+                foreach (var c in costData)
+                {
+                    var v = (Vehicle)c.Vehicle;
+                    dt.Rows.Add(
+                        $"{v.PlateNumber} - {v.Make} {v.Model}",
+                        v.Branch?.Name ?? "—",
+                        v.PurchaseCost.ToString("N2"),
+                        c.TotalJobs.ToString(),
+                        c.CompletedJobs.ToString(),
+                        ((decimal)c.RepairCost).ToString("N2"),
+                        ((decimal)c.PartsCost).ToString("N2"),
+                        ((decimal)c.TotalCost).ToString("N2"),
+                        ((decimal)c.CostPercentOfValue).ToString("N1")
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Maintenance Cost Analysis"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MaintenanceCostAnalysis.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Maintenance Cost Analysis"), "application/pdf", "MaintenanceCostAnalysis.pdf");
+            }
+
             return View(vehicles);
         }
 
         // ───────── Revenue Analysis Report ─────────
-        public async Task<IActionResult> RevenueAnalysis(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> RevenueAnalysis(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -366,11 +661,38 @@ namespace DriveAway.Controllers
             ViewBag.AvgTransaction = payments.Any() ? payments.Average(p => p.Amount) : 0;
             ViewBag.PeakDay = dailyRevenue.OrderByDescending(d => d.Total).FirstOrDefault();
 
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Date");
+                dt.Columns.Add("Contract");
+                dt.Columns.Add("Customer");
+                dt.Columns.Add("Revenue Type");
+                dt.Columns.Add("Amount (₱)");
+
+                foreach (var p in payments)
+                {
+                    // For revenue analysis, we want a clean list of all revenue-generating transactions
+                    dt.Rows.Add(
+                        p.CreatedAt.ToString("MMM d, yyyy"),
+                        p.RentalContract?.ContractNumber ?? "—",
+                        p.RentalContract?.CustomerName ?? "—",
+                        p.PaymentType.ToString(),
+                        p.Amount.ToString("N2")
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Revenue Analysis"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RevenueAnalysis.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Revenue Analysis"), "application/pdf", "RevenueAnalysis.pdf");
+            }
+
             return View();
         }
 
         // ───────── Profit and Loss Report ─────────
-        public async Task<IActionResult> ProfitAndLoss(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> ProfitAndLoss(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -459,11 +781,45 @@ namespace DriveAway.Controllers
 
             ViewBag.MonthlyPnL = monthlyPnL;
 
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Month");
+                dt.Columns.Add("Total Income (₱)");
+                dt.Columns.Add("Total Expenses (₱)");
+                dt.Columns.Add("Net Profit (₱)");
+                dt.Columns.Add("Margin (%)");
+
+                foreach (var m in monthlyPnL)
+                {
+                    var mIncome = (decimal)m.Income;
+                    var mExpense = (decimal)m.Expense;
+                    var mNet = mIncome - mExpense;
+                    var mMargin = mIncome > 0 ? (mNet / mIncome) * 100 : 0;
+
+                    dt.Rows.Add(
+                        new DateTime(m.Year, m.Month, 1).ToString("MMM yyyy"),
+                        mIncome.ToString("N2"),
+                        mExpense.ToString("N2"),
+                        mNet.ToString("N2"),
+                        mMargin.ToString("N1")
+                    );
+                }
+
+                // Append aggregate totals row at the bottom
+                dt.Rows.Add("TOTAL", totalIncome.ToString("N2"), (totalExpenses + totalRefunds).ToString("N2"), (totalIncome - (totalExpenses + totalRefunds)).ToString("N2"), "—");
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Profit and Loss"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ProfitAndLoss.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Profit and Loss"), "application/pdf", "ProfitAndLoss.pdf");
+            }
+
             return View();
         }
 
         // ───────── Payment Method Analysis Report ─────────
-        public async Task<IActionResult> PaymentMethodAnalysis(string? range, DateTime? from, DateTime? to)
+        public async Task<IActionResult> PaymentMethodAnalysis(string? range, DateTime? from, DateTime? to, string? export)
         {
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
@@ -521,6 +877,40 @@ namespace DriveAway.Controllers
             ViewBag.MonthlyTrend = monthlyTrend;
             ViewBag.TotalAmount = payments.Sum(p => p.Amount);
             ViewBag.TotalTransactions = payments.Count;
+
+            if (export == "excel" || export == "pdf")
+            {
+                var dt = new System.Data.DataTable();
+                dt.Columns.Add("Payment Method");
+                dt.Columns.Add("Payment Type");
+                dt.Columns.Add("Transaction Count");
+                dt.Columns.Add("Total Processed (₱)");
+                dt.Columns.Add("Share of Method (%)");
+
+                foreach (var m in byMethodType)
+                {
+                    var mMethod = (PaymentMethodType)m.Method;
+                    var mType = (PaymentType)m.Type;
+                    var mAmount = (decimal)m.Total;
+                    var mCount = (int)m.Count;
+
+                    var methodTotalAmount = byMethod.FirstOrDefault(b => (PaymentMethodType)b.Method == mMethod)?.Total ?? 0;
+                    var share = methodTotalAmount > 0 ? (mAmount / methodTotalAmount) * 100 : 0;
+
+                    dt.Rows.Add(
+                        mMethod.ToString(),
+                        mType.ToString(),
+                        mCount.ToString(),
+                        mAmount.ToString("N2"),
+                        share.ToString("N1")
+                    );
+                }
+
+                if (export == "excel")
+                    return File(_exportService.ExportToExcel(dt, "Payment Method Analysis"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PaymentMethodAnalysis.xlsx");
+                if (export == "pdf")
+                    return File(_exportService.ExportToPdfFromDataTable(dt, "Payment Method Analysis"), "application/pdf", "PaymentMethodAnalysis.pdf");
+            }
 
             return View();
         }
