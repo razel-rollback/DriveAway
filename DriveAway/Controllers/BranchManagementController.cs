@@ -44,6 +44,9 @@ namespace DriveAway.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (id == null) return NotFound();
 
             var branch = await _context.Branches.FindAsync(id);
@@ -95,6 +98,9 @@ namespace DriveAway.Controllers
 
         public async Task<IActionResult> Performance(int? id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (id == null) return NotFound();
             var branch = await _context.Branches.FindAsync(id);
             if (branch == null) return NotFound();

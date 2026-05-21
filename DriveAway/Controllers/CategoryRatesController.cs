@@ -76,6 +76,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (!CanModify) return Forbid();
 
             var rate = await _context.CategoryRates.FindAsync(id);
@@ -127,6 +130,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (!CanModify) return Forbid();
 
             var rate = await _context.CategoryRates.FindAsync(id);

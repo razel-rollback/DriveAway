@@ -36,6 +36,9 @@ namespace DriveAway.Controllers
 
         public async Task<IActionResult> Dashboard(string filter = "month", DateTime? startDate = null, DateTime? endDate = null)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var today = DateTime.UtcNow.Date;
 
             // ── Determine filter date range ──────────────────────

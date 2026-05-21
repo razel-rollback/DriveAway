@@ -100,6 +100,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> CompleteRepair(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var userId = GetCurrentUserId();
             var job = await _context.MaintenanceJobs
                 .Include(j => j.Vehicle)
