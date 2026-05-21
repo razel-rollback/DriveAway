@@ -13,6 +13,74 @@
     var filterLabel = ViewBag.FilterLabel as string ?? "This Month";
     var filterStart = ViewBag.FilterStart as string ?? "";
     var filterEnd = ViewBag.FilterEnd as string ?? "";
+
+    var primaryMetrics = new List<dynamic>
+    {
+        new
+        {
+            Title = "Total Fleet",
+            ValueText = ViewBag.TotalVehicles?.ToString() ?? "0",
+            BadgeText = $"{ViewBag.AvailableVehicles} available",
+            BadgeClass = "text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full",
+            IconWrapperClass = "bg-[#1E3A5F]/10 rounded-lg p-2.5",
+            IconClass = "h-6 w-6 text-[#1E3A5F]",
+            IconPath = "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4",
+            FooterText = $"₱{((decimal)ViewBag.TotalFleetValue).ToString("N0")} book value"
+        },
+        new
+        {
+            Title = "Active Rentals",
+            ValueText = ViewBag.ActiveRentals?.ToString() ?? "0",
+            BadgeText = (int)ViewBag.OverdueRentals > 0 ? $"{ViewBag.OverdueRentals} overdue" : "On track",
+            BadgeClass = (int)ViewBag.OverdueRentals > 0
+                ? "text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full"
+                : "text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full",
+            IconWrapperClass = "bg-[#FF6B00]/10 rounded-lg p-2.5",
+            IconClass = "h-6 w-6 text-[#FF6B00]",
+            IconPath = "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+            FooterText = $"{ViewBag.CompletedRentals} completed ({filterLabel})"
+        },
+        new
+        {
+            Title = "Revenue",
+            ValueText = $"₱{((decimal)ViewBag.PeriodRevenue).ToString("N0")}",
+            BadgeText = filterLabel,
+            BadgeClass = "text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full",
+            IconWrapperClass = "bg-green-100 rounded-lg p-2.5",
+            IconClass = "h-6 w-6 text-green-600",
+            IconPath = "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+            FooterText = $"₱{((decimal)ViewBag.TotalRevenue).ToString("N0")} all-time"
+        },
+        new
+        {
+            Title = "Branches",
+            ValueText = ViewBag.TotalBranches?.ToString() ?? "0",
+            BadgeText = "Active",
+            BadgeClass = "text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full",
+            IconWrapperClass = "bg-[#0B1E3D]/10 rounded-lg p-2.5",
+            IconClass = "h-6 w-6 text-[#0B1E3D]",
+            IconPath = "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+            FooterText = $"{ViewBag.TotalContracts} total contracts"
+        }
+    };
+
+    var secondaryMetrics = new List<dynamic>
+    {
+        new { Title = "Rented", ValueText = ViewBag.RentedVehicles?.ToString() ?? "0", ValueClass = "text-lg font-bold text-[#0B1E3D]" },
+        new { Title = "Under Maintenance", ValueText = ViewBag.UnderMaintenance?.ToString() ?? "0", ValueClass = "text-lg font-bold text-amber-600" },
+        new { Title = "Payments Collected", ValueText = $"₱{((decimal)ViewBag.TotalPaymentsCollected).ToString("N0")}", ValueClass = "text-lg font-bold text-green-600" },
+        new { Title = "Pending Payments", ValueText = $"₱{((decimal)ViewBag.PendingPayments).ToString("N0")}", ValueClass = "text-lg font-bold text-red-500" }
+    };
+
+    var quickActions = new List<dynamic>
+    {
+        new { Controller = "BusinessOwner", Action = "FleetManagement", Label = "Fleet", IconPath = "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" },
+        new { Controller = "BranchManagement", Action = "Index", Label = "Branches", IconPath = "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
+        new { Controller = "RentalOperations", Action = "Index", Label = "Rentals", IconPath = "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
+        new { Controller = "Maintenance", Action = "Jobs", Label = "Maintenance", IconPath = "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
+        new { Controller = "CategoryRates", Action = "Index", Label = "Rates", IconPath = "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" },
+        new { Controller = "AuditLog", Action = "Index", Label = "Audit Logs", IconPath = "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" }
+    };
 }
 
 <div class="min-h-screen bg-gray-50 py-8">
@@ -104,107 +172,34 @@
 
         <!-- ═══ Key Metrics Row ═══════════════════════════════════════════ -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <!-- Total Fleet -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="bg-[#1E3A5F]/10 rounded-lg p-2.5">
-                        <svg class="h-6 w-6 text-[#1E3A5F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                    </div>
-                    <span
-                        class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">@ViewBag.AvailableVehicles
-                        available</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.TotalVehicles</h3>
-                    <p class="text-sm font-medium text-gray-500 mb-1">Total Fleet</p>
-                    <p class="text-xs text-gray-400 mt-2">₱@(((decimal)ViewBag.TotalFleetValue).ToString("N0")) book value
-                    </p>
-                </div>
-
-                <!-- Active Rentals -->
+            @foreach (var metric in primaryMetrics)
+            {
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between mb-3">
-                        <div class="bg-[#FF6B00]/10 rounded-lg p-2.5">
-                            <svg class="h-6 w-6 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <div class="@metric.IconWrapperClass">
+                            <svg class="@metric.IconClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="@metric.IconPath"></path>
                             </svg>
                         </div>
-                        @if ((int)ViewBag.OverdueRentals > 0)
-                        {
-                            <span
-                                class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">@ViewBag.OverdueRentals
-                                overdue</span>
-                            }
-                    else
-                            {
-                                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">On track</span>
-                            }
-                        </div>
-                        <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.ActiveRentals</h3>
-                        <p class="text-sm font-medium text-gray-500 mb-1">Active Rentals</p>
-                        <p class="text-xs text-gray-400 mt-2">@ViewBag.CompletedRentals completed (@filterLabel)</p>
+                        <span class="@metric.BadgeClass">@metric.BadgeText</span>
                     </div>
-
-                    <!-- Revenue -->
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="bg-green-100 rounded-lg p-2.5">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span
-                            class="text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full">@filterLabel</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-[#0B1E3D]">₱@(((decimal)ViewBag.PeriodRevenue).ToString("N0"))</h3>
-                        <p class="text-sm font-medium text-gray-500 mb-1">Revenue</p>
-                        <p class="text-xs text-gray-400 mt-2">₱@(((decimal)ViewBag.TotalRevenue).ToString("N0")) all-time</p>
-                    </div>
-
-                    <!-- Branches -->
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="bg-[#0B1E3D]/10 rounded-lg p-2.5">
-                                <svg class="h-6 w-6 text-[#0B1E3D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span
-                            class="text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full">Active</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.TotalBranches</h3>
-                        <p class="text-sm font-medium text-gray-500 mb-1">Branches</p>
-                        <p class="text-xs text-gray-400 mt-2">@ViewBag.TotalContracts total contracts</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-[#0B1E3D]">@metric.ValueText</h3>
+                    <p class="text-sm font-medium text-gray-500 mb-1">@metric.Title</p>
+                    <p class="text-xs text-gray-400 mt-2">@metric.FooterText</p>
                 </div>
+            }
+        </div>
 
-                <!-- ═══ Secondary Metrics ═════════════════════════════════════════ -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Rented</p>
-                        <p class="text-lg font-bold text-[#0B1E3D]">@ViewBag.RentedVehicles</p>
-                    </div>
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Under Maintenance</p>
-                        <p class="text-lg font-bold text-amber-600">@ViewBag.UnderMaintenance</p>
-                    </div>
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Payments Collected</p>
-                        <p class="text-lg font-bold text-green-600">₱@(((decimal)ViewBag.TotalPaymentsCollected).ToString("N0"))
-                        </p>
-                    </div>
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                        <p class="text-xs text-gray-500 mb-1">Pending Payments</p>
-                        <p class="text-lg font-bold text-red-500">₱@(((decimal)ViewBag.PendingPayments).ToString("N0"))</p>
-                    </div>
+        <!-- ═══ Secondary Metrics ═════════════════════════════════════════ -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            @foreach (var metric in secondaryMetrics)
+            {
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+                    <p class="text-xs text-gray-500 mb-1">@metric.Title</p>
+                    <p class="@metric.ValueClass">@metric.ValueText</p>
                 </div>
+            }
+        </div>
 
                 <!-- ═══ Charts Row 1: Revenue Trend + Fleet Status ════════════════ -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -535,91 +530,20 @@
                                                                             <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
                                                                                 <h2 class="text-lg font-semibold text-[#0B1E3D] mb-4">Quick Actions</h2>
                                                                                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                                                                    <a asp-controller="BusinessOwner" asp-action="FleetManagement"
-                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                                                                                        <div
-                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
-                                                                                                 viewBox="0 0 24 24">
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Fleet</span>
-                                                                                    </a>
-                                                                                    <a asp-controller="BranchManagement" asp-action="Index"
-                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                                                                                        <div
-                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
-                                                                                                 viewBox="0 0 24 24">
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                                                                                </path>
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <span
-                                                                                        class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Branches</span>
-                                                                                    </a>
-                                                                                    <a asp-controller="RentalOperations" asp-action="Index"
-                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                                                                                        <div
-                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
-                                                                                                 viewBox="0 0 24 24">
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                                                                                                </path>
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <span
-                                                                                        class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Rentals</span>
-                                                                                    </a>
-                                                                                    <a asp-controller="Maintenance" asp-action="Jobs"
-                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                                                                                        <div
-                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
-                                                                                                 viewBox="0 0 24 24">
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                                                                                </path>
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <span
-                                                                                        class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Maintenance</span>
-                                                                                    </a>
-                                                                                    <a asp-controller="CategoryRates" asp-action="Index"
-                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                                                                                        <div
-                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
-                                                                                                 viewBox="0 0 24 24">
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
-                                                                                                </path>
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Rates</span>
-                                                                                    </a>
-                                                                                    <a asp-controller="AuditLog" asp-action="Index"
-                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                                                                                        <div
-                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
-                                                                                                 viewBox="0 0 24 24">
-                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                                                                                </path>
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Audit
-                                                                                            Logs</span>
+                                                                                    @foreach (var action in quickActions)
+                                                                                    {
+                                                                                        <a asp-controller="@action.Controller" asp-action="@action.Action"
+                                                                                           class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                            <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                                <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="@action.IconPath"></path>
+                                                                                                </svg>
+                                                                                            </div>
+                                                                                            <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">@action.Label</span>
                                                                                         </a>
-                                                                                    </div>
+                                                                                    }
                                                                                 </div>
+                                                                            </div>
 
                                                                                 <!-- Footer -->
                                                                                 <div class="text-center text-xs text-gray-400">

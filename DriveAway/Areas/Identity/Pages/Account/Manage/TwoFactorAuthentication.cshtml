@@ -28,80 +28,86 @@
                         {
                             <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">
                                 <strong>You have no recovery codes left.</strong>
-                                <p class="mt-1">You must <a asp-page="./GenerateRecoveryCodes" class="underline font-semibold" style="color: #1E3A5F;">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
-                            </div>
-                        }
-                        else if (Model.RecoveryCodesLeft == 1)
-                        {
-                            <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">
-                                <strong>You have 1 recovery code left.</strong>
-                                <p class="mt-1">You can <a asp-page="./GenerateRecoveryCodes" class="underline font-semibold" style="color: #1E3A5F;">generate a new set of recovery codes</a>.</p>
-                            </div>
-                        }
-                        else if (Model.RecoveryCodesLeft <= 3)
-                        {
-                            <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium bg-amber-50 text-amber-800 border border-amber-200">
-                                <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
-                                <p class="mt-1">You should <a asp-page="./GenerateRecoveryCodes" class="underline font-semibold" style="color: #1E3A5F;">generate a new set of recovery codes</a>.</p>
-                            </div>
-                        }
-
-                        <div class="flex flex-wrap gap-3 mb-6">
-                            if (Model.IsMachineRemembered)
-                            {
-                                <form method="post" class="inline-block">
-                                    <button type="submit"
-                                            class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
-                                            style="background-color: #1E3A5F;"
-                                            onmouseover="this.style.backgroundColor='#FF6B00'"
-                                            onmouseout="this.style.backgroundColor='#1E3A5F'">
-                                        Forget this browser
-                                    </button>
-                                </form>
+                                <p class="mt-1">You must <a asp-page="./GenerateRecoveryCodes" class="underline font-semibold"
+                                                                style="color: #1E3A5F;">generate a new set of recovery codes</a> before you can log in with
+                                    a recovery code.</p>
+                                </div>
                             }
-                            <a asp-page="./Disable2fa"
-                               class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
-                               style="background-color: #1E3A5F;"
-                               onmouseover="this.style.backgroundColor='#FF6B00'"
-                               onmouseout="this.style.backgroundColor='#1E3A5F'">
-                                Disable 2FA
-                            </a>
-                            <a asp-page="./GenerateRecoveryCodes"
-                               class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
-                               style="background-color: #1E3A5F;"
-                               onmouseover="this.style.backgroundColor='#FF6B00'"
-                               onmouseout="this.style.backgroundColor='#1E3A5F'">
-                                Reset recovery codes
-                            </a>
+                        else if (Model.RecoveryCodesLeft == 1)
+                            {
+                                <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">
+                                    <strong>You have 1 recovery code left.</strong>
+                                    <p class="mt-1">You can <a asp-page="./GenerateRecoveryCodes" class="underline font-semibold"
+                                                                   style="color: #1E3A5F;">generate a new set of recovery codes</a>.</p>
+                                    </div>
+                                }
+                        else if (Model.RecoveryCodesLeft <= 3)
+                                {
+                                    <div
+                                        class="mb-4 px-4 py-3 rounded-lg text-sm font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                                        <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
+                                        <p class="mt-1">You should <a asp-page="./GenerateRecoveryCodes" class="underline font-semibold"
+                                                                          style="color: #1E3A5F;">generate a new set of recovery codes</a>.</p>
+                                        </div>
+                                    }
+
+                                    <div class="flex flex-wrap gap-3 mb-6">
+                                        if (Model.IsMachineRemembered)
+                                        {
+                                        <form method="post" class="inline-block">
+                                            <button type="submit"
+                                                    class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+                                                    style="background-color: #1E3A5F;" onmouseover="this.style.backgroundColor='#FF6B00'"
+                                                    onmouseout="this.style.backgroundColor='#1E3A5F'"
+                                                    onfocus="this.style.backgroundColor='#FF6B00'"
+                                                    onblur="this.style.backgroundColor='#1E3A5F'">
+                                                Forget this browser
+                                            </button>
+                                        </form>
+                                        }
+                                        <a asp-page="./Disable2fa"
+                                           class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
+                                           style="background-color: #1E3A5F;" onmouseover="this.style.backgroundColor='#FF6B00'"
+                                           onmouseout="this.style.backgroundColor='#1E3A5F'" onfocus="this.style.backgroundColor='#FF6B00'"
+                                           onblur="this.style.backgroundColor='#1E3A5F'">
+                                            Disable 2FA
+                                        </a>
+                                        <a asp-page="./GenerateRecoveryCodes"
+                                           class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
+                                           style="background-color: #1E3A5F;" onmouseover="this.style.backgroundColor='#FF6B00'"
+                                           onmouseout="this.style.backgroundColor='#1E3A5F'" onfocus="this.style.backgroundColor='#FF6B00'"
+                                           onblur="this.style.backgroundColor='#1E3A5F'">
+                                            Reset recovery codes
+                                        </a>
+                                    </div>
+                                }
+
+                                <h4 class="text-base font-semibold mb-3" style="color: #1E3A5F;">Email Authentication</h4>
+                                <div class="flex flex-wrap gap-3">
+                                    @if (!Model.Is2faEnabled)
+                                    {
+                                        <a id="enable-email-authenticator" asp-page="./EnableEmailAuthenticator"
+                                           class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
+                                           style="background-color: #1E3A5F;" onmouseover="this.style.backgroundColor='#FF6B00'"
+                                           onmouseout="this.style.backgroundColor='#1E3A5F'" onfocus="this.style.backgroundColor='#FF6B00'"
+                                           onblur="this.style.backgroundColor='#1E3A5F'">
+                                            Enable Email Authentication
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">
+                                    <strong>Privacy and cookie policy have not been accepted.</strong>
+                                    <p class="mt-1">You must accept the policy before you can enable two factor authentication.</p>
+                                </div>
+                            }
                         </div>
-                    }
-
-                    <h4 class="text-base font-semibold mb-3" style="color: #1E3A5F;">Email Authentication</h4>
-                    <div class="flex flex-wrap gap-3">
-                        @if (!Model.Is2faEnabled)
-                        {
-                            <a id="enable-email-authenticator" asp-page="./EnableEmailAuthenticator"
-                               class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
-                               style="background-color: #1E3A5F;"
-                               onmouseover="this.style.backgroundColor='#FF6B00'"
-                               onmouseout="this.style.backgroundColor='#1E3A5F'">
-                                Enable Email Authentication
-                            </a>
-                        }
                     </div>
-                }
-                else
-                {
-                    <div class="px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">
-                        <strong>Privacy and cookie policy have not been accepted.</strong>
-                        <p class="mt-1">You must accept the policy before you can enable two factor authentication.</p>
-                    </div>
-                }
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+            @section Scripts {
+                <partial name="_ValidationScriptsPartial" />
+            }

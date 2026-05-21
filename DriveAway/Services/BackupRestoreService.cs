@@ -79,7 +79,7 @@ EXEC sp_executesql @sql,
             try
             {
                 // Encrypt the temp backup file to the final destination path
-                var encryptionKey = _configuration["Backup:EncryptionKey"] ?? "DriveAwayBackupSecretEncryptionKey2026!";
+                var encryptionKey = GetRequiredBackupSecret("Backup:EncryptionKey");
                 EncryptFile(tempBackupPath, finalBackupPath, encryptionKey);
             }
             finally
@@ -135,7 +135,7 @@ EXEC sp_executesql @sql,
             try
             {
                 // Decrypt the file to a temporary location so SQL Server can read it
-                var encryptionKey = _configuration["Backup:EncryptionKey"] ?? "DriveAwayBackupSecretEncryptionKey2026!";
+                var encryptionKey = GetRequiredBackupSecret("Backup:EncryptionKey");
                 DecryptFile(encryptedFilePath, decryptedTempFilePath, encryptionKey);
 
                 var dbName = GetDatabaseName();
@@ -248,7 +248,7 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
             using var conn = new SqlConnection(masterConnStr);
             await conn.OpenAsync();
 
-            var password = _configuration["Backup:MasterKeyPassword"] ?? "DriveAwaySecureBackupKeyPassword2026!";
+            var password = GetRequiredBackupSecret("Backup:MasterKeyPassword");
 
             // 1. Check if database master key exists. If not, create it.
             var checkKeySql = "SELECT COUNT(*) FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##'";
@@ -445,6 +445,15 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
                 Array.Copy(hash, result, Math.Min(length, hash.Length));
                 return result;
             }
+        }
+
+        private string GetRequiredBackupSecret(string key)
+        {
+            var value = _configuration[key];
+            if (string.IsNullOrWhiteSpace(value))
+                throw new InvalidOperationException($"Missing required configuration value: {key}");
+
+            return value;
         }
     }
 }

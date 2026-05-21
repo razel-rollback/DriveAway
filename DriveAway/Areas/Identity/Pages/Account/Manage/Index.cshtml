@@ -17,23 +17,24 @@
                 <partial name="_StatusMessage" for="StatusMessage" />
 
                 <form id="profile-form" method="post" class="space-y-5">
-                    <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded" role="alert"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded"
+                         role="alert"></div>
 
                     <!-- Username (read-only) -->
                     <div>
                         <label class="block text-sm font-medium mb-1" style="color: #1E3A5F;">Username</label>
-                        <input class="block w-full px-4 py-2.5 border rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                               style="border-color: #E2E8F0;"
-                               value="@Model.Username" disabled />
+                        <input
+                        class="block w-full px-4 py-2.5 border rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                        style="border-color: #E2E8F0;" value="@Model.Username" disabled />
                     </div>
 
                     <!-- Phone Number -->
                     <div>
-                        <label asp-for="Input.PhoneNumber" class="block text-sm font-medium mb-1" style="color: #1E3A5F;">Phone number</label>
+                        <label asp-for="Input.PhoneNumber" class="block text-sm font-medium mb-1"
+                               style="color: #1E3A5F;">Phone number</label>
                         <input asp-for="Input.PhoneNumber"
                                class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
-                               style="border-color: #E2E8F0;"
-                               placeholder="Enter phone number" />
+                               style="border-color: #E2E8F0;" placeholder="Enter phone number" />
                         <span asp-validation-for="Input.PhoneNumber" class="text-xs text-red-600 mt-1 block"></span>
                     </div>
 
@@ -41,9 +42,10 @@
                     <div>
                         <button id="update-profile-button" type="submit"
                                 class="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
-                                style="background-color: #1E3A5F;"
-                                onmouseover="this.style.backgroundColor='#FF6B00'"
-                                onmouseout="this.style.backgroundColor='#1E3A5F'">
+                                style="background-color: #1E3A5F;" onmouseover="this.style.backgroundColor='#FF6B00'"
+                                onmouseout="this.style.backgroundColor='#1E3A5F'"
+                                onfocus="this.style.backgroundColor='#FF6B00'"
+                                onblur="this.style.backgroundColor='#1E3A5F'">
                             Save
                         </button>
                     </div>
