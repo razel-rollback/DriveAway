@@ -260,6 +260,10 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
                 {
                     using (var createKeyCmd = conn.CreateCommand())
                     {
+                        // NOTE: The password value is supplied from configuration at runtime via
+                        // `GetRequiredBackupSecret("Backup:MasterKeyPassword")`. This must not be
+                        // a hard-coded literal in source control — ensure secrets are stored in
+                        // user-secrets, environment variables, or a secret manager (Key Vault).
                         createKeyCmd.CommandText = "CREATE MASTER KEY ENCRYPTION BY PASSWORD = @password";
                         createKeyCmd.Parameters.Add(new SqlParameter("@password", password));
                         await createKeyCmd.ExecuteNonQueryAsync();
@@ -452,6 +456,12 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
             var value = _configuration[key];
             if (string.IsNullOrWhiteSpace(value))
                 throw new InvalidOperationException($"Missing required configuration value: {key}");
+
+            // Detect common placeholder values or obviously weak secrets and fail-fast so
+            // developers don't accidentally leave placeholders in checked-in config.
+            var forbiddenPlaceholders = new[] { "CHANGE_ME", "your-master-key-password", "your-encryption-key", "password", "secret", "default" };
+            if (forbiddenPlaceholders.Any(p => string.Equals(p, value, StringComparison.OrdinalIgnoreCase)) || value.Length < 12)
+                throw new InvalidOperationException($"Configuration value for {key} appears to be a placeholder or too short. Set a secure secret via environment variables, user-secrets, or a secret manager.");
 
             return value;
         }

@@ -72,6 +72,18 @@
         new { Title = "Pending Payments", ValueText = $"₱{((decimal)ViewBag.PendingPayments).ToString("N0")}", ValueClass = "text-lg font-bold text-[#0B1E3D]", IconWrapperClass = "bg-red-100 rounded-lg p-2", IconClass = "h-5 w-5 text-red-500", IconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }
     };
 
+    var nhtsaStatus = ViewBag.NhtsaApiStatus as string ?? "Unknown";
+    var nhtsaBadge = nhtsaStatus == "Online" ? "bg-green-100 text-green-700" : nhtsaStatus == "Degraded" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
+    var nhtsaDot = nhtsaStatus == "Online" ? "bg-green-500" : nhtsaStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
+    var nhtsaIconWrapper = nhtsaStatus == "Online" ? "bg-green-100" : nhtsaStatus == "Degraded" ? "bg-amber-100" : "bg-red-100";
+    var nhtsaIconClass = nhtsaStatus == "Online" ? "text-green-600" : nhtsaStatus == "Degraded" ? "text-amber-600" : "text-red-600";
+
+    var pmStatus = ViewBag.PayMongoApiStatus as string ?? "Unknown";
+    var pmBadge = pmStatus == "Online" ? "bg-green-100 text-green-700" : pmStatus == "Degraded" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
+    var pmDot = pmStatus == "Online" ? "bg-green-500" : pmStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
+    var pmIconWrapper = pmStatus == "Online" ? "bg-green-100" : pmStatus == "Degraded" ? "bg-amber-100" : "bg-red-100";
+    var pmIconClass = pmStatus == "Online" ? "text-green-600" : pmStatus == "Degraded" ? "text-amber-600" : "text-red-600";
+
     var healthCards = new List<dynamic>
     {
         new { Title = "Active Sessions", Subtitle = "Last 30 min", ValueText = ViewBag.ActiveSessions?.ToString() ?? "0", ValueClass = "text-lg font-bold text-[#0B1E3D]", BadgeText = "", BadgeClass = "", DotClass = "", IconWrapperClass = "bg-indigo-100 rounded-lg p-2 flex-shrink-0", IconClass = "h-5 w-5 text-indigo-600", IconPath = "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z", Kind = "metric" },
@@ -100,17 +112,6 @@
         new { Controller = "AuditLog", Action = "Index", Label = "Audit Logs", IconPath = "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" }
     };
 
-    var nhtsaStatus = ViewBag.NhtsaApiStatus as string ?? "Unknown";
-    var nhtsaBadge = nhtsaStatus == "Online" ? "bg-green-100 text-green-700" : nhtsaStatus == "Degraded" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
-    var nhtsaDot = nhtsaStatus == "Online" ? "bg-green-500" : nhtsaStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
-    var nhtsaIconWrapper = nhtsaStatus == "Online" ? "bg-green-100" : nhtsaStatus == "Degraded" ? "bg-amber-100" : "bg-red-100";
-    var nhtsaIconClass = nhtsaStatus == "Online" ? "text-green-600" : nhtsaStatus == "Degraded" ? "text-amber-600" : "text-red-600";
-
-    var pmStatus = ViewBag.PayMongoApiStatus as string ?? "Unknown";
-    var pmBadge = pmStatus == "Online" ? "bg-green-100 text-green-700" : pmStatus == "Degraded" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
-    var pmDot = pmStatus == "Online" ? "bg-green-500" : pmStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
-    var pmIconWrapper = pmStatus == "Online" ? "bg-green-100" : pmStatus == "Degraded" ? "bg-amber-100" : "bg-red-100";
-    var pmIconClass = pmStatus == "Online" ? "text-green-600" : pmStatus == "Degraded" ? "text-amber-600" : "text-red-600";
 }
 
 <div class="min-h-screen bg-gray-50 py-8">
