@@ -2,6 +2,12 @@
 
 @{
     ViewData["Title"] = "Create User";
+    var fieldLabelClass = "block text-sm font-medium mb-2";
+    var fieldLabelStyle = "color: #1E3A5F;";
+    var textInputClass = "block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors";
+    var inputBorderStyle = "border-color: #E2E8F0;";
+    var validationClass = "text-xs text-red-600 mt-1 block";
+    var selectClass = "block w-full px-4 py-2.5 border rounded-lg appearance-none focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors bg-white";
 }
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -27,22 +33,22 @@
 
                 <!-- Email Input -->
                 <div class="mb-5">
-                    <label asp-for="Email" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Email
+                      <label asp-for="Email" class="@fieldLabelClass" style="@fieldLabelStyle">Email
                         Address</label>
                         <input asp-for="Email"
-                               class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
-                               style="border-color: #E2E8F0;" placeholder="user@example.com" />
-                        <span asp-validation-for="Email" class="text-xs text-red-600 mt-1 block"></span>
+                           class="@textInputClass"
+                           style="@inputBorderStyle" placeholder="user@example.com" />
+                       <span asp-validation-for="Email" class="@validationClass"></span>
                     </div>
 
                     <!-- Password Input -->
                     <div class="mb-5">
-                        <label asp-for="Password" class="block text-sm font-medium mb-2"
-                               style="color: #1E3A5F;">Password</label>
+                       <label asp-for="Password" class="@fieldLabelClass"
+                           style="@fieldLabelStyle">Password</label>
                         <div class="relative">
                             <input asp-for="Password" type="password" id="password-input"
-                                   class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors pr-10"
-                                   style="border-color: #E2E8F0;" placeholder="Enter password" />
+                            class="@textInputClass pr-10"
+                            style="@inputBorderStyle" placeholder="Enter password" />
                             <button type="button" id="toggle-password"
                                     class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-[#FF6B00] focus:outline-none focus:text-[#FF6B00]">
                                 <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,17 +64,17 @@
                                 </svg>
                             </button>
                         </div>
-                        <span asp-validation-for="Password" class="text-xs text-red-600 mt-1 block"></span>
+                           <span asp-validation-for="Password" class="@validationClass"></span>
                     </div>
 
                     <!-- Confirm Password Input -->
                     <div class="mb-5">
-                        <label asp-for="ConfirmPassword" class="block text-sm font-medium mb-2"
-                               style="color: #1E3A5F;">Confirm Password</label>
+                           <label asp-for="ConfirmPassword" class="@fieldLabelClass"
+                               style="@fieldLabelStyle">Confirm Password</label>
                         <div class="relative">
                             <input asp-for="ConfirmPassword" type="password" id="confirm-password-input"
-                                   class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors pr-10"
-                                   style="border-color: #E2E8F0;" placeholder="Confirm password" />
+                                class="@textInputClass pr-10"
+                                style="@inputBorderStyle" placeholder="Confirm password" />
                             <button type="button" id="toggle-confirm-password"
                                     class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-[#FF6B00] focus:outline-none focus:text-[#FF6B00]">
                                 <svg id="confirm-eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -85,17 +91,17 @@
                                 </svg>
                             </button>
                         </div>
-                        <span asp-validation-for="ConfirmPassword" class="text-xs text-red-600 mt-1 block"></span>
+                        <span asp-validation-for="ConfirmPassword" class="@validationClass"></span>
                     </div>
 
                     <!-- Role Selection -->
                     <div class="mb-6">
-                        <label asp-for="SelectedRole" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Assign
+                        <label asp-for="SelectedRole" class="@fieldLabelClass" style="@fieldLabelStyle">Assign
                             Role</label>
                             <div class="relative">
                                 <select asp-for="SelectedRole" asp-items="ViewBag.Roles" id="roleSelect"
-                                        class="block w-full px-4 py-2.5 border rounded-lg appearance-none focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors bg-white"
-                                        style="border-color: #E2E8F0; color: #1E3A5F;">
+                                        class="@selectClass"
+                                        style="@inputBorderStyle color: #1E3A5F;">
                                     <option value="">-- Select Role --</option>
                                 </select>
                                 <div
@@ -112,22 +118,22 @@
                         @if (ViewBag.IsAdminUser == true)
                         {
                             <div class="mb-6" id="branch-section">
-                                <label class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Assign Branch</label>
+                                <label class="@fieldLabelClass" style="@fieldLabelStyle">Assign Branch</label>
                                 <input type="hidden" asp-for="BranchId" value="@ViewBag.AdminBranchId" />
                                 <input type="text" class="block w-full px-4 py-2.5 border rounded-lg bg-gray-50 cursor-not-allowed"
-                                       style="border-color: #E2E8F0; color: #64748B;" value="@ViewBag.AdminBranchName" disabled />
+                                       style="@inputBorderStyle color: #64748B;" value="@ViewBag.AdminBranchName" disabled />
                                 <p class="text-xs mt-1" style="color: #64748B;">Auto-assigned to your branch</p>
                             </div>
                         }
                         else
                         {
                             <div class="mb-6" id="branch-section">
-                                <label asp-for="BranchId" class="block text-sm font-medium mb-2" style="color: #1E3A5F;">Assign
+                                <label asp-for="BranchId" class="@fieldLabelClass" style="@fieldLabelStyle">Assign
                                     Branch</label>
                                     <div class="relative">
                                         <select asp-for="BranchId" asp-items="ViewBag.Branches"
-                                                class="block w-full px-4 py-2.5 border rounded-lg appearance-none focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors bg-white"
-                                                style="border-color: #E2E8F0; color: #1E3A5F;">
+                                                class="@selectClass"
+                                                style="@inputBorderStyle color: #1E3A5F;">
                                             <option value="">-- No Branch --</option>
                                         </select>
                                         <div
@@ -150,7 +156,8 @@
                                     Create User
                                 </button>
                                 <a asp-action="Index" class="text-sm font-medium transition-colors" style="color: #64748B;"
-                                       onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#64748B'">
+                                   onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#64748B'"
+                                   onfocus="this.style.color='#FF6B00'">
                                     Cancel
                                 </a>
                             </div>

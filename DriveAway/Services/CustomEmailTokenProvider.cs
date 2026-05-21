@@ -13,7 +13,7 @@ namespace DriveAway.Services
 
         public async Task<string> GenerateAsync(string purpose, UserManager<IdentityUser> manager, IdentityUser user)
         {
-            var code = new Random().Next(100000, 999999).ToString();
+            var code = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
             await manager.SetAuthenticationTokenAsync(user, "CustomEmailMfa", "Code", code);
             await manager.SetAuthenticationTokenAsync(user, "CustomEmailMfa", "Expiration", DateTimeOffset.UtcNow.AddMinutes(5).ToString("O"));
             return code;

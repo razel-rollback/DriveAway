@@ -180,14 +180,14 @@ namespace DriveAway.Data
             if (!password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit) || !password.Any(c => "!@#$%^&*()-_+=".Contains(c)))
             {
                 // fallback: build guaranteed-complex password
-                var rnd = new Random();
+                var rnd = System.Security.Cryptography.RandomNumberGenerator.Create();
                 var sb = new System.Text.StringBuilder();
-                sb.Append((char)('A' + rnd.Next(0, 26)));
-                sb.Append((char)('a' + rnd.Next(0, 26)));
-                sb.Append((char)('0' + rnd.Next(0, 10)));
+                sb.Append((char)('A' + System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, 26)));
+                sb.Append((char)('a' + System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, 26)));
+                sb.Append((char)('0' + System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, 10)));
                 sb.Append("!#@");
                 while (sb.Length < length)
-                    sb.Append(_pwChars[rnd.Next(_pwChars.Length)]);
+                    sb.Append(_pwChars[System.Security.Cryptography.RandomNumberGenerator.GetInt32(_pwChars.Length)]);
                 return sb.ToString();
             }
             return password;

@@ -50,7 +50,7 @@
                     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all shadow-sm hover:shadow-md"
                     style="background: linear-gradient(135deg, #0B1E3D 0%, #1E3A5F 100%);"
                     onmouseover="this.style.background='linear-gradient(135deg, #FF6B00 0%, #FF8C33 100%)'"
-                    onmouseout="this.style.background='linear-gradient(135deg, #0B1E3D 0%, #1E3A5F 100%)'">
+                    onmouseout="this.style.background='linear-gradient(135deg, #0B1E3D 0%, #1E3A5F 100%)'" onfocus="this.style.background='linear-gradient(135deg, #FF6B00 0%, #FF8C33 100%)'">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -210,7 +210,7 @@
                                                 <button type="submit"
                                                         class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
                                                         style="background-color: #0B1E3D;" onmouseover="this.style.backgroundColor='#FF6B00'"
-                                                        onmouseout="this.style.backgroundColor='#0B1E3D'">
+                                                    onmouseout="this.style.backgroundColor='#0B1E3D'" onfocus="this.style.backgroundColor='#FF6B00'">
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -314,6 +314,7 @@
                                 </div>
 
                                 @section Scripts {
-                                    <!-- NOTE: prefer pinning to an exact Alpine.js release and adding an SRI `integrity` value. -->
-                                    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer crossorigin="anonymous"></script>
+                                    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
+                                            integrity="sha384-9Ax3MmS9AClxJyd5/zafcXXjxmwFhZCdsT6HJoJjarvCaAkJlk5QDzjLJm+Wdx5F" defer
+                                            crossorigin="anonymous"></script>
                                 }

@@ -4,6 +4,11 @@
 
 @{
     ViewData["Title"] = "Log in";
+    var fieldLabelClass = "block text-sm font-medium mb-1";
+    var fieldLabelStyle = "color: #1E3A5F;";
+    var fieldInputClass = "block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors";
+    var fieldInputStyle = "border-color: #E2E8F0;";
+    var fieldValidationClass = "text-xs text-red-600 mt-1 block";
 }
 
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
@@ -36,25 +41,25 @@
 
                 <!-- Email Input -->
                 <div>
-                    <label asp-for="Input.Email" class="block text-sm font-medium mb-1" style="color: #1E3A5F;">
+                    <label asp-for="Input.Email" class="@fieldLabelClass" style="@fieldLabelStyle">
                         Email
                     </label>
                     <input asp-for="Input.Email"
-                           class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
-                           style="border-color: #E2E8F0;" placeholder="your@email.com" autocomplete="username"
+                           class="@fieldInputClass"
+                           style="@fieldInputStyle" placeholder="your@email.com" autocomplete="username"
                            aria-required="true" />
-                    <span asp-validation-for="Input.Email" class="text-xs text-red-600 mt-1 block"></span>
+                    <span asp-validation-for="Input.Email" class="@fieldValidationClass"></span>
                 </div>
 
                 <!-- Password Input -->
                 <div>
-                    <label asp-for="Input.Password" class="block text-sm font-medium mb-1" style="color: #1E3A5F;">
+                    <label asp-for="Input.Password" class="@fieldLabelClass" style="@fieldLabelStyle">
                         Password
                     </label>
                     <div class="relative">
                         <input asp-for="Input.Password" id="password-input"
-                               class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors pr-10"
-                               style="border-color: #E2E8F0;" placeholder="••••••••" autocomplete="current-password"
+                               class="@fieldInputClass pr-10"
+                               style="@fieldInputStyle" placeholder="••••••••" autocomplete="current-password"
                                aria-required="true" />
                         <button type="button" id="toggle-password"
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-[#FF6B00] focus:outline-none focus:text-[#FF6B00]">
@@ -71,7 +76,7 @@
                             </svg>
                         </button>
                     </div>
-                    <span asp-validation-for="Input.Password" class="text-xs text-red-600 mt-1 block"></span>
+                    <span asp-validation-for="Input.Password" class="@fieldValidationClass"></span>
                 </div>
 
                 <!-- Remember Me and Forgot Password on same line -->
@@ -85,7 +90,8 @@
                         </label>
                     </div>
                     <a asp-page="./ForgotPassword" class="text-xs transition-colors" style="color: #1E3A5F;"
-                       onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#1E3A5F'">
+                       onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#1E3A5F'"
+                       onfocus="this.style.color='#FF6B00'">
                         Forgot password?
                     </a>
                 </div>

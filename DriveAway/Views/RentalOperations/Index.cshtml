@@ -291,25 +291,26 @@
     </div>
 
     @section Scripts {
-        <!-- TODO: compute and add SRI `integrity` value for production. See README steps below. -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+                integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU"
+                crossorigin="anonymous"></script>
         <script>
             // Table filter
             function applyFilters() {
-            const q = document.getElementById('tableSearch').value.toLowerCase();
-            const status = document.getElementById('statusFilter').value.toLowerCase();
-            let visible = 0;
+                const q = document.getElementById('tableSearch').value.toLowerCase();
+                const status = document.getElementById('statusFilter').value.toLowerCase();
+                let visible = 0;
 
-            document.querySelectorAll('.rental-row').forEach(row => {
-            const matchSearch = row.dataset.search.includes(q);
-            const matchStatus = !status || row.dataset.status === status;
-            const show = matchSearch && matchStatus;
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-            });
+                document.querySelectorAll('.rental-row').forEach(row => {
+                    const matchSearch = row.dataset.search.includes(q);
+                    const matchStatus = !status || row.dataset.status === status;
+                    const show = matchSearch && matchStatus;
+                    row.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
 
-            const noResults = document.getElementById('noResults');
-            if (noResults) noResults.classList.toggle('hidden', visible > 0);
+                const noResults = document.getElementById('noResults');
+                if (noResults) noResults.classList.toggle('hidden', visible > 0);
             }
 
             document.getElementById('tableSearch')?.addEventListener('input', applyFilters);
@@ -318,17 +319,17 @@
             // Generate QR code if payment URL exists
             var qrContainer = document.getElementById('paymentQrCode');
             if (qrContainer) {
-            var payUrl = '@(TempData.Peek("PaymentUrl") ?? "")';
-            if (payUrl) {
-            new QRCode(qrContainer, {
-            text: payUrl,
-            width: 120,
-            height: 120,
-            colorDark: "#0B1E3D",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-            });
-            }
+                var payUrl = '@(TempData.Peek("PaymentUrl") ?? "")';
+                if (payUrl) {
+                    new QRCode(qrContainer, {
+                        text: payUrl,
+                        width: 120,
+                        height: 120,
+                        colorDark: "#0B1E3D",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
             }
         </script>
     }

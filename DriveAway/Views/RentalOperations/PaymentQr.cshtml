@@ -90,28 +90,29 @@ DriveAway.Models.PaymentStatus.Pending)
     @section Scripts {
         @if (!string.IsNullOrEmpty(paymentUrl) && pendingAmount > 0)
         {
-            <!-- TODO: compute and add SRI `integrity` value for production. See README steps below. -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+                    integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU"
+                    crossorigin="anonymous"></script>
             <script>
                 new QRCode(document.getElementById("paymentQrCode"), {
-                text: "@Html.Raw(paymentUrl)",
-                width: 200,
-                height: 200,
-                colorDark: "#0B1E3D",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
+                    text: "@Html.Raw(paymentUrl)",
+                    width: 200,
+                    height: 200,
+                    colorDark: "#0B1E3D",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
                 });
 
                 // Poll for payment status every 5 seconds
                 setInterval(function () {
-                fetch('@Url.Action("CheckPaymentStatus", "RentalOperations", new { id = Model.Id })')
-                .then(response => response.json())
-                .then(data => {
-                if (data.status === 'paid') {
-                window.location.href = '@Url.Action("Index", "RentalOperations")';
-                }
-                })
-                .catch(error => console.error('Error checking payment status:', error));
+                    fetch('@Url.Action("CheckPaymentStatus", "RentalOperations", new { id = Model.Id })')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'paid') {
+                                window.location.href = '@Url.Action("Index", "RentalOperations")';
+                            }
+                        })
+                        .catch(error => console.error('Error checking payment status:', error));
                 }, 5000);
             </script>
         }

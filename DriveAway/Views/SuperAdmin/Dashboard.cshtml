@@ -326,7 +326,8 @@
                                         var nhtsaStatus = ViewBag.NhtsaApiStatus as string ?? "Unknown";
                                         var nhtsaBadge = nhtsaStatus == "Online" ? "bg-green-100 text-green-700" : nhtsaStatus == "Degraded" ?
                             "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
-                                        var nhtsaDot = nhtsaStatus == "Online" ? "bg-green-500" : nhtsaStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
+                                        var nhtsaDot = nhtsaStatus == "Online" ? "bg-green-500" : nhtsaStatus == "Degraded" ? "bg-amber-500" :
+                "bg-red-500";
                                         var nhtsaIcon = nhtsaStatus == "Online" ? "bg-green-100 text-green-600" : nhtsaStatus == "Degraded" ?
                            "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600";
                                     }
@@ -356,7 +357,8 @@
                                         var pmStatus = ViewBag.PayMongoApiStatus as string ?? "Unknown";
                                         var pmBadge = pmStatus == "Online" ? "bg-green-100 text-green-700" : pmStatus == "Degraded" ?
                                  "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
-                                        var pmDot = pmStatus == "Online" ? "bg-green-500" : pmStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
+                                        var pmDot = pmStatus == "Online" ? "bg-green-500" : pmStatus == "Degraded" ? "bg-amber-500" :
+                "bg-red-500";
                                         var pmIcon = pmStatus == "Online" ? "bg-green-100 text-green-600" : pmStatus == "Degraded" ?
                                "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600";
                                     }
@@ -798,198 +800,176 @@
                                                                     </div>
 
                                                                     @section Scripts {
-                                                                        <!-- TODO: add SRI `integrity` value for Chart.js in production builds. -->
-                                                                        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+                                                                        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+                                                                                integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC"
+                                                                                crossorigin="anonymous"></script>
                                                                         <script>
-                                                                            // ─── Color Palette ─────────────────────────────────────
                                                                             const navy = '#0B1E3D';
                                                                             const blue = '#1E3A5F';
                                                                             const orange = '#FF6B00';
-                                                                            const colors = { navy, blue, orange };
+                                                                            const chartTooltip = {
+                                                                                backgroundColor: navy,
+                                                                                titleFont: { size: 12 },
+                                                                                bodyFont: { size: 12 },
+                                                                                padding: 10,
+                                                                                cornerRadius: 8
+                                                                            };
 
-                                                                            // ─── Revenue Trend (Line Chart) ────────────────────────
+                                                                            function createCartesianOptions(extraScales = {}) {
+                                                                                return {
+                                                                                    responsive: true,
+                                                                                    maintainAspectRatio: false,
+                                                                                    plugins: {
+                                                                                        legend: { display: false },
+                                                                                        tooltip: chartTooltip
+                                                                                    },
+                                                                                    scales: {
+                                                                                        y: {
+                                                                                            beginAtZero: true,
+                                                                                            ticks: {
+                                                                                                font: { size: 11 },
+                                                                                                color: '#9CA3AF'
+                                                                                            },
+                                                                                            grid: { color: 'rgba(0,0,0,0.04)' }
+                                                                                        },
+                                                                                        x: {
+                                                                                            ticks: { font: { size: 11 }, color: '#9CA3AF' },
+                                                                                            grid: { display: false }
+                                                                                        },
+                                                                                        ...extraScales
+                                                                                    }
+                                                                                };
+                                                                            }
+
                                                                             new Chart(document.getElementById('revenueChart'), {
-                                                                            type: 'line',
-                                                                            data: {
-                                                                            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByMonth.Select(r => ((dynamic)r).Label))),
-                                                                            datasets: [{
-                                                                            label: 'Revenue (₱)',
-                                                                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByMonth.Select(r => ((dynamic)r).Revenue))),
-                                                                            borderColor: orange,
-                                                                            backgroundColor: 'rgba(255, 107, 0, 0.1)',
-                                                                            borderWidth: 2.5,
-                                                                            tension: 0.4,
-                                                                            fill: true,
-                                                                            pointBackgroundColor: orange,
-                                                                            pointBorderColor: '#fff',
-                                                                            pointBorderWidth: 2,
-                                                                            pointRadius: 5,
-                                                                            pointHoverRadius: 7
-                                                                            }]
-                                                                            },
-                                                                            options: {
-                                                                            responsive: true,
-                                                                            maintainAspectRatio: false,
-                                                                            plugins: {
-                                                                            legend: { display: false },
-                                                                            tooltip: {
-                                                                            backgroundColor: navy,
-                                                                            titleFont: { size: 12 },
-                                                                            bodyFont: { size: 12 },
-                                                                            padding: 10,
-                                                                            cornerRadius: 8,
-                                                                            callbacks: {
-                                                                            label: ctx => '₱' + ctx.parsed.y.toLocaleString()
-                                                                            }
-                                                                            }
-                                                                            },
-                                                                            scales: {
-                                                                            y: {
-                                                                            beginAtZero: true,
-                                                                            ticks: {
-                                                                            callback: v => '₱' + (v >= 1000 ? (v / 1000).toFixed(0) + 'K' : v),
-                                                                            font: { size: 11 },
-                                                                            color: '#9CA3AF'
-                                                                            },
-                                                                            grid: { color: 'rgba(0,0,0,0.04)' }
-                                                                            },
-                                                                            x: {
-                                                                            ticks: { font: { size: 11 }, color: '#9CA3AF' },
-                                                                            grid: { display: false }
-                                                                            }
-                                                                            }
-                                                                            }
+                                                                                type: 'line',
+                                                                                data: {
+                                                                                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByMonth.Select(r => ((dynamic)r).Label))),
+                                                                                    datasets: [{
+                                                                                        label: 'Revenue (₱)',
+                                                                                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByMonth.Select(r => ((dynamic)r).Revenue))),
+                                                                                        borderColor: orange,
+                                                                                        backgroundColor: 'rgba(255, 107, 0, 0.1)',
+                                                                                        borderWidth: 2.5,
+                                                                                        tension: 0.4,
+                                                                                        fill: true,
+                                                                                        pointBackgroundColor: orange,
+                                                                                        pointBorderColor: '#fff',
+                                                                                        pointBorderWidth: 2,
+                                                                                        pointRadius: 5,
+                                                                                        pointHoverRadius: 7
+                                                                                    }]
+                                                                                },
+                                                                                options: createCartesianOptions({
+                                                                                    y: {
+                                                                                        beginAtZero: true,
+                                                                                        ticks: {
+                                                                                            callback: v => '₱' + (v >= 1000 ? (v / 1000).toFixed(0) + 'K' : v),
+                                                                                            font: { size: 11 },
+                                                                                            color: '#9CA3AF'
+                                                                                        },
+                                                                                        grid: { color: 'rgba(0,0,0,0.04)' }
+                                                                                    }
+                                                                                })
                                                                             });
 
-                                                                            // ─── Vehicle Status (Doughnut Chart) ───────────────────
                                                                             new Chart(document.getElementById('vehicleStatusChart'), {
-                                                                            type: 'doughnut',
-                                                                            data: {
-                                                                            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusLabels)),
-                                                                            datasets: [{
-                                                                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusCounts)),
-                                                                            backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#6B7280'],
-                                                                            borderWidth: 0,
-                                                                            hoverOffset: 6
-                                                                            }]
-                                                                            },
-                                                                            options: {
-                                                                            responsive: true,
-                                                                            maintainAspectRatio: false,
-                                                                            cutout: '65%',
-                                                                            plugins: {
-                                                                            legend: { display: false },
-                                                                            tooltip: {
-                                                                            backgroundColor: navy,
-                                                                            titleFont: { size: 12 },
-                                                                            bodyFont: { size: 12 },
-                                                                            padding: 10,
-                                                                            cornerRadius: 8
-                                                                            }
-                                                                            }
-                                                                            }
+                                                                                type: 'doughnut',
+                                                                                data: {
+                                                                                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusLabels)),
+                                                                                    datasets: [{
+                                                                                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusCounts)),
+                                                                                        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#6B7280'],
+                                                                                        borderWidth: 0,
+                                                                                        hoverOffset: 6
+                                                                                    }]
+                                                                                },
+                                                                                options: {
+                                                                                    responsive: true,
+                                                                                    maintainAspectRatio: false,
+                                                                                    cutout: '65%',
+                                                                                    plugins: {
+                                                                                        legend: { display: false },
+                                                                                        tooltip: chartTooltip
+                                                                                    }
+                                                                                }
                                                                             });
 
-                                                                            // ─── Rental Activity (Bar Chart) ───────────────────────
                                                                             new Chart(document.getElementById('rentalsChart'), {
-                                                                            type: 'bar',
-                                                                            data: {
-                                                                            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByMonth.Select(r => ((dynamic)r).Label))),
-                                                                            datasets: [{
-                                                                            label: 'Rentals',
-                                                                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByMonth.Select(r => ((dynamic)r).Count))),
-                                                                            backgroundColor: [
-                                                                            'rgba(11, 30, 61, 0.8)',
-                                                                            'rgba(30, 58, 95, 0.8)',
-                                                                            'rgba(255, 107, 0, 0.8)',
-                                                                            'rgba(11, 30, 61, 0.8)',
-                                                                            'rgba(30, 58, 95, 0.8)',
-                                                                            'rgba(255, 107, 0, 0.8)'
-                                                                            ],
-                                                                            borderRadius: 6,
-                                                                            borderSkipped: false,
-                                                                            maxBarThickness: 48
-                                                                            }]
-                                                                            },
-                                                                            options: {
-                                                                            responsive: true,
-                                                                            maintainAspectRatio: false,
-                                                                            plugins: {
-                                                                            legend: { display: false },
-                                                                            tooltip: {
-                                                                            backgroundColor: navy,
-                                                                            titleFont: { size: 12 },
-                                                                            bodyFont: { size: 12 },
-                                                                            padding: 10,
-                                                                            cornerRadius: 8
-                                                                            }
-                                                                            },
-                                                                            scales: {
-                                                                            y: {
-                                                                            beginAtZero: true,
-                                                                            ticks: { font: { size: 11 }, color: '#9CA3AF', stepSize: 1 },
-                                                                            grid: { color: 'rgba(0,0,0,0.04)' }
-                                                                            },
-                                                                            x: {
-                                                                            ticks: { font: { size: 11 }, color: '#9CA3AF' },
-                                                                            grid: { display: false }
-                                                                            }
-                                                                            }
-                                                                            }
+                                                                                type: 'bar',
+                                                                                data: {
+                                                                                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByMonth.Select(r => ((dynamic)r).Label))),
+                                                                                    datasets: [{
+                                                                                        label: 'Rentals',
+                                                                                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByMonth.Select(r => ((dynamic)r).Count))),
+                                                                                        backgroundColor: [
+                                                                                            'rgba(11, 30, 61, 0.8)',
+                                                                                            'rgba(30, 58, 95, 0.8)',
+                                                                                            'rgba(255, 107, 0, 0.8)',
+                                                                                            'rgba(11, 30, 61, 0.8)',
+                                                                                            'rgba(30, 58, 95, 0.8)',
+                                                                                            'rgba(255, 107, 0, 0.8)'
+                                                                                        ],
+                                                                                        borderRadius: 6,
+                                                                                        borderSkipped: false,
+                                                                                        maxBarThickness: 48
+                                                                                    }]
+                                                                                },
+                                                                                options: createCartesianOptions({
+                                                                                    y: {
+                                                                                        beginAtZero: true,
+                                                                                        ticks: { font: { size: 11 }, color: '#9CA3AF', stepSize: 1 },
+                                                                                        grid: { color: 'rgba(0,0,0,0.04)' }
+                                                                                    }
+                                                                                })
                                                                             });
 
                                                                             // ─── User Roles (Polar Area Chart) ─────────────────────
                                                                             new Chart(document.getElementById('userRolesChart'), {
-                                                                            type: 'polarArea',
-                                                                            data: {
-                                                                            labels: ['Super Admins', 'Admins', 'Business Owners', 'Staff', 'Mechanics'],
-                                                                            datasets: [{
-                                                                            data: [@ViewBag.SuperAdmins, @ViewBag.Admins, @ViewBag.BusinessOwners, @ViewBag.Staff, @ViewBag.Mechanics],
-                                                                            backgroundColor: [
-                                                                            'rgba(11, 30, 61, 0.75)',
-                                                                            'rgba(30, 58, 95, 0.75)',
-                                                                            'rgba(255, 107, 0, 0.75)',
-                                                                            'rgba(59, 130, 246, 0.75)',
-                                                                            'rgba(245, 158, 11, 0.75)'
-                                                                            ],
-                                                                            borderWidth: 0
-                                                                            }]
-                                                                            },
-                                                                            options: {
-                                                                            responsive: true,
-                                                                            maintainAspectRatio: false,
-                                                                            plugins: {
-                                                                            legend: { display: false },
-                                                                            tooltip: {
-                                                                            backgroundColor: navy,
-                                                                            titleFont: { size: 12 },
-                                                                            bodyFont: { size: 12 },
-                                                                            padding: 10,
-                                                                            cornerRadius: 8
-                                                                            }
-                                                                            },
-                                                                            scales: {
-                                                                            r: {
-                                                                            ticks: { display: false },
-                                                                            grid: { color: 'rgba(0,0,0,0.04)' }
-                                                                            }
-                                                                            }
-                                                                            }
+                                                                                type: 'polarArea',
+                                                                                data: {
+                                                                                    labels: ['Super Admins', 'Admins', 'Business Owners', 'Staff', 'Mechanics'],
+                                                                                    datasets: [{
+                                                                                        data: [@ViewBag.SuperAdmins, @ViewBag.Admins, @ViewBag.BusinessOwners, @ViewBag.Staff, @ViewBag.Mechanics],
+                                                                                        backgroundColor: [
+                                                                                            'rgba(11, 30, 61, 0.75)',
+                                                                                            'rgba(30, 58, 95, 0.75)',
+                                                                                            'rgba(255, 107, 0, 0.75)',
+                                                                                            'rgba(59, 130, 246, 0.75)',
+                                                                                            'rgba(245, 158, 11, 0.75)'
+                                                                                        ],
+                                                                                        borderWidth: 0
+                                                                                    }]
+                                                                                },
+                                                                                options: {
+                                                                                    responsive: true,
+                                                                                    maintainAspectRatio: false,
+                                                                                    plugins: {
+                                                                                        legend: { display: false },
+                                                                                        tooltip: chartTooltip
+                                                                                    },
+                                                                                    scales: {
+                                                                                        r: {
+                                                                                            ticks: { display: false },
+                                                                                            grid: { color: 'rgba(0,0,0,0.04)' }
+                                                                                        }
+                                                                                    }
+                                                                                }
                                                                             });
 
                                                                             // ─── Custom Range Dropdown Toggle ──────────────────────
                                                                             const toggleBtn = document.getElementById('customRangeToggle');
                                                                             const dropdown = document.getElementById('customRangeDropdown');
                                                                             if (toggleBtn && dropdown) {
-                                                                            toggleBtn.addEventListener('click', function (e) {
-                                                                            e.stopPropagation();
-                                                                            dropdown.classList.toggle('hidden');
-                                                                            });
-                                                                            document.addEventListener('click', function (e) {
-                                                                            if (!dropdown.contains(e.target) && e.target !== toggleBtn) {
-                                                                            dropdown.classList.add('hidden');
-                                                                            }
-                                                                            });
+                                                                                toggleBtn.addEventListener('click', function (e) {
+                                                                                    e.stopPropagation();
+                                                                                    dropdown.classList.toggle('hidden');
+                                                                                });
+                                                                                document.addEventListener('click', function (e) {
+                                                                                    if (!dropdown.contains(e.target) && e.target !== toggleBtn) {
+                                                                                        dropdown.classList.add('hidden');
+                                                                                    }
+                                                                                });
                                                                             }
                                                                         </script>
                                                                     }

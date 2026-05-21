@@ -43,7 +43,13 @@ namespace DriveAway.Services
             var dbName = GetDatabaseName();
 
             // SQL Server writes the unencrypted backup to the temp path
-            var sql = $"BACKUP DATABASE [{dbName}] TO DISK = @filePath WITH FORMAT, INIT, NAME = @backupName";
+            var sql = @"
+DECLARE @sql nvarchar(max) = N'BACKUP DATABASE ' + QUOTENAME(@dbName) + N' TO DISK = @filePath WITH FORMAT, INIT, NAME = @backupName';
+EXEC sp_executesql @sql,
+    N'@filePath nvarchar(4000), @backupName nvarchar(128), @dbName sysname',
+    @filePath = @filePath,
+    @backupName = @backupName,
+    @dbName = @dbName;";
 
             var conn = _context.Database.GetDbConnection();
             var wasOpen = conn.State == System.Data.ConnectionState.Open;
@@ -56,6 +62,7 @@ namespace DriveAway.Services
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = 300; // 5 minutes for large databases
 
+                cmd.Parameters.Add(new SqlParameter("@dbName", dbName));
                 var filePathParam = new SqlParameter("@filePath", tempBackupPath);
                 var backupNameParam = new SqlParameter("@backupName", $"DriveAway Full Backup {timestamp}");
                 cmd.Parameters.Add(filePathParam);
@@ -142,8 +149,11 @@ namespace DriveAway.Services
                 try
                 {
                     using var kickCmd = masterConn.CreateCommand();
-                    kickCmd.CommandText = $"ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE";
+                    kickCmd.CommandText = @"
+DECLARE @sql nvarchar(max) = N'ALTER DATABASE ' + QUOTENAME(@dbName) + N' SET SINGLE_USER WITH ROLLBACK IMMEDIATE';
+EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
                     kickCmd.CommandTimeout = 60;
+                    kickCmd.Parameters.Add(new SqlParameter("@dbName", dbName));
                     await kickCmd.ExecuteNonQueryAsync();
                 }
                 catch
@@ -155,8 +165,14 @@ namespace DriveAway.Services
                 try
                 {
                     using var restoreCmd = masterConn.CreateCommand();
-                    restoreCmd.CommandText = $"RESTORE DATABASE [{dbName}] FROM DISK = @filePath WITH REPLACE";
+                    restoreCmd.CommandText = @"
+DECLARE @sql nvarchar(max) = N'RESTORE DATABASE ' + QUOTENAME(@dbName) + N' FROM DISK = @filePath WITH REPLACE';
+EXEC sp_executesql @sql,
+    N'@filePath nvarchar(4000), @dbName sysname',
+    @filePath = @filePath,
+    @dbName = @dbName;";
                     restoreCmd.CommandTimeout = 600; // 10 minutes for large databases
+                    restoreCmd.Parameters.Add(new SqlParameter("@dbName", dbName));
                     restoreCmd.Parameters.Add(new SqlParameter("@filePath", decryptedTempFilePath));
                     await restoreCmd.ExecuteNonQueryAsync();
                 }
@@ -166,8 +182,11 @@ namespace DriveAway.Services
                     try
                     {
                         using var multiCmd = masterConn.CreateCommand();
-                        multiCmd.CommandText = $"ALTER DATABASE [{dbName}] SET MULTI_USER";
+                        multiCmd.CommandText = @"
+DECLARE @sql nvarchar(max) = N'ALTER DATABASE ' + QUOTENAME(@dbName) + N' SET MULTI_USER';
+EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
                         multiCmd.CommandTimeout = 30;
+                        multiCmd.Parameters.Add(new SqlParameter("@dbName", dbName));
                         await multiCmd.ExecuteNonQueryAsync();
                     }
                     catch
@@ -236,12 +255,13 @@ namespace DriveAway.Services
             using (var cmd = conn.CreateCommand())
             {
                 cmd.CommandText = checkKeySql;
-                var count = (int)await cmd.ExecuteScalarAsync();
+                var count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 if (count == 0)
                 {
                     using (var createKeyCmd = conn.CreateCommand())
                     {
-                        createKeyCmd.CommandText = $"CREATE MASTER KEY ENCRYPTION BY PASSWORD = '{password}'";
+                        createKeyCmd.CommandText = "CREATE MASTER KEY ENCRYPTION BY PASSWORD = @password";
+                        createKeyCmd.Parameters.Add(new SqlParameter("@password", password));
                         await createKeyCmd.ExecuteNonQueryAsync();
                     }
                 }
@@ -252,7 +272,7 @@ namespace DriveAway.Services
             using (var cmd = conn.CreateCommand())
             {
                 cmd.CommandText = checkCertSql;
-                var count = (int)await cmd.ExecuteScalarAsync();
+                var count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                 if (count == 0)
                 {
                     using (var createCertCmd = conn.CreateCommand())
@@ -289,6 +309,9 @@ namespace DriveAway.Services
         /// </summary>
         private void GrantSqlServerAccessToBackupFolder()
         {
+            if (!OperatingSystem.IsWindows())
+                return;
+
             try
             {
                 var dirInfo = new DirectoryInfo(_backupFolder);
@@ -345,7 +368,12 @@ namespace DriveAway.Services
             // Only allow the exact backup filename pattern produced by CreateBackupAsync
             // e.g. DriveAway_Backup_20260521_031336.bak
             var allowedPattern = "^DriveAway_Backup_\\d{8}_\\d{6}\\.bak$";
-            if (!System.Text.RegularExpressions.Regex.IsMatch(fileName, allowedPattern))
+            var allowedRegex = new System.Text.RegularExpressions.Regex(
+                allowedPattern,
+                System.Text.RegularExpressions.RegexOptions.CultureInvariant,
+                TimeSpan.FromSeconds(1));
+
+            if (!allowedRegex.IsMatch(fileName))
                 throw new ArgumentException("Filename does not match expected backup pattern.");
         }
 
