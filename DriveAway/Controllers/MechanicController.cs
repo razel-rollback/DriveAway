@@ -51,6 +51,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StartRepair(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var userId = GetCurrentUserId();
             var job = await _context.MaintenanceJobs
                 .Include(j => j.Vehicle)
@@ -114,6 +117,9 @@ namespace DriveAway.Controllers
         public async Task<IActionResult> CompleteRepair(int id, string? repairNotes,
             string[]? partName, string[]? partQuantity, decimal[]? partUnitCost, decimal[]? partTotalCost)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var userId = GetCurrentUserId();
             var job = await _context.MaintenanceJobs
                 .Include(j => j.Vehicle)

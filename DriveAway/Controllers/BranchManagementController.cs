@@ -32,15 +32,14 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Branch branch)
         {
-            if (ModelState.IsValid)
-            {
-                branch.CreatedAt = DateTime.UtcNow;
-                _context.Add(branch);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Branch created successfully.";
-                return RedirectToAction(nameof(Index));
-            }
-            return View(branch);
+            if (!ModelState.IsValid)
+                return View(branch);
+
+            branch.CreatedAt = DateTime.UtcNow;
+            _context.Add(branch);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Branch created successfully.";
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int? id)
@@ -59,22 +58,21 @@ namespace DriveAway.Controllers
         {
             if (id != branch.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(branch);
+
+            try
             {
-                try
-                {
-                    _context.Update(branch);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Branch updated successfully.";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BranchExists(branch.Id)) return NotFound();
-                    else throw;
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(branch);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Branch updated successfully.";
             }
-            return View(branch);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BranchExists(branch.Id)) return NotFound();
+                else throw;
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -103,7 +101,7 @@ namespace DriveAway.Controllers
             ViewBag.FleetSize = 12;
             ViewBag.ActiveRentals = 5;
             ViewBag.MonthlyRevenue = 150000m;
-            
+
             return View(branch);
         }
 

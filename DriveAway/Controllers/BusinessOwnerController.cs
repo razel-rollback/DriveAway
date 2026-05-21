@@ -27,6 +27,9 @@ namespace DriveAway.Controllers
         // ─── DASHBOARD ─────────────────────────────────────────────────
         public async Task<IActionResult> Dashboard(string filter = "month", DateTime? startDate = null, DateTime? endDate = null)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var today = DateTime.UtcNow.Date;
 
             // ── Determine filter date range ──────────────────────
@@ -261,6 +264,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignVehicleToBranch(int vehicleId, int branchId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var vehicle = await _context.Vehicles.FindAsync(vehicleId);
             var branch = await _context.Branches.FindAsync(branchId);
             if (vehicle == null || branch == null) return NotFound();
@@ -292,6 +298,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> TransferVehicle(int vehicleId, int toBranchId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var vehicle = await _context.Vehicles.Include(v => v.Branch).FirstOrDefaultAsync(v => v.Id == vehicleId);
             var toBranch = await _context.Branches.FindAsync(toBranchId);
             if (vehicle == null || toBranch == null) return NotFound();
@@ -324,6 +333,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveDisposal(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var request = await _context.DisposalRequests.Include(d => d.Vehicle).FirstOrDefaultAsync(d => d.Id == id);
             if (request == null) return NotFound();
 
@@ -377,6 +389,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectDisposal(int id, string? reviewNotes)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var request = await _context.DisposalRequests.Include(d => d.Vehicle).FirstOrDefaultAsync(d => d.Id == id);
             if (request == null) return NotFound();
 

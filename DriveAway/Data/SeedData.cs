@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DriveAway.Data
@@ -23,15 +25,39 @@ namespace DriveAway.Data
 
             // Super Admin credentials
             string superAdminEmail = "sadmin@gmail.com";
-            string superAdminPassword = "Pass123.";
 
             // Default Admin (admin Owner) credentials - for testing/demo
             string adminEmail = "admin@gmail.com";
-            string adminPassword = "Pass123.";
 
             // Default Business Owner credentials
             string businessOwnerEmail = "owner@gmail.com";
-            string businessOwnerPassword = "Pass123.";
+
+            // Read seed passwords from configuration or environment variables to avoid hard-coded credentials.
+            // Set these in appsettings.Development.json or environment variables for local dev.
+            var configuration = serviceProvider.GetService<IConfiguration>();
+            string? superAdminPassword = configuration?["Seed:SuperAdminPassword"]
+                ?? Environment.GetEnvironmentVariable("SEED_SUPERADMIN_PASSWORD");
+            string? adminPassword = configuration?["Seed:AdminPassword"]
+                ?? Environment.GetEnvironmentVariable("SEED_ADMIN_PASSWORD");
+            string? businessOwnerPassword = configuration?["Seed:BusinessOwnerPassword"]
+                ?? Environment.GetEnvironmentVariable("SEED_BUSINESS_OWNER_PASSWORD");
+
+            // If any password is not provided, generate a secure random password and output a one-time console message.
+            if (string.IsNullOrEmpty(superAdminPassword))
+            {
+                superAdminPassword = SeedDataHelpers.GenerateSecurePassword();
+                Console.WriteLine($"[SeedData] Generated SuperAdmin password: {superAdminPassword}");
+            }
+            if (string.IsNullOrEmpty(adminPassword))
+            {
+                adminPassword = SeedDataHelpers.GenerateSecurePassword();
+                Console.WriteLine($"[SeedData] Generated Admin password: {adminPassword}");
+            }
+            if (string.IsNullOrEmpty(businessOwnerPassword))
+            {
+                businessOwnerPassword = SeedDataHelpers.GenerateSecurePassword();
+                Console.WriteLine($"[SeedData] Generated BusinessOwner password: {businessOwnerPassword}");
+            }
 
 
             // 1. Create Roles if they do not exist
@@ -123,3 +149,51 @@ namespace DriveAway.Data
         }
     }
 }
+
+namespace DriveAway.Data
+{
+    // Helper methods for seeding
+    public static class SeedDataHelpers
+    {
+        private static readonly char[] _pwChars = (
+            "abcdefghijklmnopqrstuvwxyz" +
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "0123456789" +
+            "!@#$%^&*()-_+=").ToCharArray();
+
+        public static string GenerateSecurePassword(int length = 16)
+        {
+            if (length < 12) length = 12;
+            var bytes = new byte[length];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(bytes);
+            }
+            var chars = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                var idx = bytes[i] % _pwChars.Length;
+                chars[i] = _pwChars[idx];
+            }
+            // Ensure at least one of each required category (upper, lower, digit, symbol)
+            var password = new string(chars);
+            if (!password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit) || !password.Any(c => "!@#$%^&*()-_+=".Contains(c)))
+            {
+                // fallback: build guaranteed-complex password
+                var rnd = new Random();
+                var sb = new System.Text.StringBuilder();
+                sb.Append((char)('A' + rnd.Next(0, 26)));
+                sb.Append((char)('a' + rnd.Next(0, 26)));
+                sb.Append((char)('0' + rnd.Next(0, 10)));
+                sb.Append("!#@");
+                while (sb.Length < length)
+                    sb.Append(_pwChars[rnd.Next(_pwChars.Length)]);
+                return sb.ToString();
+            }
+            return password;
+        }
+    }
+
+}
+
+

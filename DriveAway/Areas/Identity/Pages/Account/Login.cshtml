@@ -85,7 +85,7 @@
                         </label>
                     </div>
                     <a asp-page="./ForgotPassword" class="text-xs transition-colors" style="color: #1E3A5F;"
-                           onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#1E3A5F'">
+                       onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#1E3A5F'">
                         Forgot password?
                     </a>
                 </div>
@@ -108,22 +108,24 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    @* Cloudflare Turnstile is served from a vendor-managed endpoint that can change in place, so SRI is intentionally
+omitted here. *@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script>
         document.getElementById('toggle-password').addEventListener('click', function () {
-            const passwordInput = document.getElementById('password-input');
-            const eyeIcon = document.getElementById('eye-icon');
-            const eyeSlashIcon = document.getElementById('eye-slash-icon');
+        const passwordInput = document.getElementById('password-input');
+        const eyeIcon = document.getElementById('eye-icon');
+        const eyeSlashIcon = document.getElementById('eye-slash-icon');
 
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.add('hidden');
-                eyeSlashIcon.classList.remove('hidden');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('hidden');
-                eyeSlashIcon.classList.add('hidden');
-            }
+        if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.add('hidden');
+        eyeSlashIcon.classList.remove('hidden');
+        } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('hidden');
+        eyeSlashIcon.classList.add('hidden');
+        }
         });
     </script>
 }

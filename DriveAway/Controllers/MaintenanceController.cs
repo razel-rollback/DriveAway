@@ -77,6 +77,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ScanFleet()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var vehiclesQuery = _context.Vehicles
                 .Include(v => v.Branch)
                 .Where(v => v.Status != VehicleStatus.Retired);
@@ -204,6 +207,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignMechanic(int jobId, string mechanicId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var job = await _context.MaintenanceJobs
                 .Include(j => j.Vehicle)
                 .FirstOrDefaultAsync(j => j.Id == jobId);

@@ -142,6 +142,8 @@ namespace DriveAway.Controllers
         [Authorize(Roles = "Super Admin,Business Owner")]
         public async Task<IActionResult> Edit(int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var vehicle = await _context.Vehicles.FindAsync(id);
             if (vehicle == null) return NotFound();
             ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
@@ -156,74 +158,29 @@ namespace DriveAway.Controllers
             if (id != vehicle.Id) return NotFound();
             ModelState.Remove(nameof(vehicleImage));
 
-                if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var existing = await _context.Vehicles.FindAsync(id);
-                if (existing == null) return NotFound();
-
-                // Handle image upload
-                if (vehicleImage != null && vehicleImage.Length > 0)
-                {
-                    existing.ImagePath = await SaveVehicleImage(vehicleImage);
-                }
-
-                existing.VIN = vehicle.VIN;
-                existing.PlateNumber = vehicle.PlateNumber;
-                existing.Make = vehicle.Make;
-                existing.Model = vehicle.Model;
-                existing.Year = vehicle.Year;
-                existing.Category = vehicle.Category;
-                existing.BodyClass = vehicle.BodyClass;
-                existing.Manufacturer = vehicle.Manufacturer;
-                existing.PurchaseCost = vehicle.PurchaseCost;
-                existing.AcquisitionDate = vehicle.AcquisitionDate;
-                existing.Supplier = vehicle.Supplier;
-                existing.UsefulLifeYears = vehicle.UsefulLifeYears;
-                existing.SalvageValue = vehicle.SalvageValue;
-                existing.InitialMileage = vehicle.InitialMileage;
-                existing.CurrentMileage = vehicle.CurrentMileage;
-                existing.InsuranceExpiry = vehicle.InsuranceExpiry;
-                existing.RegistrationExpiry = vehicle.RegistrationExpiry;
-                // Handle Branch Change (Transfer)
-                string? transferDetails = null;
-                if (existing.BranchId != vehicle.BranchId)
-                {
-                    var oldBranch = existing.BranchId.HasValue ? await _context.Branches.FindAsync(existing.BranchId.Value) : null;
-                    var newBranch = vehicle.BranchId.HasValue ? await _context.Branches.FindAsync(vehicle.BranchId.Value) : null;
-                    
-                    transferDetails = $"Branch changed from {oldBranch?.Name ?? "Unassigned"} to {newBranch?.Name ?? "Unassigned"}.";
-                    
-                    _context.VehicleLifecycleEvents.Add(new VehicleLifecycleEvent
-                    {
-                        VehicleId = existing.Id,
-                        EventType = LifecycleEventType.BranchTransferred,
-                        EventDate = DateTime.UtcNow,
-                        Notes = transferDetails,
-                        Mileage = existing.CurrentMileage
-                    });
-                    
-                    existing.BranchId = vehicle.BranchId;
-                }
-
-                await _context.SaveChangesAsync();
-
-                // Log Audit
-                var details = new List<string>();
-                if (transferDetails != null) details.Add(transferDetails);
-                if (!details.Any()) details.Add("Vehicle details updated.");
-
-                await _audit.LogAsync(
-                    (transferDetails != null) ? AuditAction.Transfer : AuditAction.Update,
-                    AuditModule.Asset, "Vehicle",
-                    existing.Id.ToString(),
-                    $"{existing.Year} {existing.Make} {existing.Model} ({existing.PlateNumber})",
-                    string.Join(" ", details));
-
-                TempData["Success"] = "Vehicle updated successfully.";
-                return RedirectToAction(nameof(Registration));
+                ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
+                return View(vehicle);
             }
-            ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
-            return View(vehicle);
+
+            var existing = await _context.Vehicles.FindAsync(id);
+            if (existing == null) return NotFound();
+
+            var transferDetails = await UpdateVehicleAsync(existing, vehicle, vehicleImage);
+
+            await _context.SaveChangesAsync();
+
+            await _audit.LogAsync(
+                transferDetails != null ? AuditAction.Transfer : AuditAction.Update,
+                AuditModule.Asset,
+                "Vehicle",
+                existing.Id.ToString(),
+                $"{existing.Year} {existing.Make} {existing.Model} ({existing.PlateNumber})",
+                transferDetails ?? "Vehicle details updated.");
+
+            TempData["Success"] = "Vehicle updated successfully.";
+            return RedirectToAction(nameof(Registration));
         }
 
         [HttpPost]
@@ -231,6 +188,12 @@ namespace DriveAway.Controllers
         [Authorize(Roles = "Admin,Super Admin,Business Owner")]
         public async Task<IActionResult> Transfer(int vehicleId, int? newBranchId)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid transfer request.";
+                return RedirectToAction(nameof(Registration));
+            }
+
             var vehicle = await _context.Vehicles.Include(v => v.Branch).FirstOrDefaultAsync(v => v.Id == vehicleId);
             if (vehicle == null) return NotFound();
 
@@ -269,6 +232,12 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Archive(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid archive request.";
+                return RedirectToAction(nameof(Registration));
+            }
+
             var vehicle = await _context.Vehicles.FindAsync(id);
             if (vehicle == null) return NotFound();
 
@@ -295,6 +264,8 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> FetchVin(string vin)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             if (string.IsNullOrWhiteSpace(vin) || vin.Length != 17)
                 return BadRequest(new { error = "VIN must be exactly 17 characters." });
 
@@ -309,6 +280,8 @@ namespace DriveAway.Controllers
 
         public async Task<IActionResult> Index(int? vehicleId)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var query = await GetBranchFilteredVehicles();
             var vehicles = await query.OrderBy(v => v.PlateNumber).ToListAsync();
 
@@ -383,6 +356,12 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitDisposal(int vehicleId, string reason, decimal estimatedRepairCost, decimal recommendedDisposalValue)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid disposal request.";
+                return RedirectToAction(nameof(Disposal));
+            }
+
             var vehicle = await _context.Vehicles.FindAsync(vehicleId);
             if (vehicle == null) return NotFound();
 
@@ -448,6 +427,12 @@ namespace DriveAway.Controllers
         [Authorize(Roles = "Business Owner")]
         public async Task<IActionResult> ApproveDisposal(int requestId, string? reviewNotes)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid disposal review request.";
+                return RedirectToAction(nameof(Disposal));
+            }
+
             var request = await _context.DisposalRequests.Include(d => d.Vehicle).FirstOrDefaultAsync(d => d.Id == requestId);
             if (request == null) return NotFound();
 
@@ -508,6 +493,12 @@ namespace DriveAway.Controllers
         [Authorize(Roles = "Business Owner")]
         public async Task<IActionResult> RejectDisposal(int requestId, string? reviewNotes)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid disposal review request.";
+                return RedirectToAction(nameof(Disposal));
+            }
+
             var request = await _context.DisposalRequests.Include(d => d.Vehicle).FirstOrDefaultAsync(d => d.Id == requestId);
             if (request == null) return NotFound();
 
@@ -562,6 +553,8 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> GetVehiclesByCategory(string category)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var today = DateTime.Today;
             var vehicles = await _context.Vehicles
                 .Where(v => v.Status == VehicleStatus.Available
@@ -610,6 +603,54 @@ namespace DriveAway.Controllers
             }
 
             return $"/uploads/vehicles/{fileName}";
+        }
+
+        private async Task<string?> UpdateVehicleAsync(Vehicle existing, Vehicle vehicle, IFormFile? vehicleImage)
+        {
+            if (vehicleImage != null && vehicleImage.Length > 0)
+            {
+                existing.ImagePath = await SaveVehicleImage(vehicleImage);
+            }
+
+            existing.VIN = vehicle.VIN;
+            existing.PlateNumber = vehicle.PlateNumber;
+            existing.Make = vehicle.Make;
+            existing.Model = vehicle.Model;
+            existing.Year = vehicle.Year;
+            existing.Category = vehicle.Category;
+            existing.BodyClass = vehicle.BodyClass;
+            existing.Manufacturer = vehicle.Manufacturer;
+            existing.PurchaseCost = vehicle.PurchaseCost;
+            existing.AcquisitionDate = vehicle.AcquisitionDate;
+            existing.Supplier = vehicle.Supplier;
+            existing.UsefulLifeYears = vehicle.UsefulLifeYears;
+            existing.SalvageValue = vehicle.SalvageValue;
+            existing.InitialMileage = vehicle.InitialMileage;
+            existing.CurrentMileage = vehicle.CurrentMileage;
+            existing.InsuranceExpiry = vehicle.InsuranceExpiry;
+            existing.RegistrationExpiry = vehicle.RegistrationExpiry;
+
+            if (existing.BranchId == vehicle.BranchId)
+            {
+                return null;
+            }
+
+            var oldBranch = existing.BranchId.HasValue ? await _context.Branches.FindAsync(existing.BranchId.Value) : null;
+            var newBranch = vehicle.BranchId.HasValue ? await _context.Branches.FindAsync(vehicle.BranchId.Value) : null;
+
+            var transferDetails = $"Branch changed from {oldBranch?.Name ?? "Unassigned"} to {newBranch?.Name ?? "Unassigned"}.";
+
+            _context.VehicleLifecycleEvents.Add(new VehicleLifecycleEvent
+            {
+                VehicleId = existing.Id,
+                EventType = LifecycleEventType.BranchTransferred,
+                EventDate = DateTime.UtcNow,
+                Notes = transferDetails,
+                Mileage = existing.CurrentMileage
+            });
+
+            existing.BranchId = vehicle.BranchId;
+            return transferDetails;
         }
     }
 }

@@ -1,23 +1,24 @@
 @model DriveAway.Models.RentalContract
 @{
     ViewData["Title"] = "Payment QR Code";
-    
+
     // Find the latest payment record with a PayMongo link for this contract
     var payMongoPayment = Model.Payments
         .OrderByDescending(p => p.CreatedAt)
         .FirstOrDefault(p => !string.IsNullOrEmpty(p.PayMongoPaymentUrl));
 
     var paymentUrl = payMongoPayment?.PayMongoPaymentUrl ?? "";
-    
+
     // Total pending amount for this PayMongoID
     var pendingAmount = Model.Payments
-        .Where(p => p.PayMongoPaymentId == payMongoPayment?.PayMongoPaymentId && p.PaymentStatus == DriveAway.Models.PaymentStatus.Pending)
+        .Where(p => p.PayMongoPaymentId == payMongoPayment?.PayMongoPaymentId && p.PaymentStatus ==
+DriveAway.Models.PaymentStatus.Pending)
         .Sum(p => p.Amount);
 }
 
 <div class="max-w-2xl mx-auto py-10">
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-center">
-        
+
         @* ── Header Area ── *@
         <div class="bg-emerald-50 py-8 px-6 border-b border-emerald-100">
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 mb-4">
@@ -26,85 +27,92 @@
                 </svg>
             </div>
             <h1 class="text-2xl font-bold text-gray-900">Success!</h1>
-            <p class="text-gray-600 mt-2">Contract <span class="font-semibold text-gray-800">@Model.ContractNumber</span> for <span class="font-semibold text-gray-800">@Model.Vehicle?.PlateNumber</span> has been processed.</p>
-        </div>
+            <p class="text-gray-600 mt-2">Contract <span
+                class="font-semibold text-gray-800">@Model.ContractNumber</span> for <span
+                class="font-semibold text-gray-800">@Model.Vehicle?.PlateNumber</span> has been processed.</p>
+            </div>
 
-        @* ── QR Code Area ── *@
-        @if (!string.IsNullOrEmpty(paymentUrl) && pendingAmount > 0)
-        {
-            <div class="p-8 space-y-6">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-800">Complete Payment</h2>
-                    <p class="text-sm text-gray-500 mt-1">Scan the QR code or click the button below to pay via PayMongo.</p>
-                </div>
+            @* ── QR Code Area ── *@
+            @if (!string.IsNullOrEmpty(paymentUrl) && pendingAmount > 0)
+            {
+                <div class="p-8 space-y-6">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Complete Payment</h2>
+                        <p class="text-sm text-gray-500 mt-1">Scan the QR code or click the button below to pay via PayMongo.
+                        </p>
+                    </div>
 
-                <div class="flex justify-center">
-                    <div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 inline-block shadow-sm">
-                        <div id="paymentQrCode"></div>
+                    <div class="flex justify-center">
+                        <div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 inline-block shadow-sm">
+                            <div id="paymentQrCode"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-3xl font-bold text-gray-900">₱@pendingAmount.ToString("N2")</p>
+                        <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Amount Due</p>
+                    </div>
+
+                    <div class="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="@paymentUrl" target="_blank"
+                           class="inline-flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                           style="background-color: #0087F5;"> @* PayMongo Blue *@
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Proceed to PayMongo
+                        </a>
+
+                        <a asp-action="Index"
+                           class="inline-flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                            Return to Dashboard
+                        </a>
                     </div>
                 </div>
-
-                <div>
-                    <p class="text-3xl font-bold text-gray-900">₱@pendingAmount.ToString("N2")</p>
-                    <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-medium">Amount Due</p>
+            }
+            else
+            {
+                <div class="p-8 space-y-6">
+                    <p class="text-gray-500">No pending payments found for this transaction, or payment link is unavailable.</p>
+                    <div class="pt-4">
+                        <a asp-action="Index"
+                           class="inline-flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                           style="background-color: #0B1E3D;">
+                            Return to Dashboard
+                        </a>
+                    </div>
                 </div>
-
-                <div class="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="@paymentUrl" target="_blank"
-                       class="inline-flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-                       style="background-color: #0087F5;"> @* PayMongo Blue *@
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        Proceed to PayMongo
-                    </a>
-                    
-                    <a asp-action="Index"
-                       class="inline-flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                        Return to Dashboard
-                    </a>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="p-8 space-y-6">
-                <p class="text-gray-500">No pending payments found for this transaction, or payment link is unavailable.</p>
-                <div class="pt-4">
-                    <a asp-action="Index"
-                       class="inline-flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-                       style="background-color: #0B1E3D;">
-                        Return to Dashboard
-                    </a>
-                </div>
-            </div>
-        }
+            }
+        </div>
     </div>
-</div>
 
-@section Scripts {
-    @if (!string.IsNullOrEmpty(paymentUrl) && pendingAmount > 0)
-    {
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <script>
-            new QRCode(document.getElementById("paymentQrCode"), {
+    @section Scripts {
+        @if (!string.IsNullOrEmpty(paymentUrl) && pendingAmount > 0)
+        {
+            <!-- TODO: compute and add SRI `integrity` value for production. See README steps below. -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+            <script>
+                new QRCode(document.getElementById("paymentQrCode"), {
                 text: "@Html.Raw(paymentUrl)",
                 width: 200,
                 height: 200,
                 colorDark: "#0B1E3D",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.M
-            });
+                });
 
-            // Poll for payment status every 5 seconds
-            setInterval(function () {
+                // Poll for payment status every 5 seconds
+                setInterval(function () {
                 fetch('@Url.Action("CheckPaymentStatus", "RentalOperations", new { id = Model.Id })')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'paid') {
-                            window.location.href = '@Url.Action("Index", "RentalOperations")';
-                        }
-                    })
-                    .catch(error => console.error('Error checking payment status:', error));
-            }, 5000);
-        </script>
+                .then(response => response.json())
+                .then(data => {
+                if (data.status === 'paid') {
+                window.location.href = '@Url.Action("Index", "RentalOperations")';
+                }
+                })
+                .catch(error => console.error('Error checking payment status:', error));
+                }, 5000);
+            </script>
+        }
     }
-}

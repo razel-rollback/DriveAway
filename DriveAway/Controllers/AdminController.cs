@@ -1,4 +1,4 @@
-﻿using DriveAway.Data;
+using DriveAway.Data;
 using DriveAway.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +21,11 @@ namespace DriveAway.Controllers
 
         public async Task<IActionResult> Dashboard(string filter = "month", DateTime? startDate = null, DateTime? endDate = null)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var today = DateTime.UtcNow.Date;
 
             // ── Resolve the admin's assigned branch ──────────────

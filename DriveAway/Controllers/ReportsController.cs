@@ -49,6 +49,9 @@ namespace DriveAway.Controllers
         // ───────── Asset Inventory Report ─────────
         public async Task<IActionResult> AssetInventory(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -77,7 +80,7 @@ namespace DriveAway.Controllers
 
                 if (export == "excel")
                     return File(_exportService.ExportToExcel(dt, "Asset Inventory"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AssetInventory.xlsx");
-                
+
                 if (export == "pdf")
                     return File(_exportService.ExportToPdfFromDataTable(dt, "Asset Inventory"), "application/pdf", "AssetInventory.pdf");
             }
@@ -88,6 +91,9 @@ namespace DriveAway.Controllers
         // ───────── Rental Transaction Report ─────────
         public async Task<IActionResult> RentalTransactions(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -115,12 +121,12 @@ namespace DriveAway.Controllers
                 foreach (var c in contracts)
                 {
                     dt.Rows.Add(
-                        c.ContractNumber, 
-                        c.CreatedAt.ToString("MMM dd, yyyy"), 
-                        c.CustomerName, 
+                        c.ContractNumber,
+                        c.CreatedAt.ToString("MMM dd, yyyy"),
+                        c.CustomerName,
                         c.Vehicle != null ? $"{c.Vehicle.PlateNumber} - {c.Vehicle.Make} {c.Vehicle.Model}" : "—",
-                        $"{c.RentalStart:MMM dd} - {c.RentalEnd:MMM dd, yyyy}", 
-                        c.FinalFee?.ToString("N2") ?? c.TotalFee.ToString("N2"), 
+                        $"{c.RentalStart:MMM dd} - {c.RentalEnd:MMM dd, yyyy}",
+                        c.FinalFee?.ToString("N2") ?? c.TotalFee.ToString("N2"),
                         c.RentalStatus.ToString()
                     );
                 }
@@ -137,6 +143,9 @@ namespace DriveAway.Controllers
         // ───────── Vehicle Status Report ─────────
         public async Task<IActionResult> VehicleStatus(string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var vehicles = await _context.Vehicles
                 .Include(v => v.Branch)
                 .OrderBy(v => v.Status)
@@ -175,6 +184,9 @@ namespace DriveAway.Controllers
         // ───────── Maintenance Records Report ─────────
         public async Task<IActionResult> MaintenanceRecords(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -229,6 +241,9 @@ namespace DriveAway.Controllers
         // ───────── Payment Transactions Report ─────────
         public async Task<IActionResult> PaymentTransactions(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -282,6 +297,9 @@ namespace DriveAway.Controllers
         // ───────── Damage and Repair Report ─────────
         public async Task<IActionResult> DamageRepair(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -345,6 +363,9 @@ namespace DriveAway.Controllers
         // ───────── Asset Depreciation Report ─────────
         public async Task<IActionResult> AssetDepreciation(string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var vehicles = await _context.Vehicles
                 .Include(v => v.Branch)
                 .OrderBy(v => v.PlateNumber)
@@ -424,6 +445,9 @@ namespace DriveAway.Controllers
         // ───────── Vehicle Utilization Report ─────────
         public async Task<IActionResult> VehicleUtilization(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -531,6 +555,9 @@ namespace DriveAway.Controllers
         // ───────── Maintenance Cost Analysis Report ─────────
         public async Task<IActionResult> MaintenanceCostAnalysis(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -618,6 +645,9 @@ namespace DriveAway.Controllers
         // ───────── Revenue Analysis Report ─────────
         public async Task<IActionResult> RevenueAnalysis(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -694,6 +724,9 @@ namespace DriveAway.Controllers
         // ───────── Profit and Loss Report ─────────
         public async Task<IActionResult> ProfitAndLoss(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 
@@ -821,6 +854,9 @@ namespace DriveAway.Controllers
         // ───────── Payment Method Analysis Report ─────────
         public async Task<IActionResult> PaymentMethodAnalysis(string? range, DateTime? from, DateTime? to, string? export)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var (start, end, label) = ResolveDateRange(range, from, to);
             SetDateFilterViewData(range, from, to, label);
 

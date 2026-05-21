@@ -269,6 +269,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var contract = await _context.RentalContracts
                 .Include(c => c.Vehicle)
                 .Include(c => c.Payments)
@@ -284,6 +287,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> PaymentQr(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var contract = await _context.RentalContracts
                 .Include(c => c.Vehicle)
                 .Include(c => c.Payments)
@@ -298,6 +304,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckPaymentStatus(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var contract = await _context.RentalContracts
                 .Include(c => c.Payments)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -367,6 +376,9 @@ namespace DriveAway.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckIn(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var contract = await _context.RentalContracts
                 .Include(c => c.Vehicle)
                 .Include(c => c.Payments)
@@ -384,6 +396,9 @@ namespace DriveAway.Controllers
             decimal? lateFee, decimal? damageFee, decimal? fuelFee,
             string? damageSeverity, string? balancePaymentMethod)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var contract = await _context.RentalContracts
                 .Include(c => c.Vehicle)
                 .Include(c => c.Payments)
@@ -416,7 +431,7 @@ namespace DriveAway.Controllers
                         originalDepositPayment.PayMongoPaymentResourceId = paymentResourceId;
                         originalDepositPayment.OnlinePaymentOption = paymentOption;
                         originalDepositPayment.PaymentStatus = PaymentStatus.Paid;
-                        if (originalRentalPayment != null) 
+                        if (originalRentalPayment != null)
                         {
                             originalRentalPayment.PayMongoPaymentResourceId = paymentResourceId;
                             originalRentalPayment.OnlinePaymentOption = paymentOption;
@@ -508,11 +523,11 @@ namespace DriveAway.Controllers
                             depositRefund,
                             "requested_by_customer",
                             $"Deposit refund for contract {contract.ContractNumber}");
-                        
+
                         refundPayment.Notes = refunded
                             ? "Security deposit refunded online to original payment method"
                             : "Online refund attempted via PayMongo but failed — check PayMongo dashboard or process manually";
-                        
+
                         if (!refunded)
                             refundPayment.PaymentStatus = PaymentStatus.Pending;
                     }

@@ -120,11 +120,7 @@ namespace DriveAway.Services
 
         public async Task RestoreAsync(string fileName)
         {
-            ValidateFileName(fileName);
-
-            var encryptedFilePath = Path.Combine(_backupFolder, fileName);
-            if (!File.Exists(encryptedFilePath))
-                throw new FileNotFoundException("Backup file not found.", fileName);
+            var encryptedFilePath = GetRequiredBackupFilePath(fileName);
 
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var decryptedTempFilePath = Path.Combine(_backupFolder, $"DriveAway_Restore_temp_{timestamp}.bak");
@@ -192,11 +188,7 @@ namespace DriveAway.Services
 
         public Task DeleteBackupAsync(string fileName)
         {
-            ValidateFileName(fileName);
-
-            var filePath = Path.Combine(_backupFolder, fileName);
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException("Backup file not found.", fileName);
+            var filePath = GetRequiredBackupFilePath(fileName);
 
             File.Delete(filePath);
             return Task.CompletedTask;
@@ -207,12 +199,30 @@ namespace DriveAway.Services
             try { ValidateFileName(fileName); }
             catch { return null; }
 
-            var filePath = Path.Combine(_backupFolder, fileName);
-            return File.Exists(filePath) ? filePath : null;
+            // Find the file in the backups folder (case-insensitive match)
+            var candidate = Directory.EnumerateFiles(_backupFolder, "*.bak", SearchOption.TopDirectoryOnly)
+                .FirstOrDefault(path => string.Equals(Path.GetFileName(path), fileName, StringComparison.OrdinalIgnoreCase));
+
+            if (candidate == null)
+                return null;
+
+            // Canonicalize and ensure the resolved path is under the expected backup folder
+            try
+            {
+                var fullCandidate = Path.GetFullPath(candidate);
+                var fullBackupFolder = Path.GetFullPath(_backupFolder).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                if (!fullCandidate.StartsWith(fullBackupFolder, StringComparison.OrdinalIgnoreCase))
+                    return null;
+                return fullCandidate;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         // ── Helpers ──────────────────────────────────────────────
-        
+
         private async Task EnsureBackupCertificateExistsAsync()
         {
             var masterConnStr = BuildMasterConnectionString();
@@ -321,22 +331,35 @@ namespace DriveAway.Services
 
         /// <summary>
         /// Validates the filename to prevent path-traversal attacks.
-        /// Only allows .bak files with safe characters.
+        /// Only allows .bak files that match the expected backup filename pattern.
         /// </summary>
         private static void ValidateFileName(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new ArgumentException("Filename cannot be empty.");
 
+            // Reject obvious traversal characters early
             if (fileName.Contains("..") || fileName.Contains('/') || fileName.Contains('\\'))
                 throw new ArgumentException("Invalid filename.");
 
-            if (Path.GetExtension(fileName)?.ToLowerInvariant() != ".bak")
-                throw new ArgumentException("Only .bak files are allowed.");
+            // Only allow the exact backup filename pattern produced by CreateBackupAsync
+            // e.g. DriveAway_Backup_20260521_031336.bak
+            var allowedPattern = "^DriveAway_Backup_\\d{8}_\\d{6}\\.bak$";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(fileName, allowedPattern))
+                throw new ArgumentException("Filename does not match expected backup pattern.");
+        }
 
-        // Additional safety: ensure filename has no directory separators
-            if (fileName != Path.GetFileName(fileName))
-                throw new ArgumentException("Invalid filename.");
+        private string GetRequiredBackupFilePath(string fileName)
+        {
+            ValidateFileName(fileName);
+
+            var filePath = Directory.EnumerateFiles(_backupFolder, "*.bak", SearchOption.TopDirectoryOnly)
+                .FirstOrDefault(path => string.Equals(Path.GetFileName(path), fileName, StringComparison.OrdinalIgnoreCase));
+
+            if (filePath == null)
+                throw new FileNotFoundException("Backup file not found.", fileName);
+
+            return filePath;
         }
 
         private void EncryptFile(string inputFile, string outputFile, string keyString)

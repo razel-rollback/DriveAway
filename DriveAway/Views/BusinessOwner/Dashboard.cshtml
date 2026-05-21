@@ -24,11 +24,13 @@
                 <p class="text-sm text-gray-500 mt-1">All branches overview &amp; analytics</p>
             </div>
             <div class="mt-4 sm:mt-0 flex items-center space-x-3">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0B1E3D]/10 text-[#0B1E3D]">
+                <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#0B1E3D]/10 text-[#0B1E3D]">
                     <span class="inline-block w-1.5 h-1.5 bg-[#FF6B00] rounded-full mr-1.5"></span>
                     Business Owner
                 </span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                     @DateTime.Now.ToString("dddd, MMMM dd, yyyy")
                 </span>
             </div>
@@ -39,7 +41,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="flex items-center gap-2">
                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                        </path>
                     </svg>
                     <span class="text-sm font-medium text-gray-700">Filter:</span>
                     <span class="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">@filterLabel</span>
@@ -65,22 +69,27 @@
                         <button id="customRangeToggle" type="button"
                                 class="px-4 py-2 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 @(currentFilter == "custom" ? "bg-[#0B1E3D] text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200")">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
                             </svg>
                             Custom
                         </button>
-                        <div id="customRangeDropdown" class="hidden absolute right-0 top-full mt-2 bg-white rounded-xl border border-gray-200 shadow-lg p-4 z-50 w-72">
+                        <div id="customRangeDropdown"
+                             class="hidden absolute right-0 top-full mt-2 bg-white rounded-xl border border-gray-200 shadow-lg p-4 z-50 w-72">
                             <form asp-action="Dashboard" method="get" class="space-y-3">
                                 <input type="hidden" name="filter" value="custom" />
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
                                     <input type="date" name="startDate" value="@filterStart"
-                                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0B1E3D]/20 focus:border-[#0B1E3D] outline-none" required />
+                                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0B1E3D]/20 focus:border-[#0B1E3D] outline-none"
+                                           required />
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">End Date</label>
                                     <input type="date" name="endDate" value="@filterEnd"
-                                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0B1E3D]/20 focus:border-[#0B1E3D] outline-none" required />
+                                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0B1E3D]/20 focus:border-[#0B1E3D] outline-none"
+                                           required />
                                 </div>
                                 <button type="submit"
                                         class="w-full py-2 text-xs font-medium text-white bg-[#FF6B00] rounded-lg hover:bg-[#e55f00] transition-colors">
@@ -100,586 +109,681 @@
                 <div class="flex items-center justify-between mb-3">
                     <div class="bg-[#1E3A5F]/10 rounded-lg p-2.5">
                         <svg class="h-6 w-6 text-[#1E3A5F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                         </svg>
                     </div>
-                    <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">@ViewBag.AvailableVehicles available</span>
-                </div>
-                <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.TotalVehicles</h3>
-                <p class="text-sm font-medium text-gray-500 mb-1">Total Fleet</p>
-                <p class="text-xs text-gray-400 mt-2">₱@(((decimal)ViewBag.TotalFleetValue).ToString("N0")) book value</p>
-            </div>
-
-            <!-- Active Rentals -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="bg-[#FF6B00]/10 rounded-lg p-2.5">
-                        <svg class="h-6 w-6 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                    <span
+                        class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">@ViewBag.AvailableVehicles
+                        available</span>
                     </div>
-                    @if ((int)ViewBag.OverdueRentals > 0)
-                    {
-                        <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">@ViewBag.OverdueRentals overdue</span>
-                    }
-                    else
-                    {
-                        <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">On track</span>
-                    }
+                    <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.TotalVehicles</h3>
+                    <p class="text-sm font-medium text-gray-500 mb-1">Total Fleet</p>
+                    <p class="text-xs text-gray-400 mt-2">₱@(((decimal)ViewBag.TotalFleetValue).ToString("N0")) book value
+                    </p>
                 </div>
-                <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.ActiveRentals</h3>
-                <p class="text-sm font-medium text-gray-500 mb-1">Active Rentals</p>
-                <p class="text-xs text-gray-400 mt-2">@ViewBag.CompletedRentals completed (@filterLabel)</p>
-            </div>
 
-            <!-- Revenue -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="bg-green-100 rounded-lg p-2.5">
-                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full">@filterLabel</span>
-                </div>
-                <h3 class="text-2xl font-bold text-[#0B1E3D]">₱@(((decimal)ViewBag.PeriodRevenue).ToString("N0"))</h3>
-                <p class="text-sm font-medium text-gray-500 mb-1">Revenue</p>
-                <p class="text-xs text-gray-400 mt-2">₱@(((decimal)ViewBag.TotalRevenue).ToString("N0")) all-time</p>
-            </div>
-
-            <!-- Branches -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="bg-[#0B1E3D]/10 rounded-lg p-2.5">
-                        <svg class="h-6 w-6 text-[#0B1E3D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full">Active</span>
-                </div>
-                <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.TotalBranches</h3>
-                <p class="text-sm font-medium text-gray-500 mb-1">Branches</p>
-                <p class="text-xs text-gray-400 mt-2">@ViewBag.TotalContracts total contracts</p>
-            </div>
-        </div>
-
-        <!-- ═══ Secondary Metrics ═════════════════════════════════════════ -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                <p class="text-xs text-gray-500 mb-1">Rented</p>
-                <p class="text-lg font-bold text-[#0B1E3D]">@ViewBag.RentedVehicles</p>
-            </div>
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                <p class="text-xs text-gray-500 mb-1">Under Maintenance</p>
-                <p class="text-lg font-bold text-amber-600">@ViewBag.UnderMaintenance</p>
-            </div>
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                <p class="text-xs text-gray-500 mb-1">Payments Collected</p>
-                <p class="text-lg font-bold text-green-600">₱@(((decimal)ViewBag.TotalPaymentsCollected).ToString("N0"))</p>
-            </div>
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
-                <p class="text-xs text-gray-500 mb-1">Pending Payments</p>
-                <p class="text-lg font-bold text-red-500">₱@(((decimal)ViewBag.PendingPayments).ToString("N0"))</p>
-            </div>
-        </div>
-
-        <!-- ═══ Charts Row 1: Revenue Trend + Fleet Status ════════════════ -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Revenue Trend (Line Chart) -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 lg:col-span-2">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-[#0B1E3D]">Revenue Trend</h2>
-                    <span class="text-xs text-gray-400">@filterLabel</span>
-                </div>
-                <div class="relative" style="height: 280px;">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Fleet Status (Doughnut Chart) -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-[#0B1E3D]">Fleet Status</h2>
-                    <span class="text-xs text-gray-400">Current</span>
-                </div>
-                <div class="relative flex items-center justify-center" style="height: 220px;">
-                    <canvas id="fleetStatusChart"></canvas>
-                </div>
-                <div class="mt-4 grid grid-cols-2 gap-2">
-                    <div class="flex items-center text-xs">
-                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span>
-                        <span class="text-gray-600">Available <span class="font-semibold text-[#0B1E3D]">@ViewBag.AvailableVehicles</span></span>
-                    </div>
-                    <div class="flex items-center text-xs">
-                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 mr-2"></span>
-                        <span class="text-gray-600">Rented <span class="font-semibold text-[#0B1E3D]">@ViewBag.RentedVehicles</span></span>
-                    </div>
-                    <div class="flex items-center text-xs">
-                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-2"></span>
-                        <span class="text-gray-600">Maintenance <span class="font-semibold text-[#0B1E3D]">@ViewBag.UnderMaintenance</span></span>
-                    </div>
-                    <div class="flex items-center text-xs">
-                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
-                        <span class="text-gray-600">Out of Service <span class="font-semibold text-[#0B1E3D]">@ViewBag.OutOfService</span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ Charts Row 2: Rental Activity + Maintenance ═══════════════ -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Rental Activity (Bar Chart) -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-[#0B1E3D]">Rental Activity</h2>
-                    <span class="text-xs text-gray-400">@filterLabel</span>
-                </div>
-                <div class="relative" style="height: 280px;">
-                    <canvas id="rentalsChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Maintenance Overview -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-lg font-semibold text-[#0B1E3D]">Maintenance Overview</h2>
-                    <a asp-controller="Maintenance" asp-action="Jobs" class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
-                        View All →
-                    </a>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-amber-100 rounded-lg p-2">
-                                <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[#0B1E3D]">Pending Jobs</p>
-                                <p class="text-xs text-gray-500">Awaiting assignment</p>
-                            </div>
+                <!-- Active Rentals -->
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="bg-[#FF6B00]/10 rounded-lg p-2.5">
+                            <svg class="h-6 w-6 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
                         </div>
-                        <span class="text-xl font-bold text-amber-600">@ViewBag.PendingMaintenance</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-blue-100 rounded-lg p-2">
-                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[#0B1E3D]">In Progress</p>
-                                <p class="text-xs text-gray-500">Currently being repaired</p>
-                            </div>
-                        </div>
-                        <span class="text-xl font-bold text-blue-600">@ViewBag.InProgressMaintenance</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-green-100 rounded-lg p-2">
-                                <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[#0B1E3D]">Completed</p>
-                                <p class="text-xs text-gray-500">@filterLabel completed</p>
-                            </div>
-                        </div>
-                        <span class="text-xl font-bold text-green-600">@ViewBag.CompletedMaintenance</span>
-                    </div>
-                    <div class="pt-3 border-t border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-gray-500">Total Maintenance Cost (@filterLabel)</span>
-                            <span class="text-sm font-bold text-[#0B1E3D]">₱@(((decimal)ViewBag.TotalMaintenanceCost).ToString("N0"))</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ Branch Performance Table ══════════════════════════════════ -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="text-lg font-semibold text-[#0B1E3D]">Branch Performance</h2>
-                <a asp-controller="BranchManagement" asp-action="Index" class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
-                    Manage Branches →
-                </a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Branch</th>
-                            <th class="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">City</th>
-                            <th class="text-center py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Fleet Size</th>
-                            <th class="text-center py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Active Rentals</th>
-                            <th class="text-right py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Fleet Value</th>
-                            <th class="text-center py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">Utilization</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var branch in branchData)
+                        @if ((int)ViewBag.OverdueRentals > 0)
                         {
-                            var utilization = (int)branch.FleetSize > 0
-                                ? Math.Round((double)(int)branch.ActiveRentals / (int)branch.FleetSize * 100, 0)
-                                : 0;
-                            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                                <td class="py-3 px-4 font-medium text-[#0B1E3D]">@branch.Name</td>
-                                <td class="py-3 px-4 text-gray-600">@branch.City</td>
-                                <td class="py-3 px-4 text-center text-[#0B1E3D] font-medium">@branch.FleetSize</td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                                        @branch.ActiveRentals
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-right text-[#0B1E3D] font-medium">₱@(((decimal)branch.FleetValue).ToString("N0"))</td>
-                                <td class="py-3 px-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <div class="w-16 bg-gray-200 rounded-full h-1.5">
-                                            <div class="h-1.5 rounded-full @(utilization >= 70 ? "bg-green-500" : utilization >= 40 ? "bg-amber-500" : "bg-red-400")" style="width: @(utilization)%"></div>
+                            <span
+                                class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">@ViewBag.OverdueRentals
+                                overdue</span>
+                            }
+                    else
+                            {
+                                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">On track</span>
+                            }
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.ActiveRentals</h3>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Active Rentals</p>
+                        <p class="text-xs text-gray-400 mt-2">@ViewBag.CompletedRentals completed (@filterLabel)</p>
+                    </div>
+
+                    <!-- Revenue -->
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="bg-green-100 rounded-lg p-2.5">
+                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span
+                            class="text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full">@filterLabel</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#0B1E3D]">₱@(((decimal)ViewBag.PeriodRevenue).ToString("N0"))</h3>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Revenue</p>
+                        <p class="text-xs text-gray-400 mt-2">₱@(((decimal)ViewBag.TotalRevenue).ToString("N0")) all-time</p>
+                    </div>
+
+                    <!-- Branches -->
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="bg-[#0B1E3D]/10 rounded-lg p-2.5">
+                                <svg class="h-6 w-6 text-[#0B1E3D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span
+                            class="text-xs font-medium text-[#0B1E3D] bg-[#0B1E3D]/10 px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#0B1E3D]">@ViewBag.TotalBranches</h3>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Branches</p>
+                        <p class="text-xs text-gray-400 mt-2">@ViewBag.TotalContracts total contracts</p>
+                    </div>
+                </div>
+
+                <!-- ═══ Secondary Metrics ═════════════════════════════════════════ -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Rented</p>
+                        <p class="text-lg font-bold text-[#0B1E3D]">@ViewBag.RentedVehicles</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Under Maintenance</p>
+                        <p class="text-lg font-bold text-amber-600">@ViewBag.UnderMaintenance</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Payments Collected</p>
+                        <p class="text-lg font-bold text-green-600">₱@(((decimal)ViewBag.TotalPaymentsCollected).ToString("N0"))
+                        </p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+                        <p class="text-xs text-gray-500 mb-1">Pending Payments</p>
+                        <p class="text-lg font-bold text-red-500">₱@(((decimal)ViewBag.PendingPayments).ToString("N0"))</p>
+                    </div>
+                </div>
+
+                <!-- ═══ Charts Row 1: Revenue Trend + Fleet Status ════════════════ -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Revenue Trend (Line Chart) -->
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold text-[#0B1E3D]">Revenue Trend</h2>
+                            <span class="text-xs text-gray-400">@filterLabel</span>
+                        </div>
+                        <div class="relative" style="height: 280px;">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Fleet Status (Doughnut Chart) -->
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold text-[#0B1E3D]">Fleet Status</h2>
+                            <span class="text-xs text-gray-400">Current</span>
+                        </div>
+                        <div class="relative flex items-center justify-center" style="height: 220px;">
+                            <canvas id="fleetStatusChart"></canvas>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-2">
+                            <div class="flex items-center text-xs">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span>
+                                <span class="text-gray-600">Available <span
+                                    class="font-semibold text-[#0B1E3D]">@ViewBag.AvailableVehicles</span></span>
+                                </div>
+                                <div class="flex items-center text-xs">
+                                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 mr-2"></span>
+                                    <span class="text-gray-600">Rented <span
+                                        class="font-semibold text-[#0B1E3D]">@ViewBag.RentedVehicles</span></span>
+                                    </div>
+                                    <div class="flex items-center text-xs">
+                                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-2"></span>
+                                        <span class="text-gray-600">Maintenance <span
+                                            class="font-semibold text-[#0B1E3D]">@ViewBag.UnderMaintenance</span></span>
                                         </div>
-                                        <span class="text-xs font-medium text-gray-600">@(utilization)%</span>
+                                        <div class="flex items-center text-xs">
+                                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
+                                            <span class="text-gray-600">Out of Service <span
+                                                class="font-semibold text-[#0B1E3D]">@ViewBag.OutOfService</span></span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                </div>
 
-        <!-- ═══ Top Vehicles + Recent Activity ═══════════════════════════ -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-
-            <!-- Top Rented Vehicles -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-lg font-semibold text-[#0B1E3D]">Top Rented Vehicles</h2>
-                    <a asp-controller="RentalOperations" asp-action="Index" class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
-                        View All →
-                    </a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-100">
-                                <th class="text-left pb-3 font-medium text-gray-500 text-xs uppercase tracking-wider">Vehicle</th>
-                                <th class="text-center pb-3 font-medium text-gray-500 text-xs uppercase tracking-wider">Rentals</th>
-                                <th class="text-right pb-3 font-medium text-gray-500 text-xs uppercase tracking-wider">Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var topVehicles = ViewBag.TopVehicles as List<object> ?? new List<object>();
-                            }
-                            @foreach (dynamic tv in topVehicles)
-                            {
-                                <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                                    <td class="py-2.5 pr-3">
-                                        <p class="font-medium text-[#0B1E3D] text-sm">@tv.Vehicle.Make @tv.Vehicle.Model</p>
-                                        <p class="text-xs text-gray-400">@tv.Vehicle.Year &middot; @tv.Vehicle.PlateNumber</p>
-                                    </td>
-                                    <td class="py-2.5 text-center">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">@tv.RentalCount</span>
-                                    </td>
-                                    <td class="py-2.5 text-right font-medium text-[#0B1E3D]">₱@(((decimal)tv.Revenue).ToString("N0"))</td>
-                                </tr>
-                            }
-                            @if (!topVehicles.Any())
-                            {
-                                <tr>
-                                    <td colspan="3" class="py-6 text-center text-sm text-gray-400">No rental data available</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-lg font-semibold text-[#0B1E3D]">Recent Activity</h2>
-                    <a asp-controller="AuditLog" asp-action="Index" class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
-                        View All →
-                    </a>
-                </div>
-                <div class="space-y-3 max-h-[340px] overflow-y-auto pr-1">
-                    @foreach (var log in recentLogs)
-                    {
-                        <div class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="mt-0.5 flex-shrink-0">
-                                @if (log.Action.Contains("Create") || log.Action.Contains("Add") || log.Action.Contains("Register"))
-                                {
-                                    <div class="bg-green-100 rounded-full p-1.5">
-                                        <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                        </svg>
+                                <!-- ═══ Charts Row 2: Rental Activity + Maintenance ═══════════════ -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                                    <!-- Rental Activity (Bar Chart) -->
+                                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <h2 class="text-lg font-semibold text-[#0B1E3D]">Rental Activity</h2>
+                                            <span class="text-xs text-gray-400">@filterLabel</span>
+                                        </div>
+                                        <div class="relative" style="height: 280px;">
+                                            <canvas id="rentalsChart"></canvas>
+                                        </div>
                                     </div>
-                                }
-                                else if (log.Action.Contains("Update") || log.Action.Contains("Edit") || log.Action.Contains("Assign"))
-                                {
-                                    <div class="bg-blue-100 rounded-full p-1.5">
-                                        <svg class="h-3 w-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
+
+                                    <!-- Maintenance Overview -->
+                                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                                        <div class="flex items-center justify-between mb-5">
+                                            <h2 class="text-lg font-semibold text-[#0B1E3D]">Maintenance Overview</h2>
+                                            <a asp-controller="Maintenance" asp-action="Jobs"
+                                               class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
+                                                View All →
+                                            </a>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="bg-amber-100 rounded-lg p-2">
+                                                        <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor"
+                                                             viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-[#0B1E3D]">Pending Jobs</p>
+                                                        <p class="text-xs text-gray-500">Awaiting assignment</p>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xl font-bold text-amber-600">@ViewBag.PendingMaintenance</span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="bg-blue-100 rounded-lg p-2">
+                                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor"
+                                                             viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-[#0B1E3D]">In Progress</p>
+                                                        <p class="text-xs text-gray-500">Currently being repaired</p>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xl font-bold text-blue-600">@ViewBag.InProgressMaintenance</span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="bg-green-100 rounded-lg p-2">
+                                                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor"
+                                                             viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-[#0B1E3D]">Completed</p>
+                                                        <p class="text-xs text-gray-500">@filterLabel completed</p>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xl font-bold text-green-600">@ViewBag.CompletedMaintenance</span>
+                                            </div>
+                                            <div class="pt-3 border-t border-gray-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-xs text-gray-500">Total Maintenance Cost (@filterLabel)</span>
+                                                    <span
+                                                    class="text-sm font-bold text-[#0B1E3D]">₱@(((decimal)ViewBag.TotalMaintenanceCost).ToString("N0"))</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                }
-                                else if (log.Action.Contains("Delete") || log.Action.Contains("Remove"))
-                                {
-                                    <div class="bg-red-100 rounded-full p-1.5">
-                                        <svg class="h-3 w-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
+                                </div>
+
+                                <!-- ═══ Branch Performance Table ══════════════════════════════════ -->
+                                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
+                                    <div class="flex items-center justify-between mb-5">
+                                        <h2 class="text-lg font-semibold text-[#0B1E3D]">Branch Performance</h2>
+                                        <a asp-controller="BranchManagement" asp-action="Index"
+                                           class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
+                                            Manage Branches →
+                                        </a>
                                     </div>
-                                }
-                                else
-                                {
-                                    <div class="bg-gray-100 rounded-full p-1.5">
-                                        <svg class="h-3 w-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                }
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-[#0B1E3D] truncate">@log.Action</p>
-                                <p class="text-xs text-gray-500 truncate">@log.Module — @(log.UserEmail ?? "System")</p>
-                                <p class="text-xs text-gray-400 mt-0.5">@log.Timestamp.ToString("MMM dd, yyyy h:mm tt")</p>
-                            </div>
-                        </div>
-                    }
-                    @if (!recentLogs.Any())
-                    {
-                        <div class="text-center py-6">
-                            <p class="text-sm text-gray-400">No recent activity</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full text-sm">
+                                            <thead>
+                                                <tr class="border-b border-gray-100">
+                                                    <th class="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                        Branch</th>
+                                                        <th class="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                            City</th>
+                                                            <th
+                                                                class="text-center py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                Fleet Size</th>
+                                                                <th
+                                                                    class="text-center py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                    Active Rentals</th>
+                                                                    <th class="text-right py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                        Fleet Value</th>
+                                                                        <th
+                                                                            class="text-center py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                            Utilization</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach (var branch in branchData)
+                                                                        {
+                                                                            var utilization = (int)branch.FleetSize > 0
+                                                                                ? Math.Round((double)(int)branch.ActiveRentals / (int)branch.FleetSize * 100, 0)
+                                                                                : 0;
+                                                                            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                                                                <td class="py-3 px-4 font-medium text-[#0B1E3D]">@branch.Name</td>
+                                                                                <td class="py-3 px-4 text-gray-600">@branch.City</td>
+                                                                                <td class="py-3 px-4 text-center text-[#0B1E3D] font-medium">@branch.FleetSize</td>
+                                                                                <td class="py-3 px-4 text-center">
+                                                                                    <span
+                                                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                                                                                        @branch.ActiveRentals
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td class="py-3 px-4 text-right text-[#0B1E3D] font-medium">
+                                                                                    ₱@(((decimal)branch.FleetValue).ToString("N0"))</td>
+                                                                                    <td class="py-3 px-4">
+                                                                                        <div class="flex items-center justify-center space-x-2">
+                                                                                            <div class="w-16 bg-gray-200 rounded-full h-1.5">
+                                                                                                <div class="h-1.5 rounded-full @(utilization >= 70 ? "bg-green-500" : utilization >= 40 ? "bg-amber-500" : "bg-red-400")"
+                                                                                                     style="width: @(utilization)%"></div>
+                                                                                            </div>
+                                                                                            <span class="text-xs font-medium text-gray-600">@(utilization)%</span>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
 
-        <!-- ═══ Quick Actions ═════════════════════════════════════════════ -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
-            <h2 class="text-lg font-semibold text-[#0B1E3D] mb-4">Quick Actions</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a asp-controller="BusinessOwner" asp-action="FleetManagement" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                    <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                        <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Fleet</span>
-                </a>
-                <a asp-controller="BranchManagement" asp-action="Index" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                    <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                        <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Branches</span>
-                </a>
-                <a asp-controller="RentalOperations" asp-action="Index" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                    <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                        <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Rentals</span>
-                </a>
-                <a asp-controller="Maintenance" asp-action="Jobs" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                    <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                        <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Maintenance</span>
-                </a>
-                <a asp-controller="CategoryRates" asp-action="Index" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                    <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                        <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Rates</span>
-                </a>
-                <a asp-controller="AuditLog" asp-action="Index" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
-                    <div class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
-                        <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Audit Logs</span>
-                </a>
-            </div>
-        </div>
+                                                            <!-- ═══ Top Vehicles + Recent Activity ═══════════════════════════ -->
+                                                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-        <!-- Footer -->
-        <div class="text-center text-xs text-gray-400">
-            <p>Last updated: @DateTime.Now.ToString("MMMM dd, yyyy h:mm tt") &middot; DriveAway Rental System</p>
-        </div>
-    </div>
-</div>
+                                                                <!-- Top Rented Vehicles -->
+                                                                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                                                                    <div class="flex items-center justify-between mb-5">
+                                                                        <h2 class="text-lg font-semibold text-[#0B1E3D]">Top Rented Vehicles</h2>
+                                                                        <a asp-controller="RentalOperations" asp-action="Index"
+                                                                           class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
+                                                                            View All →
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="overflow-x-auto">
+                                                                        <table class="min-w-full text-sm">
+                                                                            <thead>
+                                                                                <tr class="border-b border-gray-100">
+                                                                                    <th class="text-left pb-3 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                                        Vehicle</th>
+                                                                                        <th class="text-center pb-3 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                                            Rentals</th>
+                                                                                            <th class="text-right pb-3 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                                                                                                Revenue</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            @{
+                                                                                                var topVehicles = ViewBag.TopVehicles as List<object> ?? new List<object>();
+                                                                                            }
+                                                                                            @foreach (dynamic tv in topVehicles)
+                                                                                            {
+                                                                                                <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                                                                                    <td class="py-2.5 pr-3">
+                                                                                                        <p class="font-medium text-[#0B1E3D] text-sm">@tv.Vehicle.Make @tv.Vehicle.Model</p>
+                                                                                                        <p class="text-xs text-gray-400">@tv.Vehicle.Year &middot; @tv.Vehicle.PlateNumber
+                                                                                                        </p>
+                                                                                                    </td>
+                                                                                                    <td class="py-2.5 text-center">
+                                                                                                        <span
+                                                                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">@tv.RentalCount</span>
+                                                                                                    </td>
+                                                                                                    <td class="py-2.5 text-right font-medium text-[#0B1E3D]">
+                                                                                                        ₱@(((decimal)tv.Revenue).ToString("N0"))</td>
+                                                                                                    </tr>
+                                                                                                }
+                                                                                                @if (!topVehicles.Any())
+                                                                                                {
+                                                                                                    <tr>
+                                                                                                        <td colspan="3" class="py-6 text-center text-sm text-gray-400">No rental data available
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                }
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </div>
+                                                                                </div>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <script>
-        // ─── Color Palette ─────────────────────────────────────
-        const navy   = '#0B1E3D';
-        const blue   = '#1E3A5F';
-        const orange = '#FF6B00';
+                                                                                <!-- Recent Activity -->
+                                                                                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                                                                                    <div class="flex items-center justify-between mb-5">
+                                                                                        <h2 class="text-lg font-semibold text-[#0B1E3D]">Recent Activity</h2>
+                                                                                        <a asp-controller="AuditLog" asp-action="Index"
+                                                                                           class="text-xs text-[#FF6B00] hover:text-[#0B1E3D] font-medium transition-colors">
+                                                                                            View All →
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div class="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+                                                                                        @foreach (var log in recentLogs)
+                                                                                        {
+                                                                                            <div class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+                                                                                                <div class="mt-0.5 flex-shrink-0">
+                                                                                                    @if (log.Action.Contains("Create") || log.Action.Contains("Add") ||
+                                                                                                log.Action.Contains("Register"))
+                                                                                                    {
+                                                                                                        <div class="bg-green-100 rounded-full p-1.5">
+                                                                                                            <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor"
+                                                                                                                 viewBox="0 0 24 24">
+                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                                      d="M12 4v16m8-8H4"></path>
+                                                                                                            </svg>
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                    else if (log.Action.Contains("Update") || log.Action.Contains("Edit") ||
+                                                                                                log.Action.Contains("Assign"))
+                                                                                                    {
+                                                                                                        <div class="bg-blue-100 rounded-full p-1.5">
+                                                                                                            <svg class="h-3 w-3 text-blue-600" fill="none" stroke="currentColor"
+                                                                                                                 viewBox="0 0 24 24">
+                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                                                                                </path>
+                                                                                                            </svg>
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                    else if (log.Action.Contains("Delete") || log.Action.Contains("Remove"))
+                                                                                                    {
+                                                                                                        <div class="bg-red-100 rounded-full p-1.5">
+                                                                                                            <svg class="h-3 w-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                                                                                </path>
+                                                                                                            </svg>
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        <div class="bg-gray-100 rounded-full p-1.5">
+                                                                                                            <svg class="h-3 w-3 text-gray-600" fill="none" stroke="currentColor"
+                                                                                                                 viewBox="0 0 24 24">
+                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                                                            </svg>
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                </div>
+                                                                                                <div class="flex-1 min-w-0">
+                                                                                                    <p class="text-sm font-medium text-[#0B1E3D] truncate">@log.Action</p>
+                                                                                                    <p class="text-xs text-gray-500 truncate">@log.Module — @(log.UserEmail ?? "System")</p>
+                                                                                                    <p class="text-xs text-gray-400 mt-0.5">@log.Timestamp.ToString("MMM dd, yyyy h:mm tt")</p>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        }
+                                                                                        @if (!recentLogs.Any())
+                                                                                        {
+                                                                                            <div class="text-center py-6">
+                                                                                                <p class="text-sm text-gray-400">No recent activity</p>
+                                                                                            </div>
+                                                                                        }
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
 
-        // ─── Revenue Trend (Line Chart) ────────────────────────
-        new Chart(document.getElementById('revenueChart'), {
-            type: 'line',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByPeriod.Select(r => ((dynamic)r).Label))),
-                datasets: [{
-                    label: 'Revenue (₱)',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByPeriod.Select(r => ((dynamic)r).Revenue))),
-                    borderColor: orange,
-                    backgroundColor: 'rgba(255, 107, 0, 0.1)',
-                    borderWidth: 2.5,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: orange,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: navy,
-                        titleFont: { size: 12 },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        cornerRadius: 8,
-                        callbacks: { label: ctx => '₱' + ctx.parsed.y.toLocaleString() }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: v => '₱' + (v >= 1000 ? (v / 1000).toFixed(0) + 'K' : v),
-                            font: { size: 11 },
-                            color: '#9CA3AF'
-                        },
-                        grid: { color: 'rgba(0,0,0,0.04)' }
-                    },
-                    x: {
-                        ticks: { font: { size: 11 }, color: '#9CA3AF' },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
+                                                                            <!-- ═══ Quick Actions ═════════════════════════════════════════════ -->
+                                                                            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
+                                                                                <h2 class="text-lg font-semibold text-[#0B1E3D] mb-4">Quick Actions</h2>
+                                                                                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                                                                    <a asp-controller="BusinessOwner" asp-action="FleetManagement"
+                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                        <div
+                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
+                                                                                                 viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Fleet</span>
+                                                                                    </a>
+                                                                                    <a asp-controller="BranchManagement" asp-action="Index"
+                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                        <div
+                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
+                                                                                                 viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <span
+                                                                                        class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Branches</span>
+                                                                                    </a>
+                                                                                    <a asp-controller="RentalOperations" asp-action="Index"
+                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                        <div
+                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
+                                                                                                 viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <span
+                                                                                        class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Rentals</span>
+                                                                                    </a>
+                                                                                    <a asp-controller="Maintenance" asp-action="Jobs"
+                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                        <div
+                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
+                                                                                                 viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                                                                                </path>
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <span
+                                                                                        class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Maintenance</span>
+                                                                                    </a>
+                                                                                    <a asp-controller="CategoryRates" asp-action="Index"
+                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                        <div
+                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
+                                                                                                 viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Rates</span>
+                                                                                    </a>
+                                                                                    <a asp-controller="AuditLog" asp-action="Index"
+                                                                                       class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-[#0B1E3D]/5 transition-colors group">
+                                                                                        <div
+                                                                                            class="h-10 w-10 bg-[#0B1E3D]/10 rounded-lg flex items-center justify-center mb-2 group-hover:bg-[#FF6B00]/10">
+                                                                                            <svg class="h-5 w-5 text-[#0B1E3D] group-hover:text-[#FF6B00]" fill="none" stroke="currentColor"
+                                                                                                 viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <span class="text-xs font-medium text-[#0B1E3D] group-hover:text-[#FF6B00] text-center">Audit
+                                                                                            Logs</span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </div>
 
-        // ─── Fleet Status (Doughnut Chart) ─────────────────────
-        new Chart(document.getElementById('fleetStatusChart'), {
-            type: 'doughnut',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusLabels)),
-                datasets: [{
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusCounts)),
-                    backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#6B7280'],
-                    borderWidth: 0,
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: navy,
-                        titleFont: { size: 12 },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        cornerRadius: 8
-                    }
-                }
-            }
-        });
+                                                                                <!-- Footer -->
+                                                                                <div class="text-center text-xs text-gray-400">
+                                                                                    <p>Last updated: @DateTime.Now.ToString("MMMM dd, yyyy h:mm tt") &middot; DriveAway Rental System</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
 
-        // ─── Rental Activity (Bar Chart) ───────────────────────
-        new Chart(document.getElementById('rentalsChart'), {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByPeriod.Select(r => ((dynamic)r).Label))),
-                datasets: [{
-                    label: 'Rentals',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByPeriod.Select(r => ((dynamic)r).Count))),
-                    backgroundColor: [
-                        'rgba(11, 30, 61, 0.8)',
-                        'rgba(30, 58, 95, 0.8)',
-                        'rgba(255, 107, 0, 0.8)',
-                        'rgba(11, 30, 61, 0.8)',
-                        'rgba(30, 58, 95, 0.8)',
-                        'rgba(255, 107, 0, 0.8)'
-                    ],
-                    borderRadius: 6,
-                    borderSkipped: false,
-                    maxBarThickness: 48
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: navy,
-                        titleFont: { size: 12 },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        cornerRadius: 8
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { font: { size: 11 }, color: '#9CA3AF', stepSize: 1 },
-                        grid: { color: 'rgba(0,0,0,0.04)' }
-                    },
-                    x: {
-                        ticks: { font: { size: 11 }, color: '#9CA3AF' },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
+                                                                        @section Scripts {
+                                                                            <!-- TODO: add SRI `integrity` value for Chart.js in production builds. -->
+                                                                            <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+                                                                            <script>
+                                                                                // ─── Color Palette ─────────────────────────────────────
+                                                                                const navy = '#0B1E3D';
+                                                                                const blue = '#1E3A5F';
+                                                                                const orange = '#FF6B00';
 
-        // ─── Custom Range Toggle ────────────────────────────────
-        const toggleBtn = document.getElementById('customRangeToggle');
-        const dropdown  = document.getElementById('customRangeDropdown');
-        if (toggleBtn && dropdown) {
-            toggleBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                dropdown.classList.toggle('hidden');
-            });
-            document.addEventListener('click', function (e) {
-                if (!dropdown.contains(e.target) && e.target !== toggleBtn) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-        }
+                                                                                // ─── Revenue Trend (Line Chart) ────────────────────────
+                                                                                new Chart(document.getElementById('revenueChart'), {
+                                                                                type: 'line',
+                                                                                data: {
+                                                                                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByPeriod.Select(r => ((dynamic)r).Label))),
+                                                                                datasets: [{
+                                                                                label: 'Revenue (₱)',
+                                                                                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revenueByPeriod.Select(r => ((dynamic)r).Revenue))),
+                                                                                borderColor: orange,
+                                                                                backgroundColor: 'rgba(255, 107, 0, 0.1)',
+                                                                                borderWidth: 2.5,
+                                                                                tension: 0.4,
+                                                                                fill: true,
+                                                                                pointBackgroundColor: orange,
+                                                                                pointBorderColor: '#fff',
+                                                                                pointBorderWidth: 2,
+                                                                                pointRadius: 5,
+                                                                                pointHoverRadius: 7
+                                                                                }]
+                                                                                },
+                                                                                options: {
+                                                                                responsive: true,
+                                                                                maintainAspectRatio: false,
+                                                                                plugins: {
+                                                                                legend: { display: false },
+                                                                                tooltip: {
+                                                                                backgroundColor: navy,
+                                                                                titleFont: { size: 12 },
+                                                                                bodyFont: { size: 12 },
+                                                                                padding: 10,
+                                                                                cornerRadius: 8,
+                                                                                callbacks: { label: ctx => '₱' + ctx.parsed.y.toLocaleString() }
+                                                                                }
+                                                                                },
+                                                                                scales: {
+                                                                                y: {
+                                                                                beginAtZero: true,
+                                                                                ticks: {
+                                                                                callback: v => '₱' + (v >= 1000 ? (v / 1000).toFixed(0) + 'K' : v),
+                                                                                font: { size: 11 },
+                                                                                color: '#9CA3AF'
+                                                                                },
+                                                                                grid: { color: 'rgba(0,0,0,0.04)' }
+                                                                                },
+                                                                                x: {
+                                                                                ticks: { font: { size: 11 }, color: '#9CA3AF' },
+                                                                                grid: { display: false }
+                                                                                }
+                                                                                }
+                                                                                }
+                                                                                });
 
-        @if (currentFilter == "custom")
-        {
-            <text>dropdown.classList.remove('hidden');</text>
-        }
-    </script>
-}
+                                                                                // ─── Fleet Status (Doughnut Chart) ─────────────────────
+                                                                                new Chart(document.getElementById('fleetStatusChart'), {
+                                                                                type: 'doughnut',
+                                                                                data: {
+                                                                                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusLabels)),
+                                                                                datasets: [{
+                                                                                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehicleStatusCounts)),
+                                                                                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#6B7280'],
+                                                                                borderWidth: 0,
+                                                                                hoverOffset: 6
+                                                                                }]
+                                                                                },
+                                                                                options: {
+                                                                                responsive: true,
+                                                                                maintainAspectRatio: false,
+                                                                                cutout: '65%',
+                                                                                plugins: {
+                                                                                legend: { display: false },
+                                                                                tooltip: {
+                                                                                backgroundColor: navy,
+                                                                                titleFont: { size: 12 },
+                                                                                bodyFont: { size: 12 },
+                                                                                padding: 10,
+                                                                                cornerRadius: 8
+                                                                                }
+                                                                                }
+                                                                                }
+                                                                                });
+
+                                                                                // ─── Rental Activity (Bar Chart) ───────────────────────
+                                                                                new Chart(document.getElementById('rentalsChart'), {
+                                                                                type: 'bar',
+                                                                                data: {
+                                                                                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByPeriod.Select(r => ((dynamic)r).Label))),
+                                                                                datasets: [{
+                                                                                label: 'Rentals',
+                                                                                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentalsByPeriod.Select(r => ((dynamic)r).Count))),
+                                                                                backgroundColor: [
+                                                                                'rgba(11, 30, 61, 0.8)',
+                                                                                'rgba(30, 58, 95, 0.8)',
+                                                                                'rgba(255, 107, 0, 0.8)',
+                                                                                'rgba(11, 30, 61, 0.8)',
+                                                                                'rgba(30, 58, 95, 0.8)',
+                                                                                'rgba(255, 107, 0, 0.8)'
+                                                                                ],
+                                                                                borderRadius: 6,
+                                                                                borderSkipped: false,
+                                                                                maxBarThickness: 48
+                                                                                }]
+                                                                                },
+                                                                                options: {
+                                                                                responsive: true,
+                                                                                maintainAspectRatio: false,
+                                                                                plugins: {
+                                                                                legend: { display: false },
+                                                                                tooltip: {
+                                                                                backgroundColor: navy,
+                                                                                titleFont: { size: 12 },
+                                                                                bodyFont: { size: 12 },
+                                                                                padding: 10,
+                                                                                cornerRadius: 8
+                                                                                }
+                                                                                },
+                                                                                scales: {
+                                                                                y: {
+                                                                                beginAtZero: true,
+                                                                                ticks: { font: { size: 11 }, color: '#9CA3AF', stepSize: 1 },
+                                                                                grid: { color: 'rgba(0,0,0,0.04)' }
+                                                                                },
+                                                                                x: {
+                                                                                ticks: { font: { size: 11 }, color: '#9CA3AF' },
+                                                                                grid: { display: false }
+                                                                                }
+                                                                                }
+                                                                                }
+                                                                                });
+
+                                                                                // ─── Custom Range Toggle ────────────────────────────────
+                                                                                const toggleBtn = document.getElementById('customRangeToggle');
+                                                                                const dropdown = document.getElementById('customRangeDropdown');
+                                                                                if (toggleBtn && dropdown) {
+                                                                                toggleBtn.addEventListener('click', function (e) {
+                                                                                e.stopPropagation();
+                                                                                dropdown.classList.toggle('hidden');
+                                                                                });
+                                                                                document.addEventListener('click', function (e) {
+                                                                                if (!dropdown.contains(e.target) && e.target !== toggleBtn) {
+                                                                                dropdown.classList.add('hidden');
+                                                                                }
+                                                                                });
+                                                                                }
+
+                                                                                @if (currentFilter == "custom")
+                                                                                {
+                                                                                    <text>dropdown.classList.remove('hidden');</text>
+                                                                                }
+                                                                            </script>
+                                                                        }
