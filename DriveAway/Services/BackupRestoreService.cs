@@ -260,9 +260,8 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
                 {
                     using (var createKeyCmd = conn.CreateCommand())
                     {
-                        // Secret is loaded from secure configuration at runtime
-                        // (environment variable, user-secrets, or Key Vault), not hard-coded.
-                        // Suppress CA2100 (reviewed) because we're parameterizing the value below.
+                        // The SQL keyword PASSWORD is required by SQL Server here.
+                        // The actual secret is supplied separately from secure configuration at runtime.
 #pragma warning disable CA2100
                         createKeyCmd.CommandText =
                             "CREATE MASTER KEY ENCRYPTION BY PASSWORD = @masterKeyPassword";

@@ -24,6 +24,9 @@ namespace DriveAway.Controllers
             DateTime? to,
             int page = 1)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             const int pageSize = 50;
 
             var query = _context.AuditLogs.AsQueryable();
@@ -53,22 +56,22 @@ namespace DriveAway.Controllers
 
             var today = DateTime.UtcNow.Date;
 
-            ViewBag.TotalAll     = await _context.AuditLogs.CountAsync();
-            ViewBag.TotalToday   = await _context.AuditLogs.CountAsync(l => l.Timestamp >= today);
-            ViewBag.TotalWeek    = await _context.AuditLogs.CountAsync(l => l.Timestamp >= today.AddDays(-7));
-            ViewBag.UniqueUsers  = await _context.AuditLogs.Select(l => l.UserEmail).Distinct().CountAsync();
+            ViewBag.TotalAll = await _context.AuditLogs.CountAsync();
+            ViewBag.TotalToday = await _context.AuditLogs.CountAsync(l => l.Timestamp >= today);
+            ViewBag.TotalWeek = await _context.AuditLogs.CountAsync(l => l.Timestamp >= today.AddDays(-7));
+            ViewBag.UniqueUsers = await _context.AuditLogs.Select(l => l.UserEmail).Distinct().CountAsync();
 
-            ViewBag.Modules      = await _context.AuditLogs.Select(l => l.Module).Distinct().OrderBy(m => m).ToListAsync();
-            ViewBag.Actions      = await _context.AuditLogs.Select(l => l.Action).Distinct().OrderBy(a => a).ToListAsync();
+            ViewBag.Modules = await _context.AuditLogs.Select(l => l.Module).Distinct().OrderBy(m => m).ToListAsync();
+            ViewBag.Actions = await _context.AuditLogs.Select(l => l.Action).Distinct().OrderBy(a => a).ToListAsync();
 
             ViewBag.FilterUserEmail = userEmail;
-            ViewBag.FilterModule    = module;
-            ViewBag.FilterAction    = auditAction;
-            ViewBag.FilterFrom      = from?.ToString("yyyy-MM-dd");
-            ViewBag.FilterTo        = to?.ToString("yyyy-MM-dd");
+            ViewBag.FilterModule = module;
+            ViewBag.FilterAction = auditAction;
+            ViewBag.FilterFrom = from?.ToString("yyyy-MM-dd");
+            ViewBag.FilterTo = to?.ToString("yyyy-MM-dd");
 
-            ViewBag.Page       = page;
-            ViewBag.PageSize   = pageSize;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
             ViewBag.TotalCount = totalCount;
             ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 

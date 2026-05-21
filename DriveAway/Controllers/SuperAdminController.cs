@@ -298,7 +298,7 @@ namespace DriveAway.Controllers
                 .Where(a => a.Action == "Database Restored")
                 .OrderByDescending(a => a.Timestamp)
                 .FirstOrDefaultAsync();
-            
+
             ViewBag.LastRestoredBackup = lastRestore?.EntityName;
 
             return View();
@@ -308,6 +308,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBackup()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var backup = await _backupService.CreateBackupAsync();
@@ -333,6 +336,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RestoreBackup(string fileName)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 await _backupService.RestoreAsync(fileName);
@@ -359,6 +365,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBackup(string fileName)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 await _backupService.DeleteBackupAsync(fileName);

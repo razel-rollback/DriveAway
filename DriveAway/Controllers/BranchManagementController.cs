@@ -79,6 +79,9 @@ namespace DriveAway.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Deactivate(int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var branch = await _context.Branches.FindAsync(id);
             if (branch != null)
             {
