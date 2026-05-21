@@ -30,7 +30,7 @@ namespace DriveAway.Controllers
         public async Task<IActionResult> Index()
         {
             var users = new List<IdentityUser>();
-            
+
             // Get the current user's branch (for admin filtering)
             var currentUser = await _userManager.GetUserAsync(User);
             var currentUserBranch = await _context.UserBranches
@@ -46,7 +46,7 @@ namespace DriveAway.Controllers
             {
                 // Business Owner sees Admin, Staff, and Mechanic. Also sees Business Owners (disabled actions).
                 var allUsers = await _userManager.Users.ToListAsync();
-                foreach(var u in allUsers)
+                foreach (var u in allUsers)
                 {
                     var roles = await _userManager.GetRolesAsync(u);
                     if (roles.Contains("Staff") || roles.Contains("Mechanic") || roles.Contains("Admin") || roles.Contains("Business Owner"))
@@ -62,7 +62,7 @@ namespace DriveAway.Controllers
             {
                 // Admin sees only Staff and Mechanics in their own branch, plus other Admins (disabled)
                 var allUsers = await _userManager.Users.ToListAsync();
-                foreach(var u in allUsers)
+                foreach (var u in allUsers)
                 {
                     var roles = await _userManager.GetRolesAsync(u);
                     if (roles.Contains("Staff") || roles.Contains("Mechanic"))
@@ -163,6 +163,8 @@ namespace DriveAway.Controllers
 
                 if (result.Succeeded)
                 {
+                    await _userManager.SetLockoutEnabledAsync(user, true);
+
                     if (!string.IsNullOrEmpty(model.SelectedRole))
                     {
                         await _userManager.AddToRoleAsync(user, model.SelectedRole);
@@ -275,7 +277,7 @@ namespace DriveAway.Controllers
             }
             else if (User.IsInRole("Business Owner"))
             {
-                if (userRoles.Contains("Business Owner")) 
+                if (userRoles.Contains("Business Owner"))
                 {
                     return Forbid(); // Business owner cannot edit themselves or other business owners here, only in profile.
                 }
@@ -325,15 +327,15 @@ namespace DriveAway.Controllers
                     var userRoles = await _userManager.GetRolesAsync(user);
                     if (!string.IsNullOrEmpty(model.SelectedRole))
                     {
-                         if (!userRoles.Contains(model.SelectedRole))
-                         {
-                             await _userManager.RemoveFromRolesAsync(user, userRoles);
-                             await _userManager.AddToRoleAsync(user, model.SelectedRole);
-                         }
+                        if (!userRoles.Contains(model.SelectedRole))
+                        {
+                            await _userManager.RemoveFromRolesAsync(user, userRoles);
+                            await _userManager.AddToRoleAsync(user, model.SelectedRole);
+                        }
                     }
-                    else if (userRoles.Any()) 
+                    else if (userRoles.Any())
                     {
-                         await _userManager.RemoveFromRolesAsync(user, userRoles);
+                        await _userManager.RemoveFromRolesAsync(user, userRoles);
                     }
 
                     // Update branch assignment
@@ -435,24 +437,24 @@ namespace DriveAway.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                 // Prevent deleting yourself? Optional but good practice.
-                 if (user.UserName == User.Identity.Name)
-                 {
-                     TempData["Error"] = "You cannot delete your own account.";
-                     return RedirectToAction("Index");
-                 }
+                // Prevent deleting yourself? Optional but good practice.
+                if (user.UserName == User.Identity.Name)
+                {
+                    TempData["Error"] = "You cannot delete your own account.";
+                    return RedirectToAction("Index");
+                }
 
-                 var userRoles = await _userManager.GetRolesAsync(user);
-                 if (User.IsInRole("Business Owner") && userRoles.Contains("Business Owner"))
-                 {
-                     TempData["Error"] = "You don't have permission to delete a Business Owner account.";
-                     return RedirectToAction("Index");
-                 }
-                 if (User.IsInRole("Admin") && (userRoles.Contains("Business Owner") || userRoles.Contains("Admin") || userRoles.Contains("Super Admin")))
-                 {
-                     TempData["Error"] = "You don't have permission to delete this account.";
-                     return RedirectToAction("Index");
-                 }
+                var userRoles = await _userManager.GetRolesAsync(user);
+                if (User.IsInRole("Business Owner") && userRoles.Contains("Business Owner"))
+                {
+                    TempData["Error"] = "You don't have permission to delete a Business Owner account.";
+                    return RedirectToAction("Index");
+                }
+                if (User.IsInRole("Admin") && (userRoles.Contains("Business Owner") || userRoles.Contains("Admin") || userRoles.Contains("Super Admin")))
+                {
+                    TempData["Error"] = "You don't have permission to delete this account.";
+                    return RedirectToAction("Index");
+                }
 
                 // Remove branch assignment first
                 var userBranch = await _context.UserBranches.FirstOrDefaultAsync(ub => ub.UserId == user.Id);
@@ -528,6 +530,144 @@ namespace DriveAway.Controllers
 
             TempData["Success"] = "User restored successfully!";
             return RedirectToAction("Index");
+        }
+
+        // ── Kill Switch ───────────────────────────────────────────
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Super Admin")]
+        public async Task<IActionResult> KillSwitch(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (user.UserName == User.Identity!.Name)
+            {
+                TempData["Error"] = "You cannot suspend your own account.";
+                return RedirectToAction("Index");
+            }
+
+            // Check if the account is already suspended (kill-switched)
+            bool isSuspended = user.LockoutEnabled
+                && user.LockoutEnd.HasValue
+                && user.LockoutEnd.Value.Year >= 9999;
+
+            if (isSuspended)
+            {
+                // Unsuspend — lift the kill switch
+                user.LockoutEnd = null;
+                await _userManager.UpdateAsync(user);
+
+                await _audit.LogAsync(AuditAction.Update, AuditModule.UserManagement, "User",
+                    user.Id, user.Email,
+                    "KILL SWITCH LIFTED: Account re-enabled by Super Admin.");
+
+                TempData["Success"] = $"Account for {user.Email} has been re-enabled.";
+            }
+            else
+            {
+                // Suspend instantly — set lockout to year 9999
+                user.LockoutEnabled = true;
+                user.LockoutEnd = new DateTimeOffset(9999, 12, 31, 23, 59, 59, TimeSpan.Zero);
+                await _userManager.UpdateAsync(user);
+
+                // Invalidate all existing sessions for this user
+                await _userManager.UpdateSecurityStampAsync(user);
+
+                await _audit.LogAsync(AuditAction.Update, AuditModule.UserManagement, "User",
+                    user.Id, user.Email,
+                    "KILL SWITCH ACTIVATED: Account instantly suspended by Super Admin. All sessions invalidated.");
+
+                TempData["Error"] = $"⚠️ Kill Switch activated: {user.Email} has been immediately suspended.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // ── Admin Password Reset ──────────────────────────────────
+        [HttpGet]
+        [Authorize(Roles = "Super Admin")]
+        public async Task<IActionResult> AdminResetPassword(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (user.UserName == User.Identity!.Name)
+            {
+                TempData["Error"] = "Use the standard profile page to change your own password.";
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.TargetEmail = user.Email;
+            ViewBag.TargetId = user.Id;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Super Admin")]
+        public async Task<IActionResult> AdminResetPassword(string id, string newPassword, string confirmPassword)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (user.UserName == User.Identity!.Name)
+            {
+                TempData["Error"] = "Use the standard profile page to change your own password.";
+                return RedirectToAction("Index");
+            }
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+            {
+                TempData["Error"] = "Password must be at least 6 characters.";
+                ViewBag.TargetEmail = user.Email;
+                ViewBag.TargetId = user.Id;
+                return View();
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                TempData["Error"] = "Passwords do not match.";
+                ViewBag.TargetEmail = user.Email;
+                ViewBag.TargetId = user.Id;
+                return View();
+            }
+
+            // Remove old password and set the new one
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            if (result.Succeeded)
+            {
+                // Invalidate all existing sessions
+                await _userManager.UpdateSecurityStampAsync(user);
+
+                await _audit.LogAsync(AuditAction.Update, AuditModule.UserManagement, "User",
+                    user.Id, user.Email,
+                    "Password forcefully reset by Super Admin. All sessions invalidated.");
+
+                // Optionally notify the user by email
+                try
+                {
+                    await _email.SendEmailAsync(user.Email!, "Your DriveAway Password Has Been Reset",
+                        $@"<h2>Password Reset Notice</h2>
+                           <p>Your account password has been reset by a Super Administrator.</p>
+                           <p>Please log in with your new password and change it immediately if you did not request this.</p>
+                           <p>If you believe this is unauthorised, contact your system administrator immediately.</p>");
+                }
+                catch { /* logged by SmtpEmailService */ }
+
+                TempData["Success"] = $"Password for {user.Email} has been reset successfully.";
+                return RedirectToAction("Index");
+            }
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
+
+            TempData["Error"] = string.Join(" ", result.Errors.Select(e => e.Description));
+            ViewBag.TargetEmail = user.Email;
+            ViewBag.TargetId = user.Id;
+            return View();
         }
 
         private async Task PopulateBranchesViewBag()

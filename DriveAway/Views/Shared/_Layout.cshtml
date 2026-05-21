@@ -60,6 +60,7 @@
                                                     <a asp-controller="BranchManagement" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Branch Management</a>
                                                     <a asp-controller="AuditLog" asp-action="Index" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Audit Log</a>
                                                     <a asp-controller="Admin" asp-action="Archive" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Archive</a>
+                                                    <a asp-controller="SuperAdmin" asp-action="BackupRestore" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#FF6B00] border-l-2 border-transparent hover:border-[#FF6B00] transition-colors">Backup & Restore</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -272,6 +273,7 @@
                                     <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="AuditLog" asp-action="Index">Audit Log</a>
                                     <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="CategoryRates" asp-action="Index">Category Management</a>
                                     <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="Admin" asp-action="Archive">Archive</a>
+                                    <a class="block pl-6 pr-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10" asp-controller="SuperAdmin" asp-action="BackupRestore">Backup & Restore</a>
                                 }
                                 else if (isAdmin || isBusinessOwner)
                                 {

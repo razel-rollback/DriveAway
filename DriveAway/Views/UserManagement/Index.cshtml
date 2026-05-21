@@ -108,12 +108,13 @@
                                 : User.IsInRole("Business Owner") && isBusinessOwnerUser
                                     ? "Business Owner account"
                                     : null;
+                            var isKillSwitched = !item.IsActive && !isSuperAdminUser;
 
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <tr class="hover:bg-gray-50 transition-colors duration-150 @(isKillSwitched ? "bg-red-50" : "")">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="h-8 w-8 rounded-full bg-[#1E3A5F]/10 flex items-center justify-center">
-                                            <span class="text-xs font-medium text-[#1E3A5F]">
+                                        <div class="h-8 w-8 rounded-full @(isKillSwitched ? "bg-red-100" : "bg-[#1E3A5F]/10") flex items-center justify-center">
+                                            <span class="text-xs font-medium @(isKillSwitched ? "text-red-600" : "text-[#1E3A5F]")">
                                                 @item.Email.Substring(0, 1).ToUpper()
                                             </span>
                                         </div>
@@ -124,6 +125,14 @@
                                                 <div class="mt-1">
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500">
                                                         @disabledReason
+                                                    </span>
+                                                </div>
+                                            }
+                                            @if (isKillSwitched)
+                                            {
+                                                <div class="mt-1">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700">
+                                                        ⚡ Kill Switch Active
                                                     </span>
                                                 </div>
                                             }
@@ -172,16 +181,23 @@
                                             Active
                                         </span>
                                     }
-                                    else
+                                    else if (isKillSwitched)
                                     {
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <svg class="h-2 w-2 mr-1 fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+                                            Suspended
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                                             <svg class="h-2 w-2 mr-1 fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
                                             Inactive
                                         </span>
                                     }
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end space-x-3">
+                                    <div class="flex items-center justify-end space-x-2 flex-wrap gap-y-1">
                                         @if (actionsDisabled)
                                         {
                                             <span class="text-gray-300 flex items-center" title="Actions disabled">
@@ -213,6 +229,35 @@
                                                     <span class="ml-1">Archive</span>
                                                 </button>
                                             </form>
+
+                                            @if (User.IsInRole("Super Admin"))
+                                            {
+                                                <!-- Kill Switch -->
+                                                <form asp-action="KillSwitch" asp-route-id="@item.Id" method="post" class="inline"
+                                                      onsubmit="return confirm('@(isKillSwitched ? "Lift the Kill Switch and re-enable this account?" : "⚡ ACTIVATE KILL SWITCH? This will IMMEDIATELY suspend this account and invalidate all active sessions.")');">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit"
+                                                            class="@(isKillSwitched ? "text-green-600 hover:text-green-800" : "text-red-500 hover:text-red-700") transition-colors duration-200 flex items-center"
+                                                            title="@(isKillSwitched ? "Lift Kill Switch" : "Activate Kill Switch")">
+                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                                        </svg>
+                                                        <span class="ml-1 text-xs font-semibold">@(isKillSwitched ? "Unsuspend" : "Kill")</span>
+                                                    </button>
+                                                </form>
+
+                                                <!-- Reset Password -->
+                                                <a asp-action="AdminResetPassword" asp-route-id="@item.Id"
+                                                   class="text-purple-600 hover:text-purple-800 transition-colors duration-200 flex items-center"
+                                                   title="Reset password">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                                    </svg>
+                                                    <span class="ml-1 text-xs font-semibold">Pwd Reset</span>
+                                                </a>
+                                            }
                                         }
                                     </div>
                                 </td>

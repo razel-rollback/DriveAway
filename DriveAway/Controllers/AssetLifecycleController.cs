@@ -583,15 +583,24 @@ namespace DriveAway.Controllers
         // ─── Image Helper ──────────────────────────────────────────────────
         private async Task<string> SaveVehicleImage(IFormFile file)
         {
+            // ── Security: Validate file size (max 5 MB) ──
+            const long maxFileSize = 5 * 1024 * 1024;
+            if (file.Length > maxFileSize)
+                throw new InvalidOperationException("Image file size must not exceed 5 MB.");
+
+            // ── Security: Validate file extension (whitelist) ──
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(ext))
+                throw new InvalidOperationException("Only .jpg, .jpeg, .png, and .webp image files are allowed.");
+
             if (string.IsNullOrEmpty(_env.WebRootPath))
             {
-                throw new  InvalidOperationException("WebRootPath is not configured. Ensure the wwwroot folder exists in your project.");
+                throw new InvalidOperationException("WebRootPath is not configured. Ensure the wwwroot folder exists in your project.");
             }
 
             var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "vehicles");
             Directory.CreateDirectory(uploadsDir);
-
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             var fileName = $"{Guid.NewGuid()}{ext}";
             var filePath = Path.Combine(uploadsDir, fileName);
 

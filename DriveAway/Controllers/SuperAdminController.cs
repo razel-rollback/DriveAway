@@ -1,5 +1,6 @@
 using DriveAway.Data;
 using DriveAway.Models;
+using DriveAway.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,17 +15,23 @@ namespace DriveAway.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IBackupRestoreService _backupService;
+        private readonly IAuditService _auditService;
 
         public SuperAdminController(
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            IBackupRestoreService backupService,
+            IAuditService auditService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
             _httpClientFactory = httpClientFactory;
+            _backupService = backupService;
+            _auditService = auditService;
         }
 
         public async Task<IActionResult> Dashboard(string filter = "month", DateTime? startDate = null, DateTime? endDate = null)
@@ -222,6 +229,8 @@ namespace DriveAway.Controllers
                 if (conn.State != System.Data.ConnectionState.Open)
                     await conn.OpenAsync();
                 using var cmd = conn.CreateCommand();
+                // SECURITY: Static query with zero user-supplied values — safe from SQL injection.
+                // If parameters are ever added, use cmd.Parameters.Add() instead of string concatenation.
                 cmd.CommandText = "SELECT COALESCE(SUM(size) * 8 / 1024, 0) FROM sys.database_files";
                 var result = await cmd.ExecuteScalarAsync();
                 if (result != null && result != DBNull.Value)
@@ -274,6 +283,121 @@ namespace DriveAway.Controllers
             {
                 return "Offline";
             }
+        }
+
+        // ── Backup & Restore ─────────────────────────────────────
+
+        public async Task<IActionResult> BackupRestore()
+        {
+            var backups = await _backupService.GetBackupsAsync();
+            ViewBag.Backups = backups;
+            ViewBag.DatabaseName = _backupService.GetDatabaseName();
+
+            // Find the most recent restore operation from the audit logs
+            var lastRestore = await _context.AuditLogs
+                .Where(a => a.Action == "Database Restored")
+                .OrderByDescending(a => a.Timestamp)
+                .FirstOrDefaultAsync();
+            
+            ViewBag.LastRestoredBackup = lastRestore?.EntityName;
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateBackup()
+        {
+            try
+            {
+                var backup = await _backupService.CreateBackupAsync();
+
+                await _auditService.LogAsync(
+                    action: "Database Backup Created",
+                    module: "System Administration",
+                    entityType: "DatabaseBackup",
+                    entityName: backup.FileName,
+                    details: $"Backup file created: {backup.FileName} ({FormatFileSize(backup.SizeBytes)})");
+
+                TempData["SuccessMessage"] = $"Backup created successfully: {backup.FileName} ({FormatFileSize(backup.SizeBytes)})";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Failed to create backup: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(BackupRestore));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestoreBackup(string fileName)
+        {
+            try
+            {
+                await _backupService.RestoreAsync(fileName);
+
+                // Log AFTER restore so it persists in the new database
+                await _auditService.LogAsync(
+                    action: "Database Restored",
+                    module: "System Administration",
+                    entityType: "DatabaseBackup",
+                    entityName: fileName,
+                    details: $"Database restored from backup: {fileName}");
+
+                TempData["SuccessMessage"] = $"Database restored successfully from: {fileName}";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Failed to restore database: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(BackupRestore));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteBackup(string fileName)
+        {
+            try
+            {
+                await _backupService.DeleteBackupAsync(fileName);
+
+                await _auditService.LogAsync(
+                    action: "Backup Deleted",
+                    module: "System Administration",
+                    entityType: "DatabaseBackup",
+                    entityName: fileName,
+                    details: $"Backup file deleted: {fileName}");
+
+                TempData["SuccessMessage"] = $"Backup deleted: {fileName}";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Failed to delete backup: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(BackupRestore));
+        }
+
+        public IActionResult DownloadBackup(string fileName)
+        {
+            var filePath = _backupService.GetBackupFilePath(fileName);
+            if (filePath == null)
+                return NotFound();
+
+            return PhysicalFile(filePath, "application/octet-stream", fileName);
+        }
+
+        private static string FormatFileSize(long bytes)
+        {
+            if (bytes >= 1_073_741_824)
+                return $"{bytes / 1_073_741_824.0:F2} GB";
+            if (bytes >= 1_048_576)
+                return $"{bytes / 1_048_576.0:F2} MB";
+            if (bytes >= 1_024)
+                return $"{bytes / 1_024.0:F2} KB";
+            return $"{bytes} bytes";
         }
     }
 }

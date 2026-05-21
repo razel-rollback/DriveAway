@@ -1,19 +1,24 @@
-﻿@page
+@page
 @model LoginModel
+@inject Microsoft.Extensions.Options.IOptions<DriveAway.Services.TurnstileOptions> TurnstileOptions
 
 @{
     ViewData["Title"] = "Log in";
 }
 
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background-color: #F8FAFC;">
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+     style="background-color: #F8FAFC;">
     <div class="max-w-md w-full">
         <!-- Login Card -->
         <div class="bg-white rounded-lg border border-gray-100 p-8">
             <!-- Header -->
             <div class="text-center mb-8">
-                <div class="mx-auto h-14 w-14 rounded-full flex items-center justify-center mb-4" style="background-color: #1E3A5F;">
+                <div class="mx-auto h-14 w-14 rounded-full flex items-center justify-center mb-4"
+                     style="background-color: #1E3A5F;">
                     <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                        </path>
                     </svg>
                 </div>
                 <h2 class="text-2xl font-semibold" style="color: #1E3A5F;">
@@ -26,7 +31,8 @@
 
             <!-- Login Form -->
             <form id="account" method="post" class="space-y-6">
-                <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded" role="alert"></div>
+                <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded" role="alert">
+                </div>
 
                 <!-- Email Input -->
                 <div>
@@ -35,9 +41,7 @@
                     </label>
                     <input asp-for="Input.Email"
                            class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
-                           style="border-color: #E2E8F0;"
-                           placeholder="your@email.com"
-                           autocomplete="username"
+                           style="border-color: #E2E8F0;" placeholder="your@email.com" autocomplete="username"
                            aria-required="true" />
                     <span asp-validation-for="Input.Email" class="text-xs text-red-600 mt-1 block"></span>
                 </div>
@@ -47,43 +51,53 @@
                     <label asp-for="Input.Password" class="block text-sm font-medium mb-1" style="color: #1E3A5F;">
                         Password
                     </label>
-                    <input asp-for="Input.Password"
-                           class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors"
-                           style="border-color: #E2E8F0;"
-                           placeholder="••••••••"
-                           autocomplete="current-password"
-                           aria-required="true" />
+                    <div class="relative">
+                        <input asp-for="Input.Password" id="password-input"
+                               class="block w-full px-4 py-2.5 border rounded-lg focus:ring-1 focus:ring-[#1E3A5F] focus:border-[#1E3A5F] transition-colors pr-10"
+                               style="border-color: #E2E8F0;" placeholder="••••••••" autocomplete="current-password"
+                               aria-required="true" />
+                        <button type="button" id="toggle-password"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-[#FF6B00] focus:outline-none focus:text-[#FF6B00]">
+                            <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg id="eye-slash-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                        </button>
+                    </div>
                     <span asp-validation-for="Input.Password" class="text-xs text-red-600 mt-1 block"></span>
                 </div>
 
                 <!-- Remember Me and Forgot Password on same line -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <input asp-for="Input.RememberMe"
-                               type="checkbox"
+                        <input asp-for="Input.RememberMe" type="checkbox"
                                class="h-4 w-4 rounded border-gray-300 focus:ring-1 focus:ring-[#1E3A5F]"
                                style="accent-color: #FF6B00;" />
                         <label asp-for="Input.RememberMe" class="ml-2 block text-sm" style="color: #475569;">
                             @Html.DisplayNameFor(m => m.Input.RememberMe)
                         </label>
                     </div>
-                    <a asp-page="./ForgotPassword"
-                       class="text-xs transition-colors"
-                       style="color: #1E3A5F;"
-                       onmouseover="this.style.color='#FF6B00'"
-                       onmouseout="this.style.color='#1E3A5F'">
+                    <a asp-page="./ForgotPassword" class="text-xs transition-colors" style="color: #1E3A5F;"
+                           onmouseover="this.style.color='#FF6B00'" onmouseout="this.style.color='#1E3A5F'">
                         Forgot password?
                     </a>
                 </div>
 
+                <!-- Turnstile Widget -->
+                <div class="cf-turnstile" data-sitekey="@TurnstileOptions.Value.SiteKey" data-theme="light"></div>
+
                 <!-- Submit Button -->
                 <div>
-                    <button id="login-submit"
-                            type="submit"
-                            class="w-full py-2.5 px-4 rounded-lg text-sm font-medium text-white transition-colors"
-                            style="background-color: #1E3A5F;"
-                            onmouseover="this.style.backgroundColor='#FF6B00'"
-                            onmouseout="this.style.backgroundColor='#1E3A5F'">
+                    <button id="login-submit" type="submit"
+                            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            style="background-color: #FF6B00; hover:bg-opacity-90;">
                         Sign In
                     </button>
                 </div>
@@ -94,4 +108,22 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script>
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password-input');
+            const eyeIcon = document.getElementById('eye-icon');
+            const eyeSlashIcon = document.getElementById('eye-slash-icon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.add('hidden');
+                eyeSlashIcon.classList.remove('hidden');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('hidden');
+                eyeSlashIcon.classList.add('hidden');
+            }
+        });
+    </script>
 }

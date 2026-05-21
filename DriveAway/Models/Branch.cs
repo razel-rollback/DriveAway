@@ -10,6 +10,7 @@ namespace DriveAway.Models
 
         [Required(ErrorMessage = "Branch Name is required.")]
         [StringLength(100, ErrorMessage = "Branch Name cannot exceed 100 characters.")]
+        [RegularExpression(@"^[\p{L}\p{M}\d\s.'\-&]+$", ErrorMessage = "Branch Name contains invalid characters.")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Address is required.")]
@@ -18,6 +19,7 @@ namespace DriveAway.Models
 
         [Required(ErrorMessage = "City is required.")]
         [StringLength(100)]
+        [RegularExpression(@"^[\p{L}\p{M}\s.'\-]+$", ErrorMessage = "City contains invalid characters.")]
         public string City { get; set; }
 
         [Required(ErrorMessage = "Contact Number is required.")]

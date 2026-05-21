@@ -1,4 +1,4 @@
-﻿@page
+@page
 @using Microsoft.AspNetCore.Http.Features
 @model TwoFactorAuthenticationModel
 @{
@@ -76,33 +76,16 @@
                         </div>
                     }
 
-                    <h4 class="text-base font-semibold mb-3" style="color: #1E3A5F;">Authenticator app</h4>
+                    <h4 class="text-base font-semibold mb-3" style="color: #1E3A5F;">Email Authentication</h4>
                     <div class="flex flex-wrap gap-3">
-                        @if (!Model.HasAuthenticator)
+                        @if (!Model.Is2faEnabled)
                         {
-                            <a id="enable-authenticator" asp-page="./EnableAuthenticator"
+                            <a id="enable-email-authenticator" asp-page="./EnableEmailAuthenticator"
                                class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
                                style="background-color: #1E3A5F;"
                                onmouseover="this.style.backgroundColor='#FF6B00'"
                                onmouseout="this.style.backgroundColor='#1E3A5F'">
-                                Add authenticator app
-                            </a>
-                        }
-                        else
-                        {
-                            <a id="enable-authenticator" asp-page="./EnableAuthenticator"
-                               class="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors inline-block"
-                               style="background-color: #1E3A5F;"
-                               onmouseover="this.style.backgroundColor='#FF6B00'"
-                               onmouseout="this.style.backgroundColor='#1E3A5F'">
-                                Set up authenticator app
-                            </a>
-                            <a id="reset-authenticator" asp-page="./ResetAuthenticator"
-                               class="px-5 py-2.5 rounded-lg text-sm font-medium border transition-colors inline-block"
-                               style="color: #1E3A5F; border-color: #E2E8F0;"
-                               onmouseover="this.style.backgroundColor='#F8FAFC'"
-                               onmouseout="this.style.backgroundColor='transparent'">
-                                Reset authenticator app
+                                Enable Email Authentication
                             </a>
                         }
                     </div>

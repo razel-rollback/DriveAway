@@ -20,11 +20,11 @@ namespace DriveAway.Data
 
             // --- Configuration ---
             string[] roles = { "Super Admin", "Business Owner", "Admin", "Staff", "Mechanic" };
-            
+
             // Super Admin credentials
             string superAdminEmail = "sadmin@gmail.com";
             string superAdminPassword = "Pass123.";
-            
+
             // Default Admin (admin Owner) credentials - for testing/demo
             string adminEmail = "admin@gmail.com";
             string adminPassword = "Pass123.";
@@ -57,6 +57,8 @@ namespace DriveAway.Data
 
                 if (createResult.Succeeded)
                 {
+                    await userManager.SetLockoutEnabledAsync(superAdminUser, true);
+
                     await userManager.AddToRoleAsync(superAdminUser, "Super Admin");
                 }
             }
@@ -75,6 +77,8 @@ namespace DriveAway.Data
 
                 if (createResult.Succeeded)
                 {
+                    await userManager.SetLockoutEnabledAsync(adminUser, true);
+
                     await userManager.AddToRoleAsync(adminUser, "Admin");
                 }
             }
@@ -93,6 +97,8 @@ namespace DriveAway.Data
 
                 if (createResult.Succeeded)
                 {
+                    await userManager.SetLockoutEnabledAsync(ownerUser, true);
+
                     await userManager.AddToRoleAsync(ownerUser, "Business Owner");
                 }
             }
@@ -102,15 +108,15 @@ namespace DriveAway.Data
             if (!await context.CategoryRates.AnyAsync())
             {
                 context.CategoryRates.AddRange(
-                    new CategoryRate { Category = "Economy",        DailyRate = 1500m , IsArchived = false},
-                    new CategoryRate { Category = "Compact",        DailyRate = 1800m , IsArchived = false},
-                    new CategoryRate { Category = "Intermediate",   DailyRate = 2200m , IsArchived = false},
-                    new CategoryRate { Category = "Standard",       DailyRate = 2500m , IsArchived = false},
-                    new CategoryRate { Category = "SUV/Crossover",  DailyRate = 3500m , IsArchived = false},
-                    new CategoryRate { Category = "Van/Minivan",    DailyRate = 3200m , IsArchived = false},
-                    new CategoryRate { Category = "Premium/Luxury", DailyRate = 5000m , IsArchived = false},
-                    new CategoryRate { Category = "Pickup",         DailyRate = 3000m , IsArchived = false},
-                    new CategoryRate { Category = "Other",          DailyRate = 2000m , IsArchived = false}
+                    new CategoryRate { Category = "Economy", DailyRate = 1500m, IsArchived = false },
+                    new CategoryRate { Category = "Compact", DailyRate = 1800m, IsArchived = false },
+                    new CategoryRate { Category = "Intermediate", DailyRate = 2200m, IsArchived = false },
+                    new CategoryRate { Category = "Standard", DailyRate = 2500m, IsArchived = false },
+                    new CategoryRate { Category = "SUV/Crossover", DailyRate = 3500m, IsArchived = false },
+                    new CategoryRate { Category = "Van/Minivan", DailyRate = 3200m, IsArchived = false },
+                    new CategoryRate { Category = "Premium/Luxury", DailyRate = 5000m, IsArchived = false },
+                    new CategoryRate { Category = "Pickup", DailyRate = 3000m, IsArchived = false },
+                    new CategoryRate { Category = "Other", DailyRate = 2000m, IsArchived = false }
                 );
                 await context.SaveChangesAsync();
             }

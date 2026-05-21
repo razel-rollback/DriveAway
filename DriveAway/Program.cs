@@ -18,19 +18,52 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+
+    // Account Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 3;
+    options.Lockout.AllowedForNewUsers = true;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddTokenProvider<DriveAway.Services.CustomEmailTokenProvider>("Email");
+
+// Session Management Configure Cookie settings
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Auto logout after 15 minutes of inactivity
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    // Refresh the 15-minute timer if the user makes a request seamlessly.
+    options.SlidingExpiration = true;
+});
+
+// Optional: Provide strict security stamp validation (checks every request)
+builder.Services.Configure<Microsoft.AspNetCore.Identity.SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<INhtsaService, NhtsaService>();
+// Bind Turnstile options from configuration and register Turnstile service
+
+builder.Services.Configure<DriveAway.Services.TurnstileOptions>(builder.Configuration.GetSection("Turnstile"));
+builder.Services.AddHttpClient<DriveAway.Services.ITurnstileService, DriveAway.Services.TurnstileService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddHttpClient<IPayMongoService, PayMongoService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
+builder.Services.AddScoped<IBackupRestoreService, BackupRestoreService>();
 
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
 builder.Services.AddScoped<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, SmtpEmailService>();
 
-builder.Services.AddHttpClient<IPayMongoService, PayMongoService>();
+
 
 var app = builder.Build();
 

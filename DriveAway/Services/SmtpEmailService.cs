@@ -11,6 +11,7 @@ namespace DriveAway.Services
 
         public SmtpEmailService(IConfiguration configuration, ILogger<SmtpEmailService> logger)
         {
+            // Securely binding configuration section to a typed object
             _settings = configuration.GetSection("Smtp").Get<SmtpSettings>()
                         ?? throw new InvalidOperationException("SMTP settings are not configured. Add an 'Smtp' section to appsettings.json.");
             _logger = logger;

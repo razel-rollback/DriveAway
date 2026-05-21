@@ -9,6 +9,7 @@ namespace DriveAway.Models
 
         [Required]
         [StringLength(50)]
+        [RegularExpression(@"^[\p{L}\p{M}\d\s.'\-/&]+$", ErrorMessage = "Category contains invalid characters.")]
         public string Category { get; set; } = string.Empty;
 
         [Required]

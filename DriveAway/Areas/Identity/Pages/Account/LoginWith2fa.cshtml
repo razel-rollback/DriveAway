@@ -1,0 +1,80 @@
+@page
+@model LoginWith2faModel
+@{
+    ViewData["Title"] = "Two-factor authentication";
+}
+
+<div class="flex items-center justify-center min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900" style="color: #1E3A5F;">
+                @ViewData["Title"]</h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Your login is protected with an email authenticator app. Enter the code sent to your email below.
+                </p>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <div class="mb-4 px-4 py-3 rounded-md bg-green-50 text-green-700 border border-green-200 text-sm text-center">
+                    @Model.StatusMessage
+                </div>
+            }
+
+            <form class="mt-8 space-y-6" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                <input asp-for="RememberMe" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div class="mb-4">
+                        <label asp-for="Input.TwoFactorCode" class="sr-only">Authenticator code</label>
+                        <input asp-for="Input.TwoFactorCode"
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                               autocomplete="off" placeholder="Code" />
+                        <span asp-validation-for="Input.TwoFactorCode" class="text-red-500 text-sm mt-1"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white transition-colors duration-200"
+                            style="background-color: #1E3A5F;" onmouseover="this.style.backgroundColor='#FF6B00'"
+                            onmouseout="this.style.backgroundColor='#1E3A5F'">
+                        Log in
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <form id="resendForm" method="post" asp-page-handler="Resend" asp-route-returnUrl="@Model.ReturnUrl">
+                    <input asp-for="RememberMe" type="hidden" />
+                    <button type="submit" id="resendBtn" disabled
+                            class="text-sm font-medium text-indigo-600 hover:text-indigo-500 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors">
+                        Resend Code (Wait <span id="timer">60</span>s)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var timeLeft = 60;
+                var timerElement = document.getElementById("timer");
+                var resendBtn = document.getElementById("resendBtn");
+
+                var countdown = setInterval(function () {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        resendBtn.disabled = false;
+                        resendBtn.innerHTML = "Resend Code";
+                    } else {
+                        if (timerElement) {
+                            timerElement.innerText = timeLeft;
+                        }
+                    }
+                }, 1000);
+            });
+        </script>
+    }

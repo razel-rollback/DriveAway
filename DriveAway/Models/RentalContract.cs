@@ -43,11 +43,13 @@ namespace DriveAway.Models
         [Required]
         [StringLength(100)]
         [Display(Name = "Customer Name")]
+        [RegularExpression(@"^[\p{L}\p{M}\s.'\-]+$", ErrorMessage = "Customer Name contains invalid characters.")]
         public string CustomerName { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
         [Display(Name = "Customer Contact")]
+        [RegularExpression(@"^[\d\s\+\-\(\)]+$", ErrorMessage = "Customer Contact contains invalid characters.")]
         public string CustomerContact { get; set; } = string.Empty;
 
         [Required]

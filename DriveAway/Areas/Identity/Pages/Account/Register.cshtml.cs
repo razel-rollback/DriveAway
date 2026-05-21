@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -29,13 +29,15 @@ namespace DriveAway.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly DriveAway.Services.ITurnstileService _turnstileService;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            DriveAway.Services.ITurnstileService turnstileService)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +45,7 @@ namespace DriveAway.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _turnstileService = turnstileService;
         }
 
         /// <summary>
@@ -112,6 +115,14 @@ namespace DriveAway.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                var turnstileToken = Request.Form["cf-turnstile-response"];
+                var isTurnstileValid = await _turnstileService.VerifyTokenAsync(turnstileToken);
+                if (!isTurnstileValid)
+                {
+                    ModelState.AddModelError(string.Empty, "Turnstile verification failed. Please try again.");
+                    return Page();
+                }
+
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -120,6 +131,8 @@ namespace DriveAway.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    await _userManager.SetLockoutEnabledAsync(user, true);
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
