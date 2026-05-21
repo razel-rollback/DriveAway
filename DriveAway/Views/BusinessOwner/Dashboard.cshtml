@@ -1,4 +1,19 @@
 @using DriveAway.Models
+@functions {
+    private static (string CardBg, string IconBg, string IconClass, string IconPath) GetActivityStyle(string action)
+    {
+        if (action.Contains("Create") || action.Contains("Add") || action.Contains("Register"))
+            return ("bg-green-100", "bg-green-100", "h-3 w-3 text-green-600", "M12 4v16m8-8H4");
+
+        if (action.Contains("Update") || action.Contains("Edit") || action.Contains("Assign"))
+            return ("bg-blue-100", "bg-blue-100", "h-3 w-3 text-blue-600", "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z");
+
+        if (action.Contains("Delete") || action.Contains("Remove"))
+            return ("bg-red-100", "bg-red-100", "h-3 w-3 text-red-600", "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16");
+
+        return ("bg-gray-100", "bg-gray-100", "h-3 w-3 text-gray-600", "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z");
+    }
+}
 @{
     ViewData["Title"] = "Business Owner Dashboard";
 
@@ -80,6 +95,13 @@
         new { Controller = "Maintenance", Action = "Jobs", Label = "Maintenance", IconPath = "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
         new { Controller = "CategoryRates", Action = "Index", Label = "Rates", IconPath = "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" },
         new { Controller = "AuditLog", Action = "Index", Label = "Audit Logs", IconPath = "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" }
+    };
+
+    var maintenanceCards = new List<dynamic>
+    {
+        new { Title = "Pending Jobs", Subtitle = "Awaiting assignment", ValueText = ViewBag.PendingMaintenance?.ToString() ?? "0", ValueClass = "text-xl font-bold text-amber-600", CardBg = "bg-amber-50", IconBg = "bg-amber-100", IconClass = "h-5 w-5 text-amber-600", IconPath = "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+        new { Title = "In Progress", Subtitle = "Currently being repaired", ValueText = ViewBag.InProgressMaintenance?.ToString() ?? "0", ValueClass = "text-xl font-bold text-blue-600", CardBg = "bg-blue-50", IconBg = "bg-blue-100", IconClass = "h-5 w-5 text-blue-600", IconPath = "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" },
+        new { Title = "Completed", Subtitle = $"{filterLabel} completed", ValueText = ViewBag.CompletedMaintenance?.ToString() ?? "0", ValueClass = "text-xl font-bold text-green-600", CardBg = "bg-green-50", IconBg = "bg-green-100", IconClass = "h-5 w-5 text-green-600", IconPath = "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }
     };
 }
 
@@ -271,55 +293,25 @@
                                             </a>
                                         </div>
                                         <div class="space-y-4">
-                                            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
-                                                <div class="flex items-center space-x-3">
-                                                    <div class="bg-amber-100 rounded-lg p-2">
-                                                        <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor"
-                                                             viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
+                                            @foreach (var item in maintenanceCards)
+                                            {
+                                                <div class="flex items-center justify-between p-3 @item.CardBg rounded-lg">
+                                                    <div class="flex items-center space-x-3">
+                                                        <div class="@item.IconBg rounded-lg p-2">
+                                                            <svg class="@item.IconClass" fill="none" stroke="currentColor"
+                                                                 viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                      d="@item.IconPath"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-medium text-[#0B1E3D]">@item.Title</p>
+                                                            <p class="text-xs text-gray-500">@item.Subtitle</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p class="text-sm font-medium text-[#0B1E3D]">Pending Jobs</p>
-                                                        <p class="text-xs text-gray-500">Awaiting assignment</p>
-                                                    </div>
+                                                    <span class="@item.ValueClass">@item.ValueText</span>
                                                 </div>
-                                                <span class="text-xl font-bold text-amber-600">@ViewBag.PendingMaintenance</span>
-                                            </div>
-                                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                                                <div class="flex items-center space-x-3">
-                                                    <div class="bg-blue-100 rounded-lg p-2">
-                                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor"
-                                                             viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                                            </path>
-                                                        </svg>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-medium text-[#0B1E3D]">In Progress</p>
-                                                        <p class="text-xs text-gray-500">Currently being repaired</p>
-                                                    </div>
-                                                </div>
-                                                <span class="text-xl font-bold text-blue-600">@ViewBag.InProgressMaintenance</span>
-                                            </div>
-                                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                                                <div class="flex items-center space-x-3">
-                                                    <div class="bg-green-100 rounded-lg p-2">
-                                                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor"
-                                                             viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-medium text-[#0B1E3D]">Completed</p>
-                                                        <p class="text-xs text-gray-500">@filterLabel completed</p>
-                                                    </div>
-                                                </div>
-                                                <span class="text-xl font-bold text-green-600">@ViewBag.CompletedMaintenance</span>
-                                            </div>
+                                            }
                                             <div class="pt-3 border-t border-gray-100">
                                                 <div class="flex items-center justify-between">
                                                     <span class="text-xs text-gray-500">Total Maintenance Cost (@filterLabel)</span>
@@ -465,49 +457,14 @@
                                                                                         {
                                                                                             <div class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
                                                                                                 <div class="mt-0.5 flex-shrink-0">
-                                                                                                    @if (log.Action.Contains("Create") || log.Action.Contains("Add") ||
-                                                                                                log.Action.Contains("Register"))
-                                                                                                    {
-                                                                                                        <div class="bg-green-100 rounded-full p-1.5">
-                                                                                                            <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor"
-                                                                                                                 viewBox="0 0 24 24">
-                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                                      d="M12 4v16m8-8H4"></path>
-                                                                                                            </svg>
-                                                                                                        </div>
-                                                                                                    }
-                                                                                                    else if (log.Action.Contains("Update") || log.Action.Contains("Edit") ||
-                                                                                                log.Action.Contains("Assign"))
-                                                                                                    {
-                                                                                                        <div class="bg-blue-100 rounded-full p-1.5">
-                                                                                                            <svg class="h-3 w-3 text-blue-600" fill="none" stroke="currentColor"
-                                                                                                                 viewBox="0 0 24 24">
-                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                                                                                </path>
-                                                                                                            </svg>
-                                                                                                        </div>
-                                                                                                    }
-                                                                                                    else if (log.Action.Contains("Delete") || log.Action.Contains("Remove"))
-                                                                                                    {
-                                                                                                        <div class="bg-red-100 rounded-full p-1.5">
-                                                                                                            <svg class="h-3 w-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                                                                                </path>
-                                                                                                            </svg>
-                                                                                                        </div>
-                                                                                                    }
-                                                                                                    else
-                                                                                                    {
-                                                                                                        <div class="bg-gray-100 rounded-full p-1.5">
-                                                                                                            <svg class="h-3 w-3 text-gray-600" fill="none" stroke="currentColor"
-                                                                                                                 viewBox="0 0 24 24">
-                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                                                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                                                                            </svg>
-                                                                                                        </div>
-                                                                                                    }
+                                                                                                    @{ var activityStyle = GetActivityStyle(log.Action); }
+                                                                                                    <div class="@activityStyle.IconBg rounded-full p-1.5">
+                                                                                                        <svg class="@activityStyle.IconClass" fill="none" stroke="currentColor"
+                                                                                                             viewBox="0 0 24 24">
+                                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                                  d="@activityStyle.IconPath"></path>
+                                                                                                        </svg>
+                                                                                                    </div>
                                                                                                 </div>
                                                                                                 <div class="flex-1 min-w-0">
                                                                                                     <p class="text-sm font-medium text-[#0B1E3D] truncate">@log.Action</p>

@@ -1,4 +1,15 @@
 @using DriveAway.Models
+@functions {
+    private static (string Badge, string Dot, string IconWrapper, string IconClass) GetStatusStyles(string status)
+    {
+        return status switch
+        {
+            "Online" => ("bg-green-100 text-green-700", "bg-green-500", "bg-green-100", "text-green-600"),
+            "Degraded" => ("bg-amber-100 text-amber-700", "bg-amber-500", "bg-amber-100", "text-amber-600"),
+            _ => ("bg-red-100 text-red-700", "bg-red-500", "bg-red-100", "text-red-600")
+        };
+    }
+}
 @{
     ViewData["Title"] = "Super Admin Dashboard";
 
@@ -73,24 +84,18 @@
     };
 
     var nhtsaStatus = ViewBag.NhtsaApiStatus as string ?? "Unknown";
-    var nhtsaBadge = nhtsaStatus == "Online" ? "bg-green-100 text-green-700" : nhtsaStatus == "Degraded" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
-    var nhtsaDot = nhtsaStatus == "Online" ? "bg-green-500" : nhtsaStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
-    var nhtsaIconWrapper = nhtsaStatus == "Online" ? "bg-green-100" : nhtsaStatus == "Degraded" ? "bg-amber-100" : "bg-red-100";
-    var nhtsaIconClass = nhtsaStatus == "Online" ? "text-green-600" : nhtsaStatus == "Degraded" ? "text-amber-600" : "text-red-600";
+    var nhtsaStyles = GetStatusStyles(nhtsaStatus);
 
     var pmStatus = ViewBag.PayMongoApiStatus as string ?? "Unknown";
-    var pmBadge = pmStatus == "Online" ? "bg-green-100 text-green-700" : pmStatus == "Degraded" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
-    var pmDot = pmStatus == "Online" ? "bg-green-500" : pmStatus == "Degraded" ? "bg-amber-500" : "bg-red-500";
-    var pmIconWrapper = pmStatus == "Online" ? "bg-green-100" : pmStatus == "Degraded" ? "bg-amber-100" : "bg-red-100";
-    var pmIconClass = pmStatus == "Online" ? "text-green-600" : pmStatus == "Degraded" ? "text-amber-600" : "text-red-600";
+    var pmStyles = GetStatusStyles(pmStatus);
 
     var healthCards = new List<dynamic>
     {
         new { Title = "Active Sessions", Subtitle = "Last 30 min", ValueText = ViewBag.ActiveSessions?.ToString() ?? "0", ValueClass = "text-lg font-bold text-[#0B1E3D]", BadgeText = "", BadgeClass = "", DotClass = "", IconWrapperClass = "bg-indigo-100 rounded-lg p-2 flex-shrink-0", IconClass = "h-5 w-5 text-indigo-600", IconPath = "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z", Kind = "metric" },
         new { Title = "Database Size", Subtitle = "SQL Server", ValueText = $"@ViewBag.DatabaseSizeMb MB", ValueClass = "text-lg font-bold text-[#0B1E3D]", BadgeText = "", BadgeClass = "", DotClass = "", IconWrapperClass = "bg-slate-100 rounded-lg p-2 flex-shrink-0", IconClass = "h-5 w-5 text-slate-600", IconPath = "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4", Kind = "metric" },
         new { Title = "Web Server", Subtitle = "Up @ViewBag.ServerUptime", ValueText = "Online", ValueClass = "", BadgeText = "Online", BadgeClass = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 mb-1", DotClass = "bg-green-500", IconWrapperClass = "bg-green-100 rounded-lg p-2 flex-shrink-0", IconClass = "h-5 w-5 text-green-600", IconPath = "M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01", Kind = "status" },
-        new { Title = "NHTSA API", Subtitle = "Vehicle data", ValueText = nhtsaStatus, ValueClass = "", BadgeText = nhtsaStatus, BadgeClass = nhtsaBadge, DotClass = nhtsaDot, IconWrapperClass = nhtsaIconWrapper, IconClass = nhtsaIconClass, IconPath = "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9", Kind = "status" },
-        new { Title = "PayMongo API", Subtitle = "Payment gateway", ValueText = pmStatus, ValueClass = "", BadgeText = pmStatus, BadgeClass = pmBadge, DotClass = pmDot, IconWrapperClass = pmIconWrapper, IconClass = pmIconClass, IconPath = "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z", Kind = "status" }
+        new { Title = "NHTSA API", Subtitle = "Vehicle data", ValueText = nhtsaStatus, ValueClass = "", BadgeText = nhtsaStatus, BadgeClass = nhtsaStyles.Badge, DotClass = nhtsaStyles.Dot, IconWrapperClass = nhtsaStyles.IconWrapper, IconClass = nhtsaStyles.IconClass, IconPath = "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9", Kind = "status" },
+        new { Title = "PayMongo API", Subtitle = "Payment gateway", ValueText = pmStatus, ValueClass = "", BadgeText = pmStatus, BadgeClass = pmStyles.Badge, DotClass = pmStyles.Dot, IconWrapperClass = pmStyles.IconWrapper, IconClass = pmStyles.IconClass, IconPath = "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z", Kind = "status" }
     };
 
     var userRoleBreakdown = new List<dynamic>
