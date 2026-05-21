@@ -248,7 +248,7 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
             using var conn = new SqlConnection(masterConnStr);
             await conn.OpenAsync();
 
-            var password = GetRequiredBackupSecret("Backup:MasterKeyPassword");
+            var masterKeySecret = GetRequiredBackupSecret("Backup:MasterKeyPassword");
 
             // 1. Check if database master key exists. If not, create it.
             var checkKeySql = "SELECT COUNT(*) FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##'";
@@ -260,12 +260,17 @@ EXEC sp_executesql @sql, N'@dbName sysname', @dbName = @dbName;";
                 {
                     using (var createKeyCmd = conn.CreateCommand())
                     {
-                        // NOTE: The password value is supplied from configuration at runtime via
-                        // `GetRequiredBackupSecret("Backup:MasterKeyPassword")`. This must not be
-                        // a hard-coded literal in source control — ensure secrets are stored in
-                        // user-secrets, environment variables, or a secret manager (Key Vault).
-                        createKeyCmd.CommandText = "CREATE MASTER KEY ENCRYPTION BY PASSWORD = @password";
-                        createKeyCmd.Parameters.Add(new SqlParameter("@password", password));
+                        // Secret is loaded from secure configuration at runtime
+                        // (environment variable, user-secrets, or Key Vault), not hard-coded.
+                        // Suppress CA2100 (reviewed) because we're parameterizing the value below.
+#pragma warning disable CA2100
+                        createKeyCmd.CommandText =
+                            "CREATE MASTER KEY ENCRYPTION BY PASSWORD = @masterKeyPassword";
+#pragma warning restore CA2100
+
+                        createKeyCmd.Parameters.Add(
+                            new SqlParameter("@masterKeyPassword", masterKeySecret));
+
                         await createKeyCmd.ExecuteNonQueryAsync();
                     }
                 }
